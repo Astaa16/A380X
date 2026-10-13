@@ -1,0 +1,4975 @@
+{
+  "template": "/Volumes/MacGames/A380X-XPlane12-git/open-source-747-reference/747-400.acf",
+  "replacement_count": 362,
+  "removed_template_object_attachments": true,
+  "removed_template_3d_panel": true,
+  "replacement_3d_panel": true,
+  "visible_objects": [
+    "objects/exterior/fuselage/a380x_accessories.obj",
+    "objects/exterior/fuselage/a380x_fuse1.obj",
+    "objects/exterior/fuselage/a380x_fuse2.obj",
+    "objects/exterior/fuselage/a380x_fuse3.obj",
+    "objects/exterior/fuselage/a380x_fuse4.obj",
+    "objects/exterior/fuselage/a380x_fuse5.obj",
+    "objects/exterior/fuselage/a380x_lg_bay.obj",
+    "objects/exterior/fuselage/a380x_lg_bay_main.obj",
+    "objects/exterior/fuselage/a380x_pax_windows.obj",
+    "objects/exterior/wings/a380x_eng_cores_lh.obj",
+    "objects/exterior/wings/a380x_eng_cores_rh.obj",
+    "objects/exterior/wings/a380x_eng_lh.obj",
+    "objects/exterior/wings/a380x_eng_rh.obj",
+    "objects/exterior/wings/a380x_fans.obj",
+    "objects/exterior/wings/a380x_pylons.obj",
+    "objects/exterior/wings/a380x_wing1.obj",
+    "objects/exterior/wings/a380x_wing1_2.obj",
+    "objects/exterior/wings/a380x_wing2.obj",
+    "objects/exterior/wings/a380x_wing2_2.obj",
+    "objects/exterior/wings/a380x_wingfence.obj",
+    "objects/exterior/gear-body-lh/gear_body_lh_a380_exterior_tyres.obj",
+    "objects/exterior/gear-body-lh/gear_body_lh_a380x_blg.obj",
+    "objects/exterior/gear-body-rh/gear_body_rh_a380_exterior_tyres.obj",
+    "objects/exterior/gear-body-rh/gear_body_rh_a380x_blg.obj",
+    "objects/exterior/gear-wing-lh/gear_wing_lh_a380_exterior_tyres.obj",
+    "objects/exterior/gear-wing-lh/gear_wing_lh_a380_exterior_wing1.obj",
+    "objects/exterior/gear-wing-lh/gear_wing_lh_a380x_wlg.obj",
+    "objects/exterior/gear-wing-rh/gear_wing_rh_a380_exterior_tyres.obj",
+    "objects/exterior/gear-wing-rh/gear_wing_rh_a380_exterior_wing2.obj",
+    "objects/exterior/gear-wing-rh/gear_wing_rh_a380x_wlg.obj",
+    "objects/exterior/gear-nose/gear_nose_a380_exterior_nlg.obj",
+    "objects/exterior/gear-nose/gear_nose_a380_exterior_tyres.obj",
+    "objects/exterior/gear-nose/gear_nose_a380x_accessories.obj",
+    "objects/exterior/gear-nose/gear_nose_a380x_lg_bay.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_aft_misc04_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_backwall_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_black_floor_panel_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_ceiling01_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_ceiling02_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_floor_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_misc02_no_emis.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_ovhd_screws_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_pedestal_misc01_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_rudder_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_sidewall_misc01_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_sidewalls_frontshield_4k.obj",
+    "objects/interior/cockpit/cockpit_a380_cockpit_windshield_frame_4k.obj",
+    "objects/interior/cockpit/cockpit_misc.obj",
+    "objects/interior/cabin/cabin_a380_cockpit_black_floor_panel_4k.obj",
+    "objects/interior/cabin/cabin_a380x_aft_stairs.obj",
+    "objects/interior/cabin/cabin_a380x_cabin_carpet_sewing.obj",
+    "objects/interior/cabin/cabin_a380x_cabin_floor.obj",
+    "objects/interior/cabin/cabin_a380x_cabin_ntf.obj",
+    "objects/interior/cabin/cabin_a380x_cabin_stairs_fwd.obj",
+    "objects/interior/cabin/cabin_a380x_fc_deck_sidwealls.obj",
+    "objects/interior/cabin/cabin_a380x_main_deck_assets.obj",
+    "objects/interior/cabin/cabin_a380x_main_deck_carpet.obj",
+    "objects/interior/cabin/cabin_a380x_main_deck_galley.obj",
+    "objects/interior/cabin/cabin_a380x_main_deck_pec_sidewalls.obj",
+    "objects/interior/cabin/cabin_a380x_main_deck_yc_sidewalls.obj",
+    "objects/interior/cabin/cabin_a380x_pax_doors.obj",
+    "objects/interior/cabin/cabin_a380x_upper_deck_door_surrounds.obj",
+    "objects/interior/cabin/cabin_a380x_upper_deck_floor.obj",
+    "objects/interior/cabin/cabin_a380x_upper_deck_galley.obj",
+    "objects/interior/cabin-seats/cabin_seats_a380x_bc_seats.obj",
+    "objects/interior/cabin-seats/cabin_seats_a380x_main_deck_cas_seats.obj",
+    "objects/interior/cabin-seats/cabin_seats_a380x_main_deck_pec_seats.obj",
+    "objects/interior/cabin-seats/cabin_seats_a380x_main_deck_yc_seat.obj",
+    "objects/interior/cabin-seats/cabin_seats_a380x_upper_deck_suites.obj",
+    "objects/interior/cabin-seats/cabin_seats_powered_off_screens.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_aft_misc01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_aft_misc02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_aft_misc03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_aft_misc05_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_fcu_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_glareshield_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_keyboard.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_keyboard2.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_leather01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_leather02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_leather03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip01_8k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip04_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip_knob01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_mip_knobs_02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_misc01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_misc02.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_misc03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_misc_stuff.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_ovhd01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_ovhd02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_ovhd_knobs_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_ovhd_knobs_emmis_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_ovhd_knobs_fire_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal04_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal_knobs01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal_knobs02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pedestal_screws_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_pushbuttons01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_seat_textile_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_seatbelt_textile_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_seats01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_seats02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_seats03_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_sideboards01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_sideboards02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_sidewall01_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_sidewall02_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_sidewall_isolations_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_cockpit_window_structure_4k.obj",
+    "objects/interior/cockpit-panels/panel_a380_mikes_cables_4k.obj",
+    "objects/interior/cockpit-panels/panel_rudder_cables_4k.obj",
+    "objects/interior/cockpit-panels/screen_powered_off_display_faces.obj",
+    "objects/interior/cockpit-panels/a380x_mfd_screens.obj",
+    "objects/interior/cockpit-controls/a380x_cockpit_controls.obj",
+    "objects/interior/cockpit-panels/decal_a380_cockpit_sticker_8k.obj",
+    "objects/interior/cockpit-panels/decal_a380_pushbutton_decal.obj",
+    "objects/interior/cockpit-panels/decal_a380x_cockpit_decal_emis.obj",
+    "objects/interior/cockpit-panels/decal_a380x_cockpit_decal_lovis.obj",
+    "objects/interior/cockpit-panels/decal_decal_black_noemis.obj",
+    "objects/interior/cockpit-panels/decal_new_decal_noemis.obj"
+  ],
+  "main_wing_area_m2": 841.7395024875,
+  "main_wing_span_m": 79.75092,
+  "status": "development-flight-model-not-flight-tested",
+  "fmod": {
+    "included": false,
+    "bank_files": []
+  },
+  "cockpit_controls": {
+    "included": true,
+    "object": "a380x_cockpit_controls.obj"
+  },
+  "native_3d_panel": {
+    "included": true,
+    "renderer": "a380x-fbw-avionics-v1",
+    "pfd_sides": [
+      "captain",
+      "first_officer"
+    ],
+    "nd_sides": [
+      "captain",
+      "first_officer"
+    ],
+    "efb_sides": [
+      "captain",
+      "first_officer"
+    ],
+    "mfd_sides": [
+      "captain",
+      "first_officer"
+    ],
+    "cockpit_devices": [
+      "a380x.xp12.mfd.captain",
+      "a380x.xp12.mfd.first_officer"
+    ],
+    "mfd_screens_object": "objects/interior/cockpit-panels/a380x_mfd_screens.obj",
+    "panel_size": [
+      2048,
+      2048
+    ],
+    "plugin_admin_name": "A380X FBW Avionics + flyPad",
+    "stock_xplane_efis_modes_consumed": false,
+    "raw_input_boundary": [
+      "sim/cockpit2/gauges/indicators/airspeed_kts_pilot",
+      "sim/cockpit2/gauges/indicators/airspeed_kts_copilot",
+      "sim/cockpit2/gauges/indicators/altitude_ft_pilot",
+      "sim/cockpit2/gauges/indicators/altitude_ft_copilot",
+      "sim/cockpit2/gauges/indicators/pitch_electric_deg_pilot",
+      "sim/cockpit2/gauges/indicators/pitch_electric_deg_copilot"
+    ],
+    "transitional_fcu_datarefs": [
+      "sim/cockpit2/autopilot/airspeed_dial_kts_mach[0]",
+      "sim/cockpit2/autopilot/heading_dial_deg_mag_pilot[0]",
+      "sim/cockpit2/autopilot/altitude_dial_ft[0]",
+      "sim/cockpit2/autopilot/vvi_dial_fpm[0]"
+    ]
+  },
+  "optional_lua": [
+    "A380X_XP12_FBW.lua"
+  ],
+  "avionics_provider": {
+    "format": 1,
+    "provider": "a380x-fbw-avionics-v1",
+    "source_revision": "2baa2b35eadaf4c78e172ce41bbe6b40b4aeafb2",
+    "display_targets": [
+      "captain_pfd",
+      "first_officer_pfd",
+      "captain_nd",
+      "first_officer_nd",
+      "ewd",
+      "captain_efb",
+      "first_officer_efb",
+      "fcu",
+      "captain_efis",
+      "first_officer_efis",
+      "captain_mfd",
+      "first_officer_mfd"
+    ],
+    "draw_target": "2048x2048 aircraft cockpit panel texture + two 768x1024 plugin cockpit devices",
+    "plugin_admin_name": "A380X FBW Avionics + flyPad",
+    "physical_touch_targets": 34,
+    "kccu_targets": 136,
+    "cockpit_devices": [
+      "a380x.xp12.mfd.captain",
+      "a380x.xp12.mfd.first_officer"
+    ],
+    "commands": [
+      "a380x/xp12/efb/page/dashboard",
+      "a380x/xp12/efb/page/dispatch",
+      "a380x/xp12/efb/page/ground",
+      "a380x/xp12/efb/page/performance",
+      "a380x/xp12/efb/page/navigation",
+      "a380x/xp12/efb/page/atc",
+      "a380x/xp12/efb/page/failures",
+      "a380x/xp12/efb/page/checklists",
+      "a380x/xp12/efb/page/presets",
+      "a380x/xp12/efb/page/settings",
+      "a380x/xp12/efb/action_1",
+      "a380x/xp12/efb/action_2",
+      "a380x/xp12/efb/action_3",
+      "a380x/xp12/efb/action_4",
+      "a380x/xp12/efb/action_5",
+      "a380x/xp12/efb/action_6",
+      "a380x/xp12/efb/power",
+      "a380x/xp12/efb/toggle",
+      "a380x/xp12/efb/next_page",
+      "a380x/xp12/efb/window_toggle",
+      "a380x/xp12/efb/window_open",
+      "a380x/xp12/efb/window_close",
+      "a380x/xp12/fcu/speed_up",
+      "a380x/xp12/fcu/speed_down",
+      "a380x/xp12/fcu/speed_push",
+      "a380x/xp12/fcu/speed_pull",
+      "a380x/xp12/fcu/heading_up",
+      "a380x/xp12/fcu/heading_down",
+      "a380x/xp12/fcu/heading_push",
+      "a380x/xp12/fcu/heading_pull",
+      "a380x/xp12/fcu/altitude_up",
+      "a380x/xp12/fcu/altitude_down",
+      "a380x/xp12/fcu/altitude_push",
+      "a380x/xp12/fcu/altitude_pull",
+      "a380x/xp12/fcu/vertical_speed_up",
+      "a380x/xp12/fcu/vertical_speed_down",
+      "a380x/xp12/fcu/vertical_speed_push",
+      "a380x/xp12/fcu/vertical_speed_pull",
+      "a380x/xp12/fcu/altitude_step_toggle",
+      "a380x/xp12/fcu/ap1_toggle",
+      "a380x/xp12/fcu/ap2_toggle",
+      "a380x/xp12/fcu/fd_toggle",
+      "a380x/xp12/fcu/athr_toggle",
+      "a380x/xp12/fcu/speed_mach_toggle",
+      "a380x/xp12/fcu/trk_fpa_toggle",
+      "a380x/xp12/fcu/altitude_hold",
+      "a380x/xp12/fcu/loc_toggle",
+      "a380x/xp12/fcu/approach_toggle",
+      "a380x/xp12/fcu/ap_disconnect",
+      "a380x/xp12/fcu/athr_disconnect",
+      "a380x/xp12/fcu/true_mag_toggle",
+      "a380x/xp12/fcu/metric_toggle",
+      "a380x/xp12/fcu/ls_captain_toggle",
+      "a380x/xp12/fcu/ls_first_officer_toggle",
+      "a380x/xp12/efis/captain/cstr_toggle",
+      "a380x/xp12/efis/captain/wpt_toggle",
+      "a380x/xp12/efis/captain/vord_toggle",
+      "a380x/xp12/efis/captain/ndb_toggle",
+      "a380x/xp12/efis/captain/arpt_toggle",
+      "a380x/xp12/efis/captain/vor1_toggle",
+      "a380x/xp12/efis/captain/vor2_toggle",
+      "a380x/xp12/efis/captain/terr_toggle",
+      "a380x/xp12/efis/captain/traf_toggle",
+      "a380x/xp12/efis/captain/wx_toggle",
+      "a380x/xp12/efis/captain/taxi_toggle",
+      "a380x/xp12/efis/captain/ls_toggle",
+      "a380x/xp12/efis/captain/vv_toggle",
+      "a380x/xp12/efis/captain/mode_up",
+      "a380x/xp12/efis/captain/mode_down",
+      "a380x/xp12/efis/captain/range_up",
+      "a380x/xp12/efis/captain/range_down",
+      "a380x/xp12/efis/captain/baro_up",
+      "a380x/xp12/efis/captain/baro_down",
+      "a380x/xp12/efis/captain/baro_std",
+      "a380x/xp12/efis/captain/baro_qnh",
+      "a380x/xp12/efis/captain/baro_unit_toggle",
+      "a380x/xp12/efis/captain/plan_next",
+      "a380x/xp12/efis/captain/plan_previous",
+      "a380x/xp12/efis/first_officer/cstr_toggle",
+      "a380x/xp12/efis/first_officer/wpt_toggle",
+      "a380x/xp12/efis/first_officer/vord_toggle",
+      "a380x/xp12/efis/first_officer/ndb_toggle",
+      "a380x/xp12/efis/first_officer/arpt_toggle",
+      "a380x/xp12/efis/first_officer/vor1_toggle",
+      "a380x/xp12/efis/first_officer/vor2_toggle",
+      "a380x/xp12/efis/first_officer/terr_toggle",
+      "a380x/xp12/efis/first_officer/traf_toggle",
+      "a380x/xp12/efis/first_officer/wx_toggle",
+      "a380x/xp12/efis/first_officer/taxi_toggle",
+      "a380x/xp12/efis/first_officer/ls_toggle",
+      "a380x/xp12/efis/first_officer/vv_toggle",
+      "a380x/xp12/efis/first_officer/mode_up",
+      "a380x/xp12/efis/first_officer/mode_down",
+      "a380x/xp12/efis/first_officer/range_up",
+      "a380x/xp12/efis/first_officer/range_down",
+      "a380x/xp12/efis/first_officer/baro_up",
+      "a380x/xp12/efis/first_officer/baro_down",
+      "a380x/xp12/efis/first_officer/baro_std",
+      "a380x/xp12/efis/first_officer/baro_qnh",
+      "a380x/xp12/efis/first_officer/baro_unit_toggle",
+      "a380x/xp12/efis/first_officer/plan_next",
+      "a380x/xp12/efis/first_officer/plan_previous",
+      "a380x/xp12/lighting/captain_flood_up",
+      "a380x/xp12/lighting/captain_flood_down",
+      "a380x/xp12/lighting/integral_up",
+      "a380x/xp12/lighting/integral_down",
+      "a380x/xp12/lighting/lcd_up",
+      "a380x/xp12/lighting/lcd_down",
+      "a380x/xp12/lighting/first_officer_flood_up",
+      "a380x/xp12/lighting/first_officer_flood_down",
+      "a380x/xp12/du/captain_pfd_up",
+      "a380x/xp12/du/captain_pfd_down",
+      "a380x/xp12/du/captain_nd_up",
+      "a380x/xp12/du/captain_nd_down",
+      "a380x/xp12/du/captain_wx_terr_up",
+      "a380x/xp12/du/captain_wx_terr_down",
+      "a380x/xp12/du/captain_mfd_up",
+      "a380x/xp12/du/captain_mfd_down",
+      "a380x/xp12/du/first_officer_pfd_up",
+      "a380x/xp12/du/first_officer_pfd_down",
+      "a380x/xp12/du/first_officer_nd_up",
+      "a380x/xp12/du/first_officer_nd_down",
+      "a380x/xp12/du/first_officer_wx_terr_up",
+      "a380x/xp12/du/first_officer_wx_terr_down",
+      "a380x/xp12/du/first_officer_mfd_up",
+      "a380x/xp12/du/first_officer_mfd_down",
+      "a380x/xp12/glareshield/chrono_left",
+      "a380x/xp12/glareshield/chrono_right",
+      "a380x/xp12/glareshield/takeover_left",
+      "a380x/xp12/glareshield/takeover_right",
+      "a380x/xp12/glareshield/master_warning_left",
+      "a380x/xp12/glareshield/master_warning_right",
+      "a380x/xp12/glareshield/master_caution_left",
+      "a380x/xp12/glareshield/master_caution_right",
+      "a380x/xp12/glareshield/atc_ack_left",
+      "a380x/xp12/glareshield/atc_ack_right",
+      "a380x/xp12/glareshield/atc_receive_normal",
+      "a380x/xp12/glareshield/atc_receive_urgent",
+      "a380x/xp12/glareshield/volume_left_up",
+      "a380x/xp12/glareshield/volume_left_down",
+      "a380x/xp12/glareshield/volume_right_up",
+      "a380x/xp12/glareshield/volume_right_down",
+      "a380x/xp12/glareshield/ptt_left",
+      "a380x/xp12/glareshield/ptt_right",
+      "a380x/xp12/clock/mode_up",
+      "a380x/xp12/clock/mode_down",
+      "a380x/xp12/clock/et_up",
+      "a380x/xp12/clock/et_down",
+      "a380x/xp12/clock/chr_toggle",
+      "a380x/xp12/clock/chr_reset",
+      "a380x/xp12/clock/date",
+      "a380x/xp12/clock/set_field_next",
+      "a380x/xp12/clock/set_up",
+      "a380x/xp12/clock/set_down",
+      "a380x/xp12/center_right/gear_toggle",
+      "a380x/xp12/center_right/autobrake_up",
+      "a380x/xp12/center_right/autobrake_down",
+      "a380x/xp12/center_right/rto_toggle",
+      "a380x/xp12/center_right/antiskid_toggle",
+      "a380x/xp12/center_right/accus_reinflate",
+      "a380x/xp12/cockpit_door/unlock",
+      "a380x/xp12/cockpit_door/lock",
+      "a380x/xp12/adirs/window_toggle",
+      "a380x/xp12/adirs/align_now",
+      "a380x/xp12/adirs/captain_ir_toggle",
+      "a380x/xp12/adirs/captain_adr_toggle",
+      "a380x/xp12/adirs/first_officer_ir_toggle",
+      "a380x/xp12/adirs/first_officer_adr_toggle",
+      "a380x/xp12/adirs/ir1_mode_up",
+      "a380x/xp12/adirs/ir1_mode_down",
+      "a380x/xp12/adirs/ir1_toggle",
+      "a380x/xp12/adirs/adr1_toggle",
+      "a380x/xp12/adirs/ir2_mode_up",
+      "a380x/xp12/adirs/ir2_mode_down",
+      "a380x/xp12/adirs/ir2_toggle",
+      "a380x/xp12/adirs/adr2_toggle",
+      "a380x/xp12/adirs/ir3_mode_up",
+      "a380x/xp12/adirs/ir3_mode_down",
+      "a380x/xp12/adirs/ir3_toggle",
+      "a380x/xp12/adirs/adr3_toggle",
+      "a380x/xp12/kccu/captain/a",
+      "a380x/xp12/kccu/captain/b",
+      "a380x/xp12/kccu/captain/c",
+      "a380x/xp12/kccu/captain/d",
+      "a380x/xp12/kccu/captain/e",
+      "a380x/xp12/kccu/captain/f",
+      "a380x/xp12/kccu/captain/g",
+      "a380x/xp12/kccu/captain/h",
+      "a380x/xp12/kccu/captain/i",
+      "a380x/xp12/kccu/captain/j",
+      "a380x/xp12/kccu/captain/k",
+      "a380x/xp12/kccu/captain/l",
+      "a380x/xp12/kccu/captain/m",
+      "a380x/xp12/kccu/captain/n",
+      "a380x/xp12/kccu/captain/o",
+      "a380x/xp12/kccu/captain/p",
+      "a380x/xp12/kccu/captain/q",
+      "a380x/xp12/kccu/captain/r",
+      "a380x/xp12/kccu/captain/s",
+      "a380x/xp12/kccu/captain/t",
+      "a380x/xp12/kccu/captain/u",
+      "a380x/xp12/kccu/captain/v",
+      "a380x/xp12/kccu/captain/w",
+      "a380x/xp12/kccu/captain/x",
+      "a380x/xp12/kccu/captain/y",
+      "a380x/xp12/kccu/captain/z",
+      "a380x/xp12/kccu/captain/0",
+      "a380x/xp12/kccu/captain/1",
+      "a380x/xp12/kccu/captain/2",
+      "a380x/xp12/kccu/captain/3",
+      "a380x/xp12/kccu/captain/4",
+      "a380x/xp12/kccu/captain/5",
+      "a380x/xp12/kccu/captain/6",
+      "a380x/xp12/kccu/captain/7",
+      "a380x/xp12/kccu/captain/8",
+      "a380x/xp12/kccu/captain/9",
+      "a380x/xp12/kccu/captain/dot",
+      "a380x/xp12/kccu/captain/plusminus",
+      "a380x/xp12/kccu/captain/ent",
+      "a380x/xp12/kccu/captain/backspace",
+      "a380x/xp12/kccu/captain/sp",
+      "a380x/xp12/kccu/captain/slash",
+      "a380x/xp12/kccu/captain/esc",
+      "a380x/xp12/kccu/captain/esc2",
+      "a380x/xp12/kccu/captain/up",
+      "a380x/xp12/kccu/captain/down",
+      "a380x/xp12/kccu/captain/left",
+      "a380x/xp12/kccu/captain/right",
+      "a380x/xp12/kccu/captain/dir",
+      "a380x/xp12/kccu/captain/perf",
+      "a380x/xp12/kccu/captain/init",
+      "a380x/xp12/kccu/captain/navaid",
+      "a380x/xp12/kccu/captain/mailbox",
+      "a380x/xp12/kccu/captain/fpln",
+      "a380x/xp12/kccu/captain/dest",
+      "a380x/xp12/kccu/captain/secindex",
+      "a380x/xp12/kccu/captain/surv",
+      "a380x/xp12/kccu/captain/atccom",
+      "a380x/xp12/kccu/captain/nd",
+      "a380x/xp12/kccu/captain/kbd",
+      "a380x/xp12/kccu/captain/clrinfo",
+      "a380x/xp12/kccu/captain/rewind",
+      "a380x/xp12/kccu/captain/forward",
+      "a380x/xp12/kccu/captain/wheel_up",
+      "a380x/xp12/kccu/captain/wheel_down",
+      "a380x/xp12/kccu/captain/click",
+      "a380x/xp12/kccu/captain/kbd_switch_toggle",
+      "a380x/xp12/kccu/captain/ccd_switch_toggle",
+      "a380x/xp12/kccu/first_officer/a",
+      "a380x/xp12/kccu/first_officer/b",
+      "a380x/xp12/kccu/first_officer/c",
+      "a380x/xp12/kccu/first_officer/d",
+      "a380x/xp12/kccu/first_officer/e",
+      "a380x/xp12/kccu/first_officer/f",
+      "a380x/xp12/kccu/first_officer/g",
+      "a380x/xp12/kccu/first_officer/h",
+      "a380x/xp12/kccu/first_officer/i",
+      "a380x/xp12/kccu/first_officer/j",
+      "a380x/xp12/kccu/first_officer/k",
+      "a380x/xp12/kccu/first_officer/l",
+      "a380x/xp12/kccu/first_officer/m",
+      "a380x/xp12/kccu/first_officer/n",
+      "a380x/xp12/kccu/first_officer/o",
+      "a380x/xp12/kccu/first_officer/p",
+      "a380x/xp12/kccu/first_officer/q",
+      "a380x/xp12/kccu/first_officer/r",
+      "a380x/xp12/kccu/first_officer/s",
+      "a380x/xp12/kccu/first_officer/t",
+      "a380x/xp12/kccu/first_officer/u",
+      "a380x/xp12/kccu/first_officer/v",
+      "a380x/xp12/kccu/first_officer/w",
+      "a380x/xp12/kccu/first_officer/x",
+      "a380x/xp12/kccu/first_officer/y",
+      "a380x/xp12/kccu/first_officer/z",
+      "a380x/xp12/kccu/first_officer/0",
+      "a380x/xp12/kccu/first_officer/1",
+      "a380x/xp12/kccu/first_officer/2",
+      "a380x/xp12/kccu/first_officer/3",
+      "a380x/xp12/kccu/first_officer/4",
+      "a380x/xp12/kccu/first_officer/5",
+      "a380x/xp12/kccu/first_officer/6",
+      "a380x/xp12/kccu/first_officer/7",
+      "a380x/xp12/kccu/first_officer/8",
+      "a380x/xp12/kccu/first_officer/9",
+      "a380x/xp12/kccu/first_officer/dot",
+      "a380x/xp12/kccu/first_officer/plusminus",
+      "a380x/xp12/kccu/first_officer/ent",
+      "a380x/xp12/kccu/first_officer/backspace",
+      "a380x/xp12/kccu/first_officer/sp",
+      "a380x/xp12/kccu/first_officer/slash",
+      "a380x/xp12/kccu/first_officer/esc",
+      "a380x/xp12/kccu/first_officer/esc2",
+      "a380x/xp12/kccu/first_officer/up",
+      "a380x/xp12/kccu/first_officer/down",
+      "a380x/xp12/kccu/first_officer/left",
+      "a380x/xp12/kccu/first_officer/right",
+      "a380x/xp12/kccu/first_officer/dir",
+      "a380x/xp12/kccu/first_officer/perf",
+      "a380x/xp12/kccu/first_officer/init",
+      "a380x/xp12/kccu/first_officer/navaid",
+      "a380x/xp12/kccu/first_officer/mailbox",
+      "a380x/xp12/kccu/first_officer/fpln",
+      "a380x/xp12/kccu/first_officer/dest",
+      "a380x/xp12/kccu/first_officer/secindex",
+      "a380x/xp12/kccu/first_officer/surv",
+      "a380x/xp12/kccu/first_officer/atccom",
+      "a380x/xp12/kccu/first_officer/nd",
+      "a380x/xp12/kccu/first_officer/kbd",
+      "a380x/xp12/kccu/first_officer/clrinfo",
+      "a380x/xp12/kccu/first_officer/rewind",
+      "a380x/xp12/kccu/first_officer/forward",
+      "a380x/xp12/kccu/first_officer/wheel_up",
+      "a380x/xp12/kccu/first_officer/wheel_down",
+      "a380x/xp12/kccu/first_officer/click",
+      "a380x/xp12/kccu/first_officer/kbd_switch_toggle",
+      "a380x/xp12/kccu/first_officer/ccd_switch_toggle",
+      "a380x/xp12/mfd/captain/popup",
+      "a380x/xp12/mfd/captain/popout",
+      "a380x/xp12/mfd/first_officer/popup",
+      "a380x/xp12/mfd/first_officer/popout"
+    ],
+    "datarefs": [
+      "a380x/xp12/fcu/selected_speed",
+      "a380x/xp12/fcu/selected_mach",
+      "a380x/xp12/fcu/selected_heading",
+      "a380x/xp12/fcu/selected_altitude",
+      "a380x/xp12/fcu/selected_vertical_speed",
+      "a380x/xp12/fcu/selected_fpa",
+      "a380x/xp12/fcu/speed_managed",
+      "a380x/xp12/fcu/heading_managed",
+      "a380x/xp12/fcu/altitude_managed",
+      "a380x/xp12/fcu/mach_mode",
+      "a380x/xp12/fcu/trk_fpa",
+      "a380x/xp12/fcu/true_heading",
+      "a380x/xp12/fcu/metric_altitude",
+      "a380x/xp12/fcu/ap1_active",
+      "a380x/xp12/fcu/ap2_active",
+      "a380x/xp12/fcu/fd_active",
+      "a380x/xp12/fcu/athr_active",
+      "a380x/xp12/fcu/loc_active",
+      "a380x/xp12/fcu/approach_active",
+      "a380x/xp12/fcu/altitude_step_ft",
+      "a380x/xp12/fcu/servo_active",
+      "a380x/xp12/fcu/ls_captain",
+      "a380x/xp12/fcu/ls_first_officer",
+      "a380x/xp12/fcu/athr_armed",
+      "a380x/xp12/fcu/altitude_hold_active",
+      "a380x/xp12/pfd/on_ground",
+      "a380x/xp12/pfd/flap_handle_index",
+      "a380x/xp12/pfd/flap_config",
+      "a380x/xp12/pfd/flap_valid",
+      "a380x/xp12/pfd/slat_valid",
+      "a380x/xp12/pfd/speedbrake_valid",
+      "a380x/xp12/pfd/spoilers_armed",
+      "a380x/xp12/pfd/gear_down",
+      "a380x/xp12/pfd/flap_fault",
+      "a380x/xp12/pfd/slat_fault",
+      "a380x/xp12/pfd/stall_warning",
+      "a380x/xp12/pfd/envelope_valid",
+      "a380x/xp12/pfd/clean_performance_valid",
+      "a380x/xp12/pfd/flap_ratio",
+      "a380x/xp12/pfd/slat_ratio",
+      "a380x/xp12/pfd/spoiler_ratio",
+      "a380x/xp12/pfd/flap_target_ratio",
+      "a380x/xp12/pfd/slat_target_ratio",
+      "a380x/xp12/pfd/vmax_knots",
+      "a380x/xp12/pfd/vfe_next_knots",
+      "a380x/xp12/pfd/vls_knots",
+      "a380x/xp12/pfd/alpha_prot_knots",
+      "a380x/xp12/pfd/alpha_limit_knots",
+      "a380x/xp12/pfd/stall_warning_knots",
+      "a380x/xp12/pfd/f_speed_knots",
+      "a380x/xp12/pfd/s_speed_knots",
+      "a380x/xp12/pfd/green_dot_knots",
+      "a380x/xp12/pfd/v1_knots",
+      "a380x/xp12/pfd/vr_knots",
+      "a380x/xp12/pfd/v2_knots",
+      "a380x/xp12/efis/captain/cstr",
+      "a380x/xp12/efis/captain/wpt",
+      "a380x/xp12/efis/captain/vord",
+      "a380x/xp12/efis/captain/ndb",
+      "a380x/xp12/efis/captain/arpt",
+      "a380x/xp12/efis/captain/vor1",
+      "a380x/xp12/efis/captain/vor2",
+      "a380x/xp12/efis/captain/terr",
+      "a380x/xp12/efis/captain/traf",
+      "a380x/xp12/efis/captain/ls",
+      "a380x/xp12/efis/captain/vv",
+      "a380x/xp12/efis/captain/wx_requested",
+      "a380x/xp12/efis/captain/taxi_requested",
+      "a380x/xp12/efis/captain/mode",
+      "a380x/xp12/efis/captain/range_index",
+      "a380x/xp12/efis/captain/zoom",
+      "a380x/xp12/efis/captain/baro_std",
+      "a380x/xp12/efis/captain/baro_inhg",
+      "a380x/xp12/efis/captain/powered",
+      "a380x/xp12/efis/captain/range_nm",
+      "a380x/xp12/efis/captain/qnh_hpa",
+      "a380x/xp12/efis/captain/baro_preset_hpa",
+      "a380x/xp12/efis/first_officer/cstr",
+      "a380x/xp12/efis/first_officer/wpt",
+      "a380x/xp12/efis/first_officer/vord",
+      "a380x/xp12/efis/first_officer/ndb",
+      "a380x/xp12/efis/first_officer/arpt",
+      "a380x/xp12/efis/first_officer/vor1",
+      "a380x/xp12/efis/first_officer/vor2",
+      "a380x/xp12/efis/first_officer/terr",
+      "a380x/xp12/efis/first_officer/traf",
+      "a380x/xp12/efis/first_officer/ls",
+      "a380x/xp12/efis/first_officer/vv",
+      "a380x/xp12/efis/first_officer/wx_requested",
+      "a380x/xp12/efis/first_officer/taxi_requested",
+      "a380x/xp12/efis/first_officer/mode",
+      "a380x/xp12/efis/first_officer/range_index",
+      "a380x/xp12/efis/first_officer/zoom",
+      "a380x/xp12/efis/first_officer/baro_std",
+      "a380x/xp12/efis/first_officer/baro_inhg",
+      "a380x/xp12/efis/first_officer/powered",
+      "a380x/xp12/efis/first_officer/range_nm",
+      "a380x/xp12/efis/first_officer/qnh_hpa",
+      "a380x/xp12/efis/first_officer/baro_preset_hpa",
+      "a380x/xp12/lighting/captain_flood",
+      "a380x/xp12/lighting/integral",
+      "a380x/xp12/lighting/lcd",
+      "a380x/xp12/lighting/first_officer_flood",
+      "a380x/xp12/du/captain_pfd",
+      "a380x/xp12/du/captain_nd",
+      "a380x/xp12/du/captain_wx_terr",
+      "a380x/xp12/du/captain_mfd",
+      "a380x/xp12/du/first_officer_pfd",
+      "a380x/xp12/du/first_officer_nd",
+      "a380x/xp12/du/first_officer_wx_terr",
+      "a380x/xp12/du/first_officer_mfd",
+      "a380x/xp12/glareshield/chrono_left_mode",
+      "a380x/xp12/glareshield/chrono_right_mode",
+      "a380x/xp12/glareshield/chrono_left_seconds",
+      "a380x/xp12/glareshield/chrono_right_seconds",
+      "a380x/xp12/glareshield/stick_left_moving",
+      "a380x/xp12/glareshield/stick_right_moving",
+      "a380x/xp12/glareshield/priority",
+      "a380x/xp12/glareshield/master_warning",
+      "a380x/xp12/glareshield/master_caution",
+      "a380x/xp12/glareshield/autoland_warning",
+      "a380x/xp12/glareshield/land_mode",
+      "a380x/xp12/glareshield/atc_pending",
+      "a380x/xp12/glareshield/volume_left",
+      "a380x/xp12/glareshield/volume_right",
+      "a380x/xp12/glareshield/ptt_left",
+      "a380x/xp12/glareshield/ptt_right",
+      "a380x/xp12/glareshield/master_warning_lit",
+      "a380x/xp12/glareshield/master_caution_lit",
+      "a380x/xp12/glareshield/autoland_lit",
+      "a380x/xp12/glareshield/atc_lit",
+      "a380x/xp12/glareshield/priority_arrow_left",
+      "a380x/xp12/glareshield/priority_arrow_right",
+      "a380x/xp12/glareshield/priority_green_left",
+      "a380x/xp12/glareshield/priority_green_right",
+      "a380x/xp12/clock/mode",
+      "a380x/xp12/clock/et_selector",
+      "a380x/xp12/clock/date_held",
+      "a380x/xp12/clock/set_field",
+      "a380x/xp12/clock/year",
+      "a380x/xp12/clock/month",
+      "a380x/xp12/clock/day",
+      "a380x/xp12/clock/hour",
+      "a380x/xp12/clock/minute",
+      "a380x/xp12/clock/second",
+      "a380x/xp12/clock/et_seconds",
+      "a380x/xp12/clock/chr_seconds",
+      "a380x/xp12/clock/chr_running",
+      "a380x/xp12/clock/powered",
+      "a380x/xp12/clock/chr_held",
+      "a380x/xp12/clock/rst_held",
+      "a380x/xp12/clock/et_display",
+      "a380x/xp12/clock/chr_display",
+      "a380x/xp12/center_right/gear_lever",
+      "a380x/xp12/center_right/gear_nose",
+      "a380x/xp12/center_right/gear_wing",
+      "a380x/xp12/center_right/gear_body",
+      "a380x/xp12/center_right/gear_arrow",
+      "a380x/xp12/center_right/gear_not_down_warning",
+      "a380x/xp12/center_right/gear_not_locked_down_warning",
+      "a380x/xp12/center_right/gear_not_locked_up_warning",
+      "a380x/xp12/center_right/gear_nose_green",
+      "a380x/xp12/center_right/gear_nose_red",
+      "a380x/xp12/center_right/gear_wing_green",
+      "a380x/xp12/center_right/gear_wing_red",
+      "a380x/xp12/center_right/gear_body_green",
+      "a380x/xp12/center_right/gear_body_red",
+      "a380x/xp12/center_right/gear_wing_left_green",
+      "a380x/xp12/center_right/gear_wing_left_red",
+      "a380x/xp12/center_right/gear_wing_right_green",
+      "a380x/xp12/center_right/gear_wing_right_red",
+      "a380x/xp12/center_right/gear_body_left_green",
+      "a380x/xp12/center_right/gear_body_left_red",
+      "a380x/xp12/center_right/gear_body_right_green",
+      "a380x/xp12/center_right/gear_body_right_red",
+      "a380x/xp12/center_right/body_accu_psi",
+      "a380x/xp12/center_right/body_accu_zone",
+      "a380x/xp12/center_right/autobrake_selected",
+      "a380x/xp12/center_right/autobrake_armed",
+      "a380x/xp12/center_right/rto_arm",
+      "a380x/xp12/center_right/antiskid_on",
+      "a380x/xp12/center_right/rto_pressed",
+      "a380x/xp12/center_right/btv_reverted",
+      "a380x/xp12/center_right/normal_brakes_available",
+      "a380x/xp12/center_right/autobrake_available",
+      "a380x/xp12/center_right/antiskid_available",
+      "a380x/xp12/center_right/emergency_braking",
+      "a380x/xp12/center_right/autobrake_active",
+      "a380x/xp12/center_right/brake_left_ratio_milli",
+      "a380x/xp12/center_right/brake_right_ratio_milli",
+      "a380x/xp12/center_right/reinflate_pressed",
+      "a380x/xp12/center_right/reinflate_active",
+      "a380x/xp12/cockpit_door/position",
+      "a380x/xp12/cockpit_door/locked",
+      "a380x/xp12/adirs/ir1_mode",
+      "a380x/xp12/adirs/ir1_knob",
+      "a380x/xp12/adirs/ir1_pressed",
+      "a380x/xp12/adirs/ir1_off",
+      "a380x/xp12/adirs/ir1_fault",
+      "a380x/xp12/adirs/ir1_failure",
+      "a380x/xp12/adirs/ir1_nav_valid",
+      "a380x/xp12/adirs/ir1_attitude_valid",
+      "a380x/xp12/adirs/ir1_heading_valid",
+      "a380x/xp12/adirs/ir1_nav_locked",
+      "a380x/xp12/adirs/ir1_aligning",
+      "a380x/xp12/adirs/ir1_alignment_remaining",
+      "a380x/xp12/adirs/ir1_heading_required",
+      "a380x/xp12/adirs/ir1_heading_reminder",
+      "a380x/xp12/adirs/ir1_heading_age",
+      "a380x/xp12/adirs/ir1_heading_deg",
+      "a380x/xp12/adirs/ir1_pitch_deg",
+      "a380x/xp12/adirs/ir1_roll_deg",
+      "a380x/xp12/adirs/ir1_vertical_speed_fpm",
+      "a380x/xp12/adirs/ir1_track_deg",
+      "a380x/xp12/adirs/ir1_ground_speed_knots",
+      "a380x/xp12/adirs/ir1_latitude_deg",
+      "a380x/xp12/adirs/ir1_longitude_deg",
+      "a380x/xp12/adirs/ir1_flight_path_deg",
+      "a380x/xp12/adirs/ir2_mode",
+      "a380x/xp12/adirs/ir2_knob",
+      "a380x/xp12/adirs/ir2_pressed",
+      "a380x/xp12/adirs/ir2_off",
+      "a380x/xp12/adirs/ir2_fault",
+      "a380x/xp12/adirs/ir2_failure",
+      "a380x/xp12/adirs/ir2_nav_valid",
+      "a380x/xp12/adirs/ir2_attitude_valid",
+      "a380x/xp12/adirs/ir2_heading_valid",
+      "a380x/xp12/adirs/ir2_nav_locked",
+      "a380x/xp12/adirs/ir2_aligning",
+      "a380x/xp12/adirs/ir2_alignment_remaining",
+      "a380x/xp12/adirs/ir2_heading_required",
+      "a380x/xp12/adirs/ir2_heading_reminder",
+      "a380x/xp12/adirs/ir2_heading_age",
+      "a380x/xp12/adirs/ir2_heading_deg",
+      "a380x/xp12/adirs/ir2_pitch_deg",
+      "a380x/xp12/adirs/ir2_roll_deg",
+      "a380x/xp12/adirs/ir2_vertical_speed_fpm",
+      "a380x/xp12/adirs/ir2_track_deg",
+      "a380x/xp12/adirs/ir2_ground_speed_knots",
+      "a380x/xp12/adirs/ir2_latitude_deg",
+      "a380x/xp12/adirs/ir2_longitude_deg",
+      "a380x/xp12/adirs/ir2_flight_path_deg",
+      "a380x/xp12/adirs/ir3_mode",
+      "a380x/xp12/adirs/ir3_knob",
+      "a380x/xp12/adirs/ir3_pressed",
+      "a380x/xp12/adirs/ir3_off",
+      "a380x/xp12/adirs/ir3_fault",
+      "a380x/xp12/adirs/ir3_failure",
+      "a380x/xp12/adirs/ir3_nav_valid",
+      "a380x/xp12/adirs/ir3_attitude_valid",
+      "a380x/xp12/adirs/ir3_heading_valid",
+      "a380x/xp12/adirs/ir3_nav_locked",
+      "a380x/xp12/adirs/ir3_aligning",
+      "a380x/xp12/adirs/ir3_alignment_remaining",
+      "a380x/xp12/adirs/ir3_heading_required",
+      "a380x/xp12/adirs/ir3_heading_reminder",
+      "a380x/xp12/adirs/ir3_heading_age",
+      "a380x/xp12/adirs/ir3_heading_deg",
+      "a380x/xp12/adirs/ir3_pitch_deg",
+      "a380x/xp12/adirs/ir3_roll_deg",
+      "a380x/xp12/adirs/ir3_vertical_speed_fpm",
+      "a380x/xp12/adirs/ir3_track_deg",
+      "a380x/xp12/adirs/ir3_ground_speed_knots",
+      "a380x/xp12/adirs/ir3_latitude_deg",
+      "a380x/xp12/adirs/ir3_longitude_deg",
+      "a380x/xp12/adirs/ir3_flight_path_deg",
+      "a380x/xp12/adirs/adr1_pressed",
+      "a380x/xp12/adirs/adr1_off",
+      "a380x/xp12/adirs/adr1_fault",
+      "a380x/xp12/adirs/adr1_failure",
+      "a380x/xp12/adirs/adr1_valid",
+      "a380x/xp12/adirs/adr1_ias_knots",
+      "a380x/xp12/adirs/adr1_altitude_ft",
+      "a380x/xp12/adirs/adr1_mach",
+      "a380x/xp12/adirs/adr1_aoa_deg",
+      "a380x/xp12/adirs/adr1_sat_c",
+      "a380x/xp12/adirs/adr1_tat_c",
+      "a380x/xp12/adirs/adr1_overspeed",
+      "a380x/xp12/adirs/adr2_pressed",
+      "a380x/xp12/adirs/adr2_off",
+      "a380x/xp12/adirs/adr2_fault",
+      "a380x/xp12/adirs/adr2_failure",
+      "a380x/xp12/adirs/adr2_valid",
+      "a380x/xp12/adirs/adr2_ias_knots",
+      "a380x/xp12/adirs/adr2_altitude_ft",
+      "a380x/xp12/adirs/adr2_mach",
+      "a380x/xp12/adirs/adr2_aoa_deg",
+      "a380x/xp12/adirs/adr2_sat_c",
+      "a380x/xp12/adirs/adr2_tat_c",
+      "a380x/xp12/adirs/adr2_overspeed",
+      "a380x/xp12/adirs/adr3_pressed",
+      "a380x/xp12/adirs/adr3_off",
+      "a380x/xp12/adirs/adr3_fault",
+      "a380x/xp12/adirs/adr3_failure",
+      "a380x/xp12/adirs/adr3_valid",
+      "a380x/xp12/adirs/adr3_ias_knots",
+      "a380x/xp12/adirs/adr3_altitude_ft",
+      "a380x/xp12/adirs/adr3_mach",
+      "a380x/xp12/adirs/adr3_aoa_deg",
+      "a380x/xp12/adirs/adr3_sat_c",
+      "a380x/xp12/adirs/adr3_tat_c",
+      "a380x/xp12/adirs/adr3_overspeed",
+      "a380x/xp12/adirs/on_batt",
+      "a380x/xp12/adirs/captain_ir_source",
+      "a380x/xp12/adirs/captain_adr_source",
+      "a380x/xp12/adirs/first_officer_ir_source",
+      "a380x/xp12/adirs/first_officer_adr_source",
+      "a380x/xp12/kccu/captain/kbd_on",
+      "a380x/xp12/kccu/captain/ccd_on",
+      "a380x/xp12/kccu/first_officer/kbd_on",
+      "a380x/xp12/kccu/first_officer/ccd_on",
+      "a380x/xp12/mfd/captain/active_page",
+      "a380x/xp12/mfd/captain/keyboard_captured",
+      "a380x/xp12/mfd/first_officer/active_page",
+      "a380x/xp12/mfd/first_officer/keyboard_captured",
+      "a380x/xp12/mfd/pc_keyboard_capture",
+      "a380x/xp12/fms/flight_phase",
+      "a380x/xp12/fms/v1_knots",
+      "a380x/xp12/fms/vr_knots",
+      "a380x/xp12/fms/v2_knots",
+      "a380x/xp12/fms/to_flex_temp_c",
+      "a380x/xp12/fms/to_power_setting",
+      "a380x/xp12/fms/to_flaps",
+      "a380x/xp12/fms/to_ths_for_pct",
+      "a380x/xp12/fms/to_speeds_not_inserted",
+      "a380x/xp12/fms/vspeeds_disagree",
+      "a380x/xp12/fms/to_speeds_too_low",
+      "a380x/xp12/fms/thr_red_alt_ft",
+      "a380x/xp12/fms/acc_alt_ft",
+      "a380x/xp12/fms/eo_acc_alt_ft",
+      "a380x/xp12/fms/thr_red_alt_valid",
+      "a380x/xp12/fms/acc_alt_valid",
+      "a380x/xp12/fms/eo_acc_alt_valid",
+      "a380x/xp12/fms/trans_alt_ft",
+      "a380x/xp12/fms/trans_level_fl",
+      "a380x/xp12/fms/trans_alt_valid",
+      "a380x/xp12/fms/trans_level_valid",
+      "a380x/xp12/fms/cruise_altitude_ft",
+      "a380x/xp12/fms/fg_altitude_constraint_ft",
+      "a380x/xp12/fms/managed_speed_knots",
+      "a380x/xp12/fms/managed_speed_is_mach",
+      "a380x/xp12/fms/managed_mach",
+      "a380x/xp12/fms/managed_speed_valid",
+      "a380x/xp12/fms/presel_speed_knots",
+      "a380x/xp12/fms/presel_mach",
+      "a380x/xp12/fms/green_dot_knots",
+      "a380x/xp12/fms/f_speed_knots",
+      "a380x/xp12/fms/s_speed_knots",
+      "a380x/xp12/fms/vls_knots",
+      "a380x/xp12/fms/approach_vapp_knots",
+      "a380x/xp12/fms/approach_vls_knots",
+      "a380x/xp12/fms/approach_vref_knots",
+      "a380x/xp12/fms/approach_f_knots",
+      "a380x/xp12/fms/approach_s_knots",
+      "a380x/xp12/fms/approach_gd_knots",
+      "a380x/xp12/fms/landing_conf3",
+      "a380x/xp12/fms/approach_headwind_knots",
+      "a380x/xp12/fms/approach_headwind_valid",
+      "a380x/xp12/fms/dh_ft",
+      "a380x/xp12/fms/mda_ft",
+      "a380x/xp12/fms/minimums_in_range",
+      "a380x/xp12/fms/landing_elevation_ft",
+      "a380x/xp12/fms/dest_lat_deg",
+      "a380x/xp12/fms/dest_lon_deg",
+      "a380x/xp12/fms/landing_elevation_valid",
+      "a380x/xp12/fms/dest_pos_valid",
+      "a380x/xp12/fms/gross_weight_kg",
+      "a380x/xp12/fms/zfw_kg",
+      "a380x/xp12/fms/zfw_cg_pct",
+      "a380x/xp12/fms/dest_efob_below_min",
+      "a380x/xp12/fms/msg_check_speed_mode",
+      "a380x/xp12/fms/msg_set_hold_speed",
+      "a380x/xp12/fms/msg_td_reached",
+      "a380x/xp12/fms/nd_fm_message_flags_l",
+      "a380x/xp12/fms/nd_fm_message_flags_r",
+      "a380x/xp12/fms/fmc_a_healthy",
+      "a380x/xp12/fms/fmc_b_healthy",
+      "a380x/xp12/fms/fmc_c_healthy",
+      "a380x/xp12/fms/fms_l_failed",
+      "a380x/xp12/fms/fms_r_failed",
+      "a380x/xp12/fms/switching_knob",
+      "a380x/xp12/fms/fmc_a_failed",
+      "a380x/xp12/fms/fmc_b_failed",
+      "a380x/xp12/fms/fmc_c_failed",
+      "a380x/xp12/fms/fmc_a_reset",
+      "a380x/xp12/fms/fmc_b_reset",
+      "a380x/xp12/fms/fmc_c_reset",
+      "a380x/xp12/surv/xpdr_auto",
+      "a380x/xp12/surv/alt_rptg_request",
+      "a380x/xp12/surv/tcas_alert_level",
+      "a380x/xp12/surv/tcas_alt_select",
+      "a380x/xp12/surv/terr_sys_off",
+      "a380x/xp12/surv/gpws_sys_off",
+      "a380x/xp12/surv/gs_mode_off",
+      "a380x/xp12/surv/flap_mode_off",
+      "a380x/xp12/surv/wxr_taws_sys",
+      "a380x/xp12/surv/xpdr_tcas_sys"
+    ],
+    "stock_xplane_efis_modes_consumed": true,
+    "logic_sources": [
+      "fbw-a380x/src/systems/instruments/src/PFD/FMADefinitions.ts",
+      "fbw-a380x/src/wasm/fbw_a380/src/model/A380FgOuterLoops.cpp",
+      "fbw-a380x/src/wasm/fbw_a380/src/model/A380FcuComputer.cpp",
+      "fbw-a380x/src/wasm/fbw_a380/src/model/A380PrimComputerFg.cpp",
+      "fbw-a380x/src/systems/instruments/src/PFD/PFD.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/PFDUtils.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/AttitudeIndicatorHorizon.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/AttitudeIndicatorFixed.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/SpeedIndicator.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/AltitudeIndicator.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/HeadingIndicator.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/VerticalSpeedIndicator.tsx",
+      "fbw-a380x/src/systems/instruments/src/PFD/LowerArea.tsx",
+      "src/systems/systems-host/CpiomC/FlightWarningSystem/FwsFlightPhases.ts",
+      "fbw-a32nx/src/systems/instruments/src/EFB/Service/TODCalculator.ts",
+      "fbw-a380x/src/systems/instruments/src/EFB/Assets/Checklists/checklists.json5",
+      "fbw-common/src/systems/instruments/src/EFB/Efb.tsx",
+      "fbw-common/src/systems/instruments/src/EFB/Assets/Theme.css",
+      "fbw-common/src/systems/instruments/src/EFB/ToolBar/ToolBar.tsx",
+      "fbw-common/src/systems/instruments/src/EFB/Dashboard/Dashboard.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/EWD.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/style.scss",
+      "fbw-a380x/src/systems/instruments/src/EWD/elements/EngineGauge.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/elements/ThrustGauge.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/elements/N1.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/elements/EGT.tsx",
+      "fbw-a380x/src/systems/instruments/src/EWD/elements/WdMemos.tsx",
+      "fbw-a380x/src/systems/instruments/src/MsfsAvionicsCommon/definitions.scss",
+      "fbw-a380x/src/systems/systems-host/CpiomC/FlightWarningSystem/FwsMemos.ts",
+      "fbw-a380x/src/wasm/fadec_a380x/src/Fadec/EngineControl_A380X.cpp",
+      "fbw-a380x/src/systems/instruments/src/MFD/MFD.tsx",
+      "fbw-a380x/src/systems/instruments/src/MFD/FMC/FlightManagementComputer.ts",
+      "fbw-a380x/src/systems/instruments/src/MFD/FMC/FmcAircraftInterface.ts",
+      "fbw-a380x/src/systems/instruments/src/MFD/pages/FMS",
+      "fbw-a380x/src/systems/instruments/src/MFD/pages/common",
+      "fbw-a380x/src/systems/instruments/src/MFD/shared",
+      "fbw-common/src/systems/fmgc/src/flightplanning"
+    ],
+    "files": [
+      {
+        "path": "plugins/A380XAvionics/mac_x64/A380XAvionics.xpl",
+        "sha256": "6331b4c0cffa0218acda03934366a4ef1ee829dc37f8358c92209456feaafa5e"
+      },
+      {
+        "path": "plugins/A380XAvionics/win_x64/A380XAvionics.xpl",
+        "sha256": "aa9f6acf6af46570d9db1c92fc275aed45b938bee9d2e8adf7a1283de46297f9"
+      },
+      {
+        "path": "plugins/A380XAvionics/sounds/priority_left.pcm",
+        "sha256": "21a256b26c2a248e11d27f6d233775eb46d85ec43941c77ffe5afd9e762e548e"
+      },
+      {
+        "path": "plugins/A380XAvionics/sounds/priority_right.pcm",
+        "sha256": "6fd9ad8cdf6749fbd1ff6d5cfae1a07219b15eaf766fa320bc26c729310dc203"
+      },
+      {
+        "path": "plugins/A380XAvionics/build-report.json",
+        "sha256": "41d678b133dcb42c8dbef38a94fe150114c202cbbc1e3bfff33898639bed0cb1"
+      }
+    ],
+    "runtime_tested": false
+  },
+  "aileron_visual_provider": {
+    "format": 1,
+    "provider": "a380x-aileron-dance-v1",
+    "runtime": "FlyWithLua NG 2.8.12 or later",
+    "visual_only": true,
+    "requires_global_installation": true,
+    "datarefs": [
+      {
+        "name": "a380x/xp12/visual/aileron_l_inboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/visual/aileron_l_midboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/visual/aileron_l_outboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/visual/aileron_r_inboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/visual/aileron_r_midboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/visual/aileron_r_outboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/elevator_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/rudder_ratio",
+        "type": "Float",
+        "minimum": -1,
+        "maximum": 1
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      },
+      {
+        "name": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+        "type": "Float",
+        "minimum": 0,
+        "maximum": 65
+      }
+    ],
+    "files": [
+      {
+        "path": "plugins/FlyWithLua/Scripts (required)/A380X_XP12_Ailerons.lua",
+        "install_path": "Scripts/A380X_XP12_Ailerons.lua",
+        "sha256": "4b8159a0a6f324e3a99d0c886cceb107c74f70b7a5a980691a021d9bba42f6ea"
+      },
+      {
+        "path": "plugins/FlyWithLua/Modules/a380x_aileron_dance.lua",
+        "install_path": "Modules/a380x_aileron_dance.lua",
+        "sha256": "d1b02ea7f39df05cb8a83937fb158abdaa9c0c476c58f97be28f1b3c04bdb460"
+      },
+      {
+        "path": "plugins/FlyWithLua/Modules/a380x_hydraulic_surfaces.lua",
+        "install_path": "Modules/a380x_hydraulic_surfaces.lua",
+        "sha256": "0369849bdcaac23bae661ce1d0a144e5752adb28dc56a3e2d8d0cf40bb2d1440"
+      },
+      {
+        "path": "plugins/FlyWithLua/Scripts (required)/A380X_XP12_Hydraulics.lua",
+        "install_path": "Scripts/A380X_XP12_Hydraulics.lua",
+        "sha256": "d10030eef7eaab703d8f6387702f3adc62a3c0d33f4f39c4921f454606d75c04"
+      }
+    ],
+    "bootstrap": {
+      "registration": "XPluginStart",
+      "files": [
+        {
+          "path": "plugins/A380XAileronDatarefs/mac_x64/A380XAileronDatarefs.xpl",
+          "sha256": "7f44049c71c6830b2476de605bb9ce17ca8193a2fd94017a086e9d96d9f0c191"
+        },
+        {
+          "path": "plugins/A380XAileronDatarefs/win_x64/A380XAileronDatarefs.xpl",
+          "sha256": "345e68de8d953bbe57d9b09a1035394ffabcc52d3d295caade58221d7ad2f8dd"
+        }
+      ]
+    }
+  },
+  "hydraulic_surface_provider": {
+    "format": 1,
+    "visual_only": true,
+    "runtime_execution_verified": false,
+    "header_token_changes": 510,
+    "objects": [
+      {
+        "object": "fuselage/a380x_accessories.obj",
+        "source_sha256": "2706ec9ee855b3bd3a107a7700ee6ec0ca3e483f27a3c73c7387fadcbcbb05f3",
+        "output_sha256": "d96313f61b326055979d17e4ccaa4a665b17e26faa68c15d8ba0f05181f76fc1",
+        "source_bytes": 12915132,
+        "output_bytes": 12915172,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 153608,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153603,
+            "key_count": 21
+          },
+          {
+            "line": 153637,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153632,
+            "key_count": 21
+          },
+          {
+            "line": 153666,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153661,
+            "key_count": 21
+          },
+          {
+            "line": 153699,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153694,
+            "key_count": 21
+          },
+          {
+            "line": 153728,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153723,
+            "key_count": 21
+          },
+          {
+            "line": 153757,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153752,
+            "key_count": 21
+          },
+          {
+            "line": 153786,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153781,
+            "key_count": 21
+          },
+          {
+            "line": 153815,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153810,
+            "key_count": 21
+          },
+          {
+            "line": 153844,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153839,
+            "key_count": 21
+          },
+          {
+            "line": 153873,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 153868,
+            "key_count": 21
+          },
+          {
+            "line": 153904,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153902,
+            "key_count": 7
+          },
+          {
+            "line": 153913,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153902,
+            "key_count": 7
+          },
+          {
+            "line": 153922,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153902,
+            "key_count": 7
+          },
+          {
+            "line": 153934,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153932,
+            "key_count": 7
+          },
+          {
+            "line": 153943,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153932,
+            "key_count": 7
+          },
+          {
+            "line": 153952,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 153932,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_fuse1.obj",
+        "source_sha256": "bf4de8918fb70b06f217becc9b02bc873c470596c55e91ccb66e81987907099d",
+        "output_sha256": "44584ae8a9d5cf554f1a5b20dc60ee7aebca3d80626725584ad248b0ce2dde20",
+        "source_bytes": 6688104,
+        "output_bytes": 6688144,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 76566,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76561,
+            "key_count": 21
+          },
+          {
+            "line": 76595,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76590,
+            "key_count": 21
+          },
+          {
+            "line": 76624,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76619,
+            "key_count": 21
+          },
+          {
+            "line": 76653,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76648,
+            "key_count": 21
+          },
+          {
+            "line": 76682,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76677,
+            "key_count": 21
+          },
+          {
+            "line": 76711,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76706,
+            "key_count": 21
+          },
+          {
+            "line": 76740,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76735,
+            "key_count": 21
+          },
+          {
+            "line": 76769,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76764,
+            "key_count": 21
+          },
+          {
+            "line": 76798,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76793,
+            "key_count": 21
+          },
+          {
+            "line": 76827,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 76822,
+            "key_count": 21
+          },
+          {
+            "line": 76854,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76852,
+            "key_count": 7
+          },
+          {
+            "line": 76863,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76852,
+            "key_count": 7
+          },
+          {
+            "line": 76872,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76852,
+            "key_count": 7
+          },
+          {
+            "line": 76884,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76882,
+            "key_count": 7
+          },
+          {
+            "line": 76893,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76882,
+            "key_count": 7
+          },
+          {
+            "line": 76902,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 76882,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_fuse2.obj",
+        "source_sha256": "7a069821ed3f76674e78519da610fd6ccafa808a64ad46e2916a8395b2f1e1e4",
+        "output_sha256": "75443c09fea8a3969157299c5076390af94f8b1591356ee58d877d95eda54d9c",
+        "source_bytes": 3308841,
+        "output_bytes": 3308881,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 38222,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38217,
+            "key_count": 21
+          },
+          {
+            "line": 38251,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38246,
+            "key_count": 21
+          },
+          {
+            "line": 38280,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38275,
+            "key_count": 21
+          },
+          {
+            "line": 38309,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38304,
+            "key_count": 21
+          },
+          {
+            "line": 38338,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38333,
+            "key_count": 21
+          },
+          {
+            "line": 38367,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38362,
+            "key_count": 21
+          },
+          {
+            "line": 38396,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38391,
+            "key_count": 21
+          },
+          {
+            "line": 38425,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38420,
+            "key_count": 21
+          },
+          {
+            "line": 38454,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38449,
+            "key_count": 21
+          },
+          {
+            "line": 38483,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 38478,
+            "key_count": 21
+          },
+          {
+            "line": 38510,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38508,
+            "key_count": 7
+          },
+          {
+            "line": 38519,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38508,
+            "key_count": 7
+          },
+          {
+            "line": 38528,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38508,
+            "key_count": 7
+          },
+          {
+            "line": 38540,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38538,
+            "key_count": 7
+          },
+          {
+            "line": 38549,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38538,
+            "key_count": 7
+          },
+          {
+            "line": 38558,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 38538,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_fuse3.obj",
+        "source_sha256": "ea4fa52b1ba8be2fcc342f49c2e1fcd224d6c72cd275cb06d187a9584ba09cf3",
+        "output_sha256": "a2f4158c710d3fa11563df4aa38b43cadebb0d6956906663ef6656ae6f34bc3f",
+        "source_bytes": 6505690,
+        "output_bytes": 6505730,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 74562,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74557,
+            "key_count": 21
+          },
+          {
+            "line": 74591,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74586,
+            "key_count": 21
+          },
+          {
+            "line": 74620,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74615,
+            "key_count": 21
+          },
+          {
+            "line": 74649,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74644,
+            "key_count": 21
+          },
+          {
+            "line": 74678,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74673,
+            "key_count": 21
+          },
+          {
+            "line": 74707,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74702,
+            "key_count": 21
+          },
+          {
+            "line": 74736,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74731,
+            "key_count": 21
+          },
+          {
+            "line": 74765,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74760,
+            "key_count": 21
+          },
+          {
+            "line": 74794,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74789,
+            "key_count": 21
+          },
+          {
+            "line": 74823,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 74818,
+            "key_count": 21
+          },
+          {
+            "line": 74851,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74849,
+            "key_count": 7
+          },
+          {
+            "line": 74860,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74849,
+            "key_count": 7
+          },
+          {
+            "line": 74869,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74849,
+            "key_count": 7
+          },
+          {
+            "line": 74881,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74879,
+            "key_count": 7
+          },
+          {
+            "line": 74890,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74879,
+            "key_count": 7
+          },
+          {
+            "line": 74899,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 74879,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_fuse4.obj",
+        "source_sha256": "74d384d66e5bd6f9deda11375e7b9d73838058a8883edc820b8d9b7cc7c0d50f",
+        "output_sha256": "8effda982bda5de941d26f8b487f6ebbab7b1ba9b007ec384482326b6f04da5e",
+        "source_bytes": 9661919,
+        "output_bytes": 9661959,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 111747,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111742,
+            "key_count": 21
+          },
+          {
+            "line": 111779,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111774,
+            "key_count": 21
+          },
+          {
+            "line": 111808,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111803,
+            "key_count": 21
+          },
+          {
+            "line": 111838,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111833,
+            "key_count": 21
+          },
+          {
+            "line": 111868,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111863,
+            "key_count": 21
+          },
+          {
+            "line": 111903,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111898,
+            "key_count": 21
+          },
+          {
+            "line": 111934,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111929,
+            "key_count": 21
+          },
+          {
+            "line": 111965,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111960,
+            "key_count": 21
+          },
+          {
+            "line": 111997,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 111992,
+            "key_count": 21
+          },
+          {
+            "line": 112026,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 112021,
+            "key_count": 21
+          },
+          {
+            "line": 112059,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112057,
+            "key_count": 7
+          },
+          {
+            "line": 112068,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112057,
+            "key_count": 7
+          },
+          {
+            "line": 112077,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112057,
+            "key_count": 7
+          },
+          {
+            "line": 112091,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112089,
+            "key_count": 7
+          },
+          {
+            "line": 112100,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112089,
+            "key_count": 7
+          },
+          {
+            "line": 112109,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 112089,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_fuse5.obj",
+        "source_sha256": "47bda53568215181903bb3ec96cc25c307d22f337a1b2b5bdc67972d9a8cd67a",
+        "output_sha256": "bf6f26ccf761de208256d838cdc027fe629dd8ca818f616bd358111a90203c3d",
+        "source_bytes": 5452971,
+        "output_bytes": 5453011,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 63613,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63608,
+            "key_count": 21
+          },
+          {
+            "line": 63642,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63637,
+            "key_count": 21
+          },
+          {
+            "line": 63671,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63666,
+            "key_count": 21
+          },
+          {
+            "line": 63700,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63695,
+            "key_count": 21
+          },
+          {
+            "line": 63729,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63724,
+            "key_count": 21
+          },
+          {
+            "line": 63758,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63753,
+            "key_count": 21
+          },
+          {
+            "line": 63787,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63782,
+            "key_count": 21
+          },
+          {
+            "line": 63816,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63811,
+            "key_count": 21
+          },
+          {
+            "line": 63845,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63840,
+            "key_count": 21
+          },
+          {
+            "line": 63874,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 63869,
+            "key_count": 21
+          },
+          {
+            "line": 63901,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63899,
+            "key_count": 7
+          },
+          {
+            "line": 63910,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63899,
+            "key_count": 7
+          },
+          {
+            "line": 63919,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63899,
+            "key_count": 7
+          },
+          {
+            "line": 63931,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63929,
+            "key_count": 7
+          },
+          {
+            "line": 63940,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63929,
+            "key_count": 7
+          },
+          {
+            "line": 63949,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 63929,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_lg_bay.obj",
+        "source_sha256": "b202603d4f2d7847539b3809cf4df6d83a6c13b1bee26e99925e77026394e7ef",
+        "output_sha256": "979410b0cb7c0ca24872de97d12c03f23c051159f8c2934d2d1295217573dea9",
+        "source_bytes": 3890658,
+        "output_bytes": 3890698,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 44314,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44309,
+            "key_count": 21
+          },
+          {
+            "line": 44343,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44338,
+            "key_count": 21
+          },
+          {
+            "line": 44372,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44367,
+            "key_count": 21
+          },
+          {
+            "line": 44401,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44396,
+            "key_count": 21
+          },
+          {
+            "line": 44430,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44425,
+            "key_count": 21
+          },
+          {
+            "line": 44459,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44454,
+            "key_count": 21
+          },
+          {
+            "line": 44488,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44483,
+            "key_count": 21
+          },
+          {
+            "line": 44517,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44512,
+            "key_count": 21
+          },
+          {
+            "line": 44546,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44541,
+            "key_count": 21
+          },
+          {
+            "line": 44575,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 44570,
+            "key_count": 21
+          },
+          {
+            "line": 44602,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44600,
+            "key_count": 7
+          },
+          {
+            "line": 44611,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44600,
+            "key_count": 7
+          },
+          {
+            "line": 44620,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44600,
+            "key_count": 7
+          },
+          {
+            "line": 44632,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44630,
+            "key_count": 7
+          },
+          {
+            "line": 44641,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44630,
+            "key_count": 7
+          },
+          {
+            "line": 44650,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 44630,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_lg_bay_main.obj",
+        "source_sha256": "1de2726b29210f201a37eacb3e251a843fe409e5288e7954f6b4c868ababc5db",
+        "output_sha256": "3899c122c060864fd9000cc0209b3a1449a8fd41e502df3391b25eae0a6357f8",
+        "source_bytes": 4613956,
+        "output_bytes": 4613996,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 53988,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 53983,
+            "key_count": 21
+          },
+          {
+            "line": 54017,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54012,
+            "key_count": 21
+          },
+          {
+            "line": 54046,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54041,
+            "key_count": 21
+          },
+          {
+            "line": 54075,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54070,
+            "key_count": 21
+          },
+          {
+            "line": 54104,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54099,
+            "key_count": 21
+          },
+          {
+            "line": 54133,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54128,
+            "key_count": 21
+          },
+          {
+            "line": 54162,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54157,
+            "key_count": 21
+          },
+          {
+            "line": 54191,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54186,
+            "key_count": 21
+          },
+          {
+            "line": 54220,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54215,
+            "key_count": 21
+          },
+          {
+            "line": 54249,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 54244,
+            "key_count": 21
+          },
+          {
+            "line": 54276,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54274,
+            "key_count": 7
+          },
+          {
+            "line": 54285,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54274,
+            "key_count": 7
+          },
+          {
+            "line": 54294,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54274,
+            "key_count": 7
+          },
+          {
+            "line": 54306,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54304,
+            "key_count": 7
+          },
+          {
+            "line": 54315,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54304,
+            "key_count": 7
+          },
+          {
+            "line": 54324,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 54304,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "fuselage/a380x_pax_windows.obj",
+        "source_sha256": "210918a26595dc768a22c3f094e68f936c59c7bebccc9a662a55e75266dbf7ec",
+        "output_sha256": "9c201ff3937dce443f301e87cb39b11a4f3e5b0383ac2338fbd19cbf7a7a263f",
+        "source_bytes": 113263,
+        "output_bytes": 113303,
+        "header_token_changes": 16,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 337,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 332,
+            "key_count": 21
+          },
+          {
+            "line": 366,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 361,
+            "key_count": 21
+          },
+          {
+            "line": 395,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 390,
+            "key_count": 21
+          },
+          {
+            "line": 424,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 419,
+            "key_count": 21
+          },
+          {
+            "line": 453,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 448,
+            "key_count": 21
+          },
+          {
+            "line": 482,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 477,
+            "key_count": 21
+          },
+          {
+            "line": 511,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 506,
+            "key_count": 21
+          },
+          {
+            "line": 540,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 535,
+            "key_count": 21
+          },
+          {
+            "line": 569,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 564,
+            "key_count": 21
+          },
+          {
+            "line": 598,
+            "old_dataref": "sim/joystick/yoke_pitch_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/elevator_ratio",
+            "scope_begin_line": 593,
+            "key_count": 21
+          },
+          {
+            "line": 625,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 623,
+            "key_count": 7
+          },
+          {
+            "line": 634,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 623,
+            "key_count": 7
+          },
+          {
+            "line": 643,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 623,
+            "key_count": 7
+          },
+          {
+            "line": 655,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 653,
+            "key_count": 7
+          },
+          {
+            "line": 664,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 653,
+            "key_count": 7
+          },
+          {
+            "line": 673,
+            "old_dataref": "sim/flightmodel2/controls/heading_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/rudder_ratio",
+            "scope_begin_line": 653,
+            "key_count": 7
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_eng_cores_lh.obj",
+        "source_sha256": "f8762704d6f7c7a97959f26516dbda40422fb76c830b2d1be0cce0110c43731a",
+        "output_sha256": "f8762704d6f7c7a97959f26516dbda40422fb76c830b2d1be0cce0110c43731a",
+        "source_bytes": 4741563,
+        "output_bytes": 4741563,
+        "header_token_changes": 0,
+        "all_other_bytes_preserved": true,
+        "headers": []
+      },
+      {
+        "object": "wings/a380x_eng_cores_rh.obj",
+        "source_sha256": "08c74cc8a52066ec8ebeede9383ef9008c5d4deac310bf078cc2fd201ee44cdc",
+        "output_sha256": "08c74cc8a52066ec8ebeede9383ef9008c5d4deac310bf078cc2fd201ee44cdc",
+        "source_bytes": 5104140,
+        "output_bytes": 5104140,
+        "header_token_changes": 0,
+        "all_other_bytes_preserved": true,
+        "headers": []
+      },
+      {
+        "object": "wings/a380x_eng_lh.obj",
+        "source_sha256": "d543f0dac3aa9ed6ba6cafb960d0a6427dd7d2b3350f00a3c3a1cb3063785d36",
+        "output_sha256": "d543f0dac3aa9ed6ba6cafb960d0a6427dd7d2b3350f00a3c3a1cb3063785d36",
+        "source_bytes": 9589078,
+        "output_bytes": 9589078,
+        "header_token_changes": 0,
+        "all_other_bytes_preserved": true,
+        "headers": []
+      },
+      {
+        "object": "wings/a380x_eng_rh.obj",
+        "source_sha256": "647e2035562652815ffc837afc72351fd61c5b8b28e12df3354f513fad7e1dfb",
+        "output_sha256": "647e2035562652815ffc837afc72351fd61c5b8b28e12df3354f513fad7e1dfb",
+        "source_bytes": 9357027,
+        "output_bytes": 9357027,
+        "header_token_changes": 0,
+        "all_other_bytes_preserved": true,
+        "headers": []
+      },
+      {
+        "object": "wings/a380x_fans.obj",
+        "source_sha256": "b710bb905e98c25228d295bd98bd536a3f36e0b4c0113a678fed2c4234389ea0",
+        "output_sha256": "b710bb905e98c25228d295bd98bd536a3f36e0b4c0113a678fed2c4234389ea0",
+        "source_bytes": 9025426,
+        "output_bytes": 9025426,
+        "header_token_changes": 0,
+        "all_other_bytes_preserved": true,
+        "headers": []
+      },
+      {
+        "object": "wings/a380x_pylons.obj",
+        "source_sha256": "8b23438eaf86bf18a9d7e957cf065217528aa6f559b6f78e79c2e7d309c0437c",
+        "output_sha256": "8eea99e37917c7b2850c526c665cc9d4e2190f94deea7a0876c9db4549282163",
+        "source_bytes": 7876740,
+        "output_bytes": 7876962,
+        "header_token_changes": 58,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 86321,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 86316,
+            "key_count": 25
+          },
+          {
+            "line": 86354,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 86349,
+            "key_count": 34
+          },
+          {
+            "line": 86712,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 86707,
+            "key_count": 34
+          },
+          {
+            "line": 86754,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 86749,
+            "key_count": 34
+          },
+          {
+            "line": 86790,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 86749,
+            "key_count": 34
+          },
+          {
+            "line": 86826,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 86749,
+            "key_count": 34
+          },
+          {
+            "line": 87224,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 87219,
+            "key_count": 25
+          },
+          {
+            "line": 87257,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 87252,
+            "key_count": 34
+          },
+          {
+            "line": 87790,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 87785,
+            "key_count": 34
+          },
+          {
+            "line": 88188,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 88183,
+            "key_count": 25
+          },
+          {
+            "line": 88221,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88216,
+            "key_count": 34
+          },
+          {
+            "line": 88257,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88216,
+            "key_count": 34
+          },
+          {
+            "line": 88293,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88216,
+            "key_count": 34
+          },
+          {
+            "line": 88335,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88330,
+            "key_count": 34
+          },
+          {
+            "line": 88868,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88863,
+            "key_count": 34
+          },
+          {
+            "line": 88910,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88905,
+            "key_count": 34
+          },
+          {
+            "line": 88952,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 88947,
+            "key_count": 34
+          },
+          {
+            "line": 88994,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 88989,
+            "key_count": 34
+          },
+          {
+            "line": 89393,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 89388,
+            "key_count": 25
+          },
+          {
+            "line": 89426,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 89421,
+            "key_count": 34
+          },
+          {
+            "line": 89468,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 89463,
+            "key_count": 25
+          },
+          {
+            "line": 89495,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 89463,
+            "key_count": 25
+          },
+          {
+            "line": 89522,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 89463,
+            "key_count": 25
+          },
+          {
+            "line": 90046,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90041,
+            "key_count": 25
+          },
+          {
+            "line": 90073,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90041,
+            "key_count": 25
+          },
+          {
+            "line": 90100,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90041,
+            "key_count": 25
+          },
+          {
+            "line": 90133,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90128,
+            "key_count": 25
+          },
+          {
+            "line": 90522,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90517,
+            "key_count": 25
+          },
+          {
+            "line": 90555,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 90550,
+            "key_count": 25
+          },
+          {
+            "line": 93991,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 93986,
+            "key_count": 25
+          },
+          {
+            "line": 94024,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94019,
+            "key_count": 34
+          },
+          {
+            "line": 94380,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94375,
+            "key_count": 34
+          },
+          {
+            "line": 94422,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94417,
+            "key_count": 34
+          },
+          {
+            "line": 94458,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94417,
+            "key_count": 34
+          },
+          {
+            "line": 94494,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94417,
+            "key_count": 34
+          },
+          {
+            "line": 94892,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 94887,
+            "key_count": 25
+          },
+          {
+            "line": 94925,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 94920,
+            "key_count": 34
+          },
+          {
+            "line": 95458,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 95453,
+            "key_count": 34
+          },
+          {
+            "line": 95856,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 95851,
+            "key_count": 25
+          },
+          {
+            "line": 95889,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 95884,
+            "key_count": 34
+          },
+          {
+            "line": 95925,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 95884,
+            "key_count": 34
+          },
+          {
+            "line": 95961,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 95884,
+            "key_count": 34
+          },
+          {
+            "line": 96003,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 95998,
+            "key_count": 34
+          },
+          {
+            "line": 96536,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 96531,
+            "key_count": 34
+          },
+          {
+            "line": 96578,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 96573,
+            "key_count": 34
+          },
+          {
+            "line": 96620,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 96615,
+            "key_count": 34
+          },
+          {
+            "line": 96662,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 96657,
+            "key_count": 34
+          },
+          {
+            "line": 97061,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97056,
+            "key_count": 25
+          },
+          {
+            "line": 97094,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 97089,
+            "key_count": 34
+          },
+          {
+            "line": 97136,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97131,
+            "key_count": 25
+          },
+          {
+            "line": 97163,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97131,
+            "key_count": 25
+          },
+          {
+            "line": 97190,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97131,
+            "key_count": 25
+          },
+          {
+            "line": 97714,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97709,
+            "key_count": 25
+          },
+          {
+            "line": 97741,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97709,
+            "key_count": 25
+          },
+          {
+            "line": 97768,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97709,
+            "key_count": 25
+          },
+          {
+            "line": 97801,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 97796,
+            "key_count": 25
+          },
+          {
+            "line": 98190,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 98185,
+            "key_count": 25
+          },
+          {
+            "line": 98223,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 98218,
+            "key_count": 25
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_wing1.obj",
+        "source_sha256": "08186b03fadd73aa09496fd708d176d1c445b7b0bf73a83112eadc9315a957d1",
+        "output_sha256": "38341b153bf35c309facb48b7bf9c27c40fe0c9018fee02998a6868650a6cb07",
+        "source_bytes": 11038023,
+        "output_bytes": 11038281,
+        "header_token_changes": 67,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 119783,
+            "old_dataref": "a380x/xp12/visual/aileron_l_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+            "scope_begin_line": 119778,
+            "key_count": 201
+          },
+          {
+            "line": 119986,
+            "old_dataref": "a380x/xp12/visual/aileron_l_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+            "scope_begin_line": 119778,
+            "key_count": 201
+          },
+          {
+            "line": 120189,
+            "old_dataref": "a380x/xp12/visual/aileron_l_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+            "scope_begin_line": 119778,
+            "key_count": 201
+          },
+          {
+            "line": 120578,
+            "old_dataref": "a380x/xp12/visual/aileron_l_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+            "scope_begin_line": 120573,
+            "key_count": 201
+          },
+          {
+            "line": 120781,
+            "old_dataref": "a380x/xp12/visual/aileron_l_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+            "scope_begin_line": 120573,
+            "key_count": 201
+          },
+          {
+            "line": 120984,
+            "old_dataref": "a380x/xp12/visual/aileron_l_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+            "scope_begin_line": 120573,
+            "key_count": 201
+          },
+          {
+            "line": 121195,
+            "old_dataref": "a380x/xp12/visual/aileron_l_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+            "scope_begin_line": 121190,
+            "key_count": 201
+          },
+          {
+            "line": 121398,
+            "old_dataref": "a380x/xp12/visual/aileron_l_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+            "scope_begin_line": 121190,
+            "key_count": 201
+          },
+          {
+            "line": 121601,
+            "old_dataref": "a380x/xp12/visual/aileron_l_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+            "scope_begin_line": 121190,
+            "key_count": 201
+          },
+          {
+            "line": 122346,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 122341,
+            "key_count": 25
+          },
+          {
+            "line": 122379,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 122374,
+            "key_count": 34
+          },
+          {
+            "line": 122737,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 122732,
+            "key_count": 34
+          },
+          {
+            "line": 122779,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 122774,
+            "key_count": 34
+          },
+          {
+            "line": 122815,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 122774,
+            "key_count": 34
+          },
+          {
+            "line": 122851,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 122774,
+            "key_count": 34
+          },
+          {
+            "line": 123251,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 123246,
+            "key_count": 25
+          },
+          {
+            "line": 123284,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 123279,
+            "key_count": 34
+          },
+          {
+            "line": 123823,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 123818,
+            "key_count": 34
+          },
+          {
+            "line": 124226,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124221,
+            "key_count": 25
+          },
+          {
+            "line": 124259,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124254,
+            "key_count": 34
+          },
+          {
+            "line": 124295,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124254,
+            "key_count": 34
+          },
+          {
+            "line": 124331,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124254,
+            "key_count": 34
+          },
+          {
+            "line": 124375,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124370,
+            "key_count": 34
+          },
+          {
+            "line": 124912,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124907,
+            "key_count": 34
+          },
+          {
+            "line": 124954,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124949,
+            "key_count": 34
+          },
+          {
+            "line": 124996,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 124991,
+            "key_count": 34
+          },
+          {
+            "line": 125040,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 125035,
+            "key_count": 34
+          },
+          {
+            "line": 125439,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125434,
+            "key_count": 25
+          },
+          {
+            "line": 125472,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 125467,
+            "key_count": 34
+          },
+          {
+            "line": 125515,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125510,
+            "key_count": 25
+          },
+          {
+            "line": 125542,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125510,
+            "key_count": 25
+          },
+          {
+            "line": 125569,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125510,
+            "key_count": 25
+          },
+          {
+            "line": 126098,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126093,
+            "key_count": 25
+          },
+          {
+            "line": 126125,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126093,
+            "key_count": 25
+          },
+          {
+            "line": 126152,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126093,
+            "key_count": 25
+          },
+          {
+            "line": 126186,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126181,
+            "key_count": 25
+          },
+          {
+            "line": 126578,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126573,
+            "key_count": 25
+          },
+          {
+            "line": 126611,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 126606,
+            "key_count": 25
+          },
+          {
+            "line": 130065,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 130060,
+            "key_count": 25
+          },
+          {
+            "line": 130098,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130093,
+            "key_count": 34
+          },
+          {
+            "line": 130453,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130448,
+            "key_count": 34
+          },
+          {
+            "line": 130495,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130490,
+            "key_count": 34
+          },
+          {
+            "line": 130531,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130490,
+            "key_count": 34
+          },
+          {
+            "line": 130567,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130490,
+            "key_count": 34
+          },
+          {
+            "line": 130965,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 130960,
+            "key_count": 25
+          },
+          {
+            "line": 130998,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 130993,
+            "key_count": 34
+          },
+          {
+            "line": 131531,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131526,
+            "key_count": 34
+          },
+          {
+            "line": 131929,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 131924,
+            "key_count": 25
+          },
+          {
+            "line": 131962,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131957,
+            "key_count": 34
+          },
+          {
+            "line": 131998,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131957,
+            "key_count": 34
+          },
+          {
+            "line": 132034,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131957,
+            "key_count": 34
+          },
+          {
+            "line": 132076,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 132071,
+            "key_count": 34
+          },
+          {
+            "line": 132609,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 132604,
+            "key_count": 34
+          },
+          {
+            "line": 132651,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 132646,
+            "key_count": 34
+          },
+          {
+            "line": 132693,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 132688,
+            "key_count": 34
+          },
+          {
+            "line": 132735,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 132730,
+            "key_count": 34
+          },
+          {
+            "line": 133133,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133128,
+            "key_count": 25
+          },
+          {
+            "line": 133166,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 133161,
+            "key_count": 34
+          },
+          {
+            "line": 133208,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133203,
+            "key_count": 25
+          },
+          {
+            "line": 133235,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133203,
+            "key_count": 25
+          },
+          {
+            "line": 133262,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133203,
+            "key_count": 25
+          },
+          {
+            "line": 133786,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133781,
+            "key_count": 25
+          },
+          {
+            "line": 133813,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133781,
+            "key_count": 25
+          },
+          {
+            "line": 133840,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133781,
+            "key_count": 25
+          },
+          {
+            "line": 133873,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 133868,
+            "key_count": 25
+          },
+          {
+            "line": 134262,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 134257,
+            "key_count": 25
+          },
+          {
+            "line": 134295,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 134290,
+            "key_count": 25
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_wing1_2.obj",
+        "source_sha256": "a8c3ffcbe50b51eb90c964938eba16cf20cc641533574c0ec213bee9d2154e52",
+        "output_sha256": "6b667fefab4ede75f3f75895501aa26b98eecc96178b919f9a60ac26aa10c255",
+        "source_bytes": 11751853,
+        "output_bytes": 11752075,
+        "header_token_changes": 58,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 127897,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 127892,
+            "key_count": 25
+          },
+          {
+            "line": 127931,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 127926,
+            "key_count": 34
+          },
+          {
+            "line": 128288,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 128283,
+            "key_count": 34
+          },
+          {
+            "line": 128331,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 128326,
+            "key_count": 34
+          },
+          {
+            "line": 128367,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 128326,
+            "key_count": 34
+          },
+          {
+            "line": 128403,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 128326,
+            "key_count": 34
+          },
+          {
+            "line": 128805,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 128800,
+            "key_count": 25
+          },
+          {
+            "line": 128839,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 128834,
+            "key_count": 34
+          },
+          {
+            "line": 129377,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 129372,
+            "key_count": 34
+          },
+          {
+            "line": 129780,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 129775,
+            "key_count": 25
+          },
+          {
+            "line": 129814,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 129809,
+            "key_count": 34
+          },
+          {
+            "line": 129850,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 129809,
+            "key_count": 34
+          },
+          {
+            "line": 129886,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 129809,
+            "key_count": 34
+          },
+          {
+            "line": 129929,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 129924,
+            "key_count": 34
+          },
+          {
+            "line": 130466,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 130461,
+            "key_count": 34
+          },
+          {
+            "line": 130508,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 130503,
+            "key_count": 34
+          },
+          {
+            "line": 130550,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 130545,
+            "key_count": 34
+          },
+          {
+            "line": 130593,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 130588,
+            "key_count": 34
+          },
+          {
+            "line": 130995,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 130990,
+            "key_count": 25
+          },
+          {
+            "line": 131029,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 131024,
+            "key_count": 34
+          },
+          {
+            "line": 131072,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131067,
+            "key_count": 25
+          },
+          {
+            "line": 131099,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131067,
+            "key_count": 25
+          },
+          {
+            "line": 131126,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131067,
+            "key_count": 25
+          },
+          {
+            "line": 131654,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131649,
+            "key_count": 25
+          },
+          {
+            "line": 131681,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131649,
+            "key_count": 25
+          },
+          {
+            "line": 131708,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131649,
+            "key_count": 25
+          },
+          {
+            "line": 131742,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 131737,
+            "key_count": 25
+          },
+          {
+            "line": 132134,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 132129,
+            "key_count": 25
+          },
+          {
+            "line": 132168,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 132163,
+            "key_count": 25
+          },
+          {
+            "line": 135615,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 135610,
+            "key_count": 25
+          },
+          {
+            "line": 135648,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 135643,
+            "key_count": 34
+          },
+          {
+            "line": 136003,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 135998,
+            "key_count": 34
+          },
+          {
+            "line": 136045,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 136040,
+            "key_count": 34
+          },
+          {
+            "line": 136081,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 136040,
+            "key_count": 34
+          },
+          {
+            "line": 136117,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 136040,
+            "key_count": 34
+          },
+          {
+            "line": 136515,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 136510,
+            "key_count": 25
+          },
+          {
+            "line": 136548,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 136543,
+            "key_count": 34
+          },
+          {
+            "line": 137081,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 137076,
+            "key_count": 34
+          },
+          {
+            "line": 137479,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 137474,
+            "key_count": 25
+          },
+          {
+            "line": 137512,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 137507,
+            "key_count": 34
+          },
+          {
+            "line": 137548,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 137507,
+            "key_count": 34
+          },
+          {
+            "line": 137584,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 137507,
+            "key_count": 34
+          },
+          {
+            "line": 137626,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 137621,
+            "key_count": 34
+          },
+          {
+            "line": 138159,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 138154,
+            "key_count": 34
+          },
+          {
+            "line": 138201,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 138196,
+            "key_count": 34
+          },
+          {
+            "line": 138243,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 138238,
+            "key_count": 34
+          },
+          {
+            "line": 138285,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 138280,
+            "key_count": 34
+          },
+          {
+            "line": 138683,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 138678,
+            "key_count": 25
+          },
+          {
+            "line": 138716,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 138711,
+            "key_count": 34
+          },
+          {
+            "line": 138758,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 138753,
+            "key_count": 25
+          },
+          {
+            "line": 138785,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 138753,
+            "key_count": 25
+          },
+          {
+            "line": 138812,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 138753,
+            "key_count": 25
+          },
+          {
+            "line": 139336,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139331,
+            "key_count": 25
+          },
+          {
+            "line": 139363,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139331,
+            "key_count": 25
+          },
+          {
+            "line": 139390,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139331,
+            "key_count": 25
+          },
+          {
+            "line": 139423,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139418,
+            "key_count": 25
+          },
+          {
+            "line": 139812,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139807,
+            "key_count": 25
+          },
+          {
+            "line": 139845,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 139840,
+            "key_count": 25
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_wing2.obj",
+        "source_sha256": "ee840941f9470a2f98eef1469230b7c527edf896564a0c8092aa35025ab3cbaa",
+        "output_sha256": "439c3211f0dab311481f709835f47eba9b634c2ce9414c631e29c3a77736e7f2",
+        "source_bytes": 10659499,
+        "output_bytes": 10659757,
+        "header_token_changes": 67,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 117792,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 117787,
+            "key_count": 25
+          },
+          {
+            "line": 117825,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 117820,
+            "key_count": 34
+          },
+          {
+            "line": 118180,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 118175,
+            "key_count": 34
+          },
+          {
+            "line": 118222,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 118217,
+            "key_count": 34
+          },
+          {
+            "line": 118258,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 118217,
+            "key_count": 34
+          },
+          {
+            "line": 118294,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 118217,
+            "key_count": 34
+          },
+          {
+            "line": 118692,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 118687,
+            "key_count": 25
+          },
+          {
+            "line": 118725,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 118720,
+            "key_count": 34
+          },
+          {
+            "line": 119258,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 119253,
+            "key_count": 34
+          },
+          {
+            "line": 119656,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 119651,
+            "key_count": 25
+          },
+          {
+            "line": 119689,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 119684,
+            "key_count": 34
+          },
+          {
+            "line": 119725,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 119684,
+            "key_count": 34
+          },
+          {
+            "line": 119761,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 119684,
+            "key_count": 34
+          },
+          {
+            "line": 119803,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 119798,
+            "key_count": 34
+          },
+          {
+            "line": 120336,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 120331,
+            "key_count": 34
+          },
+          {
+            "line": 120378,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 120373,
+            "key_count": 34
+          },
+          {
+            "line": 120420,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 120415,
+            "key_count": 34
+          },
+          {
+            "line": 120462,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 120457,
+            "key_count": 34
+          },
+          {
+            "line": 120860,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 120855,
+            "key_count": 25
+          },
+          {
+            "line": 120893,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 120888,
+            "key_count": 34
+          },
+          {
+            "line": 120935,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 120930,
+            "key_count": 25
+          },
+          {
+            "line": 120962,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 120930,
+            "key_count": 25
+          },
+          {
+            "line": 120989,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 120930,
+            "key_count": 25
+          },
+          {
+            "line": 121513,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121508,
+            "key_count": 25
+          },
+          {
+            "line": 121540,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121508,
+            "key_count": 25
+          },
+          {
+            "line": 121567,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121508,
+            "key_count": 25
+          },
+          {
+            "line": 121600,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121595,
+            "key_count": 25
+          },
+          {
+            "line": 121989,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121984,
+            "key_count": 25
+          },
+          {
+            "line": 122022,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 122017,
+            "key_count": 25
+          },
+          {
+            "line": 122906,
+            "old_dataref": "a380x/xp12/visual/aileron_r_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+            "scope_begin_line": 122901,
+            "key_count": 201
+          },
+          {
+            "line": 123109,
+            "old_dataref": "a380x/xp12/visual/aileron_r_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+            "scope_begin_line": 122901,
+            "key_count": 201
+          },
+          {
+            "line": 123312,
+            "old_dataref": "a380x/xp12/visual/aileron_r_outboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+            "scope_begin_line": 122901,
+            "key_count": 201
+          },
+          {
+            "line": 123702,
+            "old_dataref": "a380x/xp12/visual/aileron_r_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+            "scope_begin_line": 123697,
+            "key_count": 201
+          },
+          {
+            "line": 123905,
+            "old_dataref": "a380x/xp12/visual/aileron_r_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+            "scope_begin_line": 123697,
+            "key_count": 201
+          },
+          {
+            "line": 124108,
+            "old_dataref": "a380x/xp12/visual/aileron_r_midboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+            "scope_begin_line": 123697,
+            "key_count": 201
+          },
+          {
+            "line": 124318,
+            "old_dataref": "a380x/xp12/visual/aileron_r_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+            "scope_begin_line": 124313,
+            "key_count": 201
+          },
+          {
+            "line": 124521,
+            "old_dataref": "a380x/xp12/visual/aileron_r_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+            "scope_begin_line": 124313,
+            "key_count": 201
+          },
+          {
+            "line": 124724,
+            "old_dataref": "a380x/xp12/visual/aileron_r_inboard_ratio",
+            "new_dataref": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+            "scope_begin_line": 124313,
+            "key_count": 201
+          },
+          {
+            "line": 125469,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 125464,
+            "key_count": 25
+          },
+          {
+            "line": 125502,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 125497,
+            "key_count": 34
+          },
+          {
+            "line": 125860,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 125855,
+            "key_count": 34
+          },
+          {
+            "line": 125902,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 125897,
+            "key_count": 34
+          },
+          {
+            "line": 125938,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 125897,
+            "key_count": 34
+          },
+          {
+            "line": 125974,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 125897,
+            "key_count": 34
+          },
+          {
+            "line": 126374,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 126369,
+            "key_count": 25
+          },
+          {
+            "line": 126407,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 126402,
+            "key_count": 34
+          },
+          {
+            "line": 126945,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 126940,
+            "key_count": 34
+          },
+          {
+            "line": 127346,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 127341,
+            "key_count": 25
+          },
+          {
+            "line": 127379,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 127374,
+            "key_count": 34
+          },
+          {
+            "line": 127415,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 127374,
+            "key_count": 34
+          },
+          {
+            "line": 127451,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 127374,
+            "key_count": 34
+          },
+          {
+            "line": 127494,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 127489,
+            "key_count": 34
+          },
+          {
+            "line": 128030,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 128025,
+            "key_count": 34
+          },
+          {
+            "line": 128072,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 128067,
+            "key_count": 34
+          },
+          {
+            "line": 128114,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 128109,
+            "key_count": 34
+          },
+          {
+            "line": 128157,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 128152,
+            "key_count": 34
+          },
+          {
+            "line": 128556,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 128551,
+            "key_count": 25
+          },
+          {
+            "line": 128589,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 128584,
+            "key_count": 34
+          },
+          {
+            "line": 128632,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 128627,
+            "key_count": 25
+          },
+          {
+            "line": 128659,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 128627,
+            "key_count": 25
+          },
+          {
+            "line": 128686,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 128627,
+            "key_count": 25
+          },
+          {
+            "line": 129214,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129209,
+            "key_count": 25
+          },
+          {
+            "line": 129241,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129209,
+            "key_count": 25
+          },
+          {
+            "line": 129268,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129209,
+            "key_count": 25
+          },
+          {
+            "line": 129302,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129297,
+            "key_count": 25
+          },
+          {
+            "line": 129694,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129689,
+            "key_count": 25
+          },
+          {
+            "line": 129727,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129722,
+            "key_count": 25
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_wing2_2.obj",
+        "source_sha256": "73274dea2edd2dce7133232917832cfbbf2d1b4c2cd6ef43013ad9e546052d6c",
+        "output_sha256": "ce58c5559ddc114c6b4d9767ae8460d7486d1e8ade78de16523dc5cce824f121",
+        "source_bytes": 11140748,
+        "output_bytes": 11140970,
+        "header_token_changes": 58,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 120974,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 120969,
+            "key_count": 25
+          },
+          {
+            "line": 121007,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121002,
+            "key_count": 34
+          },
+          {
+            "line": 121362,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121357,
+            "key_count": 34
+          },
+          {
+            "line": 121404,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121399,
+            "key_count": 34
+          },
+          {
+            "line": 121440,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121399,
+            "key_count": 34
+          },
+          {
+            "line": 121476,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121399,
+            "key_count": 34
+          },
+          {
+            "line": 121874,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 121869,
+            "key_count": 25
+          },
+          {
+            "line": 121907,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 121902,
+            "key_count": 34
+          },
+          {
+            "line": 122440,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 122435,
+            "key_count": 34
+          },
+          {
+            "line": 122838,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 122833,
+            "key_count": 25
+          },
+          {
+            "line": 122871,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 122866,
+            "key_count": 34
+          },
+          {
+            "line": 122907,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 122866,
+            "key_count": 34
+          },
+          {
+            "line": 122943,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 122866,
+            "key_count": 34
+          },
+          {
+            "line": 122985,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 122980,
+            "key_count": 34
+          },
+          {
+            "line": 123518,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 123513,
+            "key_count": 34
+          },
+          {
+            "line": 123560,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 123555,
+            "key_count": 34
+          },
+          {
+            "line": 123602,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 123597,
+            "key_count": 34
+          },
+          {
+            "line": 123644,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 123639,
+            "key_count": 34
+          },
+          {
+            "line": 124042,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124037,
+            "key_count": 25
+          },
+          {
+            "line": 124075,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 124070,
+            "key_count": 34
+          },
+          {
+            "line": 124117,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124112,
+            "key_count": 25
+          },
+          {
+            "line": 124144,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124112,
+            "key_count": 25
+          },
+          {
+            "line": 124171,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124112,
+            "key_count": 25
+          },
+          {
+            "line": 124695,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124690,
+            "key_count": 25
+          },
+          {
+            "line": 124722,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124690,
+            "key_count": 25
+          },
+          {
+            "line": 124749,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124690,
+            "key_count": 25
+          },
+          {
+            "line": 124782,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 124777,
+            "key_count": 25
+          },
+          {
+            "line": 125171,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125166,
+            "key_count": 25
+          },
+          {
+            "line": 125204,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 125199,
+            "key_count": 25
+          },
+          {
+            "line": 128646,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 128641,
+            "key_count": 25
+          },
+          {
+            "line": 128680,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 128675,
+            "key_count": 34
+          },
+          {
+            "line": 129036,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 129031,
+            "key_count": 34
+          },
+          {
+            "line": 129078,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 129073,
+            "key_count": 34
+          },
+          {
+            "line": 129114,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 129073,
+            "key_count": 34
+          },
+          {
+            "line": 129150,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 129073,
+            "key_count": 34
+          },
+          {
+            "line": 129551,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 129546,
+            "key_count": 25
+          },
+          {
+            "line": 129585,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 129580,
+            "key_count": 34
+          },
+          {
+            "line": 130122,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 130117,
+            "key_count": 34
+          },
+          {
+            "line": 130522,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 130517,
+            "key_count": 25
+          },
+          {
+            "line": 130556,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 130551,
+            "key_count": 34
+          },
+          {
+            "line": 130592,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 130551,
+            "key_count": 34
+          },
+          {
+            "line": 130628,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 130551,
+            "key_count": 34
+          },
+          {
+            "line": 130672,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 130667,
+            "key_count": 34
+          },
+          {
+            "line": 131208,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131203,
+            "key_count": 34
+          },
+          {
+            "line": 131250,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131245,
+            "key_count": 34
+          },
+          {
+            "line": 131292,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 131287,
+            "key_count": 34
+          },
+          {
+            "line": 131336,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 131331,
+            "key_count": 34
+          },
+          {
+            "line": 131736,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 131731,
+            "key_count": 25
+          },
+          {
+            "line": 131770,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 131765,
+            "key_count": 34
+          },
+          {
+            "line": 131814,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 131809,
+            "key_count": 25
+          },
+          {
+            "line": 131841,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 131809,
+            "key_count": 25
+          },
+          {
+            "line": 131868,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 131809,
+            "key_count": 25
+          },
+          {
+            "line": 132395,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132390,
+            "key_count": 25
+          },
+          {
+            "line": 132422,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132390,
+            "key_count": 25
+          },
+          {
+            "line": 132449,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132390,
+            "key_count": 25
+          },
+          {
+            "line": 132483,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132478,
+            "key_count": 25
+          },
+          {
+            "line": 132873,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132868,
+            "key_count": 25
+          },
+          {
+            "line": 132907,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 132902,
+            "key_count": 25
+          }
+        ]
+      },
+      {
+        "object": "wings/a380x_wingfence.obj",
+        "source_sha256": "920f4938a3a2c140e02e2ccd638d6f13165542d67f907f4d4f13e5b6f58a0df6",
+        "output_sha256": "575e23402def128fcef05e4956783474333c49a36caa4426cb465e154e9a2e9a",
+        "source_bytes": 1245711,
+        "output_bytes": 1245933,
+        "header_token_changes": 58,
+        "all_other_bytes_preserved": true,
+        "headers": [
+          {
+            "line": 9232,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 9227,
+            "key_count": 25
+          },
+          {
+            "line": 9265,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 9260,
+            "key_count": 34
+          },
+          {
+            "line": 9620,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 9615,
+            "key_count": 34
+          },
+          {
+            "line": 9662,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 9657,
+            "key_count": 34
+          },
+          {
+            "line": 9698,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 9657,
+            "key_count": 34
+          },
+          {
+            "line": 9734,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 9657,
+            "key_count": 34
+          },
+          {
+            "line": 10132,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 10127,
+            "key_count": 25
+          },
+          {
+            "line": 10165,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[4]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+            "scope_begin_line": 10160,
+            "key_count": 34
+          },
+          {
+            "line": 10698,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 10693,
+            "key_count": 34
+          },
+          {
+            "line": 11096,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 11091,
+            "key_count": 25
+          },
+          {
+            "line": 11129,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11124,
+            "key_count": 34
+          },
+          {
+            "line": 11165,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11124,
+            "key_count": 34
+          },
+          {
+            "line": 11201,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11124,
+            "key_count": 34
+          },
+          {
+            "line": 11243,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11238,
+            "key_count": 34
+          },
+          {
+            "line": 11776,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11771,
+            "key_count": 34
+          },
+          {
+            "line": 11818,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11813,
+            "key_count": 34
+          },
+          {
+            "line": 11860,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[2]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+            "scope_begin_line": 11855,
+            "key_count": 34
+          },
+          {
+            "line": 11902,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 11897,
+            "key_count": 34
+          },
+          {
+            "line": 12300,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12295,
+            "key_count": 25
+          },
+          {
+            "line": 12333,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+            "scope_begin_line": 12328,
+            "key_count": 34
+          },
+          {
+            "line": 12375,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12370,
+            "key_count": 25
+          },
+          {
+            "line": 12402,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12370,
+            "key_count": 25
+          },
+          {
+            "line": 12429,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12370,
+            "key_count": 25
+          },
+          {
+            "line": 12953,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12948,
+            "key_count": 25
+          },
+          {
+            "line": 12980,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12948,
+            "key_count": 25
+          },
+          {
+            "line": 13007,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 12948,
+            "key_count": 25
+          },
+          {
+            "line": 13040,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 13035,
+            "key_count": 25
+          },
+          {
+            "line": 13429,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 13424,
+            "key_count": 25
+          },
+          {
+            "line": 13462,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[0]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+            "scope_begin_line": 13457,
+            "key_count": 25
+          },
+          {
+            "line": 16900,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 16895,
+            "key_count": 25
+          },
+          {
+            "line": 16933,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 16928,
+            "key_count": 34
+          },
+          {
+            "line": 17288,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 17283,
+            "key_count": 34
+          },
+          {
+            "line": 17330,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 17325,
+            "key_count": 34
+          },
+          {
+            "line": 17366,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 17325,
+            "key_count": 34
+          },
+          {
+            "line": 17402,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 17325,
+            "key_count": 34
+          },
+          {
+            "line": 17800,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 17795,
+            "key_count": 25
+          },
+          {
+            "line": 17833,
+            "old_dataref": "sim/flightmodel2/wing/spoiler2_deg[5]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+            "scope_begin_line": 17828,
+            "key_count": 34
+          },
+          {
+            "line": 18366,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 18361,
+            "key_count": 34
+          },
+          {
+            "line": 18764,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 18759,
+            "key_count": 25
+          },
+          {
+            "line": 18797,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 18792,
+            "key_count": 34
+          },
+          {
+            "line": 18833,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 18792,
+            "key_count": 34
+          },
+          {
+            "line": 18869,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 18792,
+            "key_count": 34
+          },
+          {
+            "line": 18911,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 18906,
+            "key_count": 34
+          },
+          {
+            "line": 19444,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 19439,
+            "key_count": 34
+          },
+          {
+            "line": 19486,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 19481,
+            "key_count": 34
+          },
+          {
+            "line": 19528,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[3]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+            "scope_begin_line": 19523,
+            "key_count": 34
+          },
+          {
+            "line": 19570,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 19565,
+            "key_count": 34
+          },
+          {
+            "line": 19968,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 19963,
+            "key_count": 25
+          },
+          {
+            "line": 20001,
+            "old_dataref": "sim/flightmodel2/wing/spoiler1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+            "scope_begin_line": 19996,
+            "key_count": 34
+          },
+          {
+            "line": 20043,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20038,
+            "key_count": 25
+          },
+          {
+            "line": 20070,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20038,
+            "key_count": 25
+          },
+          {
+            "line": 20097,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20038,
+            "key_count": 25
+          },
+          {
+            "line": 20621,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20616,
+            "key_count": 25
+          },
+          {
+            "line": 20648,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20616,
+            "key_count": 25
+          },
+          {
+            "line": 20675,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20616,
+            "key_count": 25
+          },
+          {
+            "line": 20708,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 20703,
+            "key_count": 25
+          },
+          {
+            "line": 21097,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 21092,
+            "key_count": 25
+          },
+          {
+            "line": 21130,
+            "old_dataref": "sim/flightmodel2/wing/speedbrake1_deg[1]",
+            "new_dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+            "scope_begin_line": 21125,
+            "key_count": 25
+          }
+        ]
+      }
+    ],
+    "backup": "/Volumes/Savs' drive/A380X-XPlane12/xplane-port/build/hydraulics-backup-20261007"
+  }
+}

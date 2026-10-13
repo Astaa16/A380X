@@ -1,0 +1,19 @@
+{
+  "tested_at": "2026-10-03T23:18:00+05:00",
+  "xplane_version": "12.4.3-r2-15ff1e4d",
+  "platform": "macOS Apple Silicon",
+  "aircraft": "Aircraft/A380X-XP12/A380X-XP12.acf",
+  "aircraft_load_result": "pass",
+  "evidence": [
+    "Loading airplane number 0 with Aircraft/A380X-XP12/A380X-XP12.acf",
+    "Transitioning from state state_NormalLoading to state_Normal"
+  ],
+  "a380_normal_state_seconds_before_benchmark_replay_switch": 24.424,
+  "acf_obj_or_png_errors": [],
+  "nonfatal_warnings": [
+    "X-Plane probed for optional DDS sidecars before using the packaged PNG gear textures",
+    "No A380X-XP12_vrconfig.txt is provided yet"
+  ],
+  "flight_dynamics_validation": "not performed",
+  "test_harness_note": "The FPS-test replay later replaced the A380 with the stock Cirrus SF50 and X-Plane crashed in that separate replay phase. The A380 had already completed its runtime load and reached state_Normal."
+}

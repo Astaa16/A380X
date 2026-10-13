@@ -1,0 +1,7 @@
+# The complete aircraft's generated models, textures, liveries, and runtime
+# plugins are stored with Git LFS so the repository remains cloneable and the
+# 100 MiB GitHub object limit is respected.
+output/A380X-XP12/objects/** filter=lfs diff=lfs merge=lfs -text
+output/A380X-XP12/textures/** filter=lfs diff=lfs merge=lfs -text
+output/A380X-XP12/liveries/** filter=lfs diff=lfs merge=lfs -text
+output/A380X-XP12/plugins/** filter=lfs diff=lfs merge=lfs -text

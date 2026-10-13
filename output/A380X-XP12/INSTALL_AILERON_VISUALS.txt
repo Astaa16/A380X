@@ -1,0 +1,23 @@
+A380X aileron and hydraulic surface visual animation dependency
+
+Install FlyWithLua NG (tested API: 2.8.12), then, with X-Plane closed:
+1. Copy plugins/FlyWithLua/Modules/a380x_aileron_dance.lua and
+   plugins/FlyWithLua/Modules/a380x_hydraulic_surfaces.lua to
+   X-Plane 12/Resources/plugins/FlyWithLua/Modules/.
+2. Copy plugins/FlyWithLua/Scripts (required)/A380X_XP12_Ailerons.lua and
+   plugins/FlyWithLua/Scripts (required)/A380X_XP12_Hydraulics.lua to
+   X-Plane 12/Resources/plugins/FlyWithLua/Scripts/.
+3. Keep the included plugins/A380XAileronDatarefs folder in this aircraft.
+   It registers all 22 animation datarefs before X-Plane loads the objects.
+4. Fully restart X-Plane and load this A380X-XP12 aircraft.
+
+The same Lua files support Mac and Windows. Do not install or enable the
+optional experimental FBW control-law script for these animations.
+Only custom visual values are written; flight physics are unchanged.
+The six legacy and eight hydraulic ratios use [-1, 1]; eight hydraulic
+spoiler angles use [0, 65] degrees. Both drivers and modules are required.
+Without the drivers these surfaces cannot animate normally; a stopped Lua
+runtime may leave the last visual pose until the aircraft is reloaded.
+Restore the saved native-animation build if FlyWithLua is unavailable.
+Back up existing files before upgrading; do not overwrite unrelated scripts.
+These scripts passed offline Lua 5.1/5.4 tests, not a simulator flight test.

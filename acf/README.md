@@ -4,7 +4,7 @@ This folder keeps the small, editable X-Plane aircraft definitions separate from
 
 ## Which file should I edit?
 
-Edit **`A380X-XP12-current.acf`**. It is copied from `output/A380X-XP12/A380X-XP12.acf` and is the current development definition.
+For a change to the complete aircraft, edit **[`../output/A380X-XP12/A380X-XP12.acf`](../output/A380X-XP12/A380X-XP12.acf)**. `A380X-XP12-current.acf` is a small standalone copy of that same current development definition for focused comparison and review.
 
 The two other files are comparison baselines:
 

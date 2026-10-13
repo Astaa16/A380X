@@ -2,11 +2,25 @@
 
 This directory is an independent A380X conversion workbench using the downloaded FlyByWire source and MSFS glTF assets. No third-party X-Plane A380 is used as a carrier or dependency.
 
+## Complete X-Plane aircraft
+
+The complete installable aircraft is in [`output/A380X-XP12/`](output/A380X-XP12/). Models, textures, liveries, and runtime plugins are stored with Git LFS because the package is approximately 2.6 GB and contains files larger than GitHub's normal 100 MiB limit.
+
+Clone it with Git LFS enabled:
+
+```sh
+git lfs install
+git clone https://github.com/Sava227/A380X.git
+```
+
+Then copy the resulting `A380X/output/A380X-XP12` folder into X-Plane 12's `Aircraft` directory. A browser-generated source archive may contain LFS pointer files instead of the actual aircraft assets, so cloning with Git LFS is the reliable installation method.
+
 ## Landing-gear repair: start here
 
 The editable X-Plane aircraft files are deliberately collected in [`acf/`](acf/README.md) so a contributor can work on the landing gear without downloading the multi-gigabyte generated package.
 
-- **Current file to fix:** [`acf/A380X-XP12-current.acf`](acf/A380X-XP12-current.acf)
+- **Aircraft's current file to fix:** [`output/A380X-XP12/A380X-XP12.acf`](output/A380X-XP12/A380X-XP12.acf)
+- **Small standalone copy:** [`acf/A380X-XP12-current.acf`](acf/A380X-XP12-current.acf)
 - **Before the nose-wheel contact fix:** [`acf/acf-before-nosegear-contact-fix-20261005.acf`](acf/acf-before-nosegear-contact-fix-20261005.acf)
 - **Before ground calibration:** [`acf/acf-before-ground-calibration.acf`](acf/acf-before-ground-calibration.acf)
 - **Known defect, evidence, acceptance criteria, and next telemetry:** [`docs/GROUND_TEST_NOTES.md`](docs/GROUND_TEST_NOTES.md)

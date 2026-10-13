@@ -1,0 +1,176 @@
+{
+  "format": 1,
+  "provider": "a380x-aileron-dance-v1",
+  "runtime": "FlyWithLua NG 2.8.12 or later",
+  "visual_only": true,
+  "requires_global_installation": true,
+  "datarefs": [
+    {
+      "name": "a380x/xp12/visual/aileron_l_inboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/visual/aileron_l_midboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/visual/aileron_l_outboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/visual/aileron_r_inboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/visual/aileron_r_midboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/visual/aileron_r_outboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/elevator_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/rudder_ratio",
+      "type": "Float",
+      "minimum": -1,
+      "maximum": 1
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    },
+    {
+      "name": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+      "type": "Float",
+      "minimum": 0,
+      "maximum": 65
+    }
+  ],
+  "files": [
+    {
+      "path": "plugins/FlyWithLua/Scripts (required)/A380X_XP12_Ailerons.lua",
+      "install_path": "Scripts/A380X_XP12_Ailerons.lua",
+      "sha256": "4b8159a0a6f324e3a99d0c886cceb107c74f70b7a5a980691a021d9bba42f6ea"
+    },
+    {
+      "path": "plugins/FlyWithLua/Modules/a380x_aileron_dance.lua",
+      "install_path": "Modules/a380x_aileron_dance.lua",
+      "sha256": "d1b02ea7f39df05cb8a83937fb158abdaa9c0c476c58f97be28f1b3c04bdb460"
+    },
+    {
+      "path": "plugins/FlyWithLua/Modules/a380x_hydraulic_surfaces.lua",
+      "install_path": "Modules/a380x_hydraulic_surfaces.lua",
+      "sha256": "0369849bdcaac23bae661ce1d0a144e5752adb28dc56a3e2d8d0cf40bb2d1440"
+    },
+    {
+      "path": "plugins/FlyWithLua/Scripts (required)/A380X_XP12_Hydraulics.lua",
+      "install_path": "Scripts/A380X_XP12_Hydraulics.lua",
+      "sha256": "d10030eef7eaab703d8f6387702f3adc62a3c0d33f4f39c4921f454606d75c04"
+    }
+  ],
+  "bootstrap": {
+    "registration": "XPluginStart",
+    "files": [
+      {
+        "path": "plugins/A380XAileronDatarefs/mac_x64/A380XAileronDatarefs.xpl",
+        "sha256": "7f44049c71c6830b2476de605bb9ce17ca8193a2fd94017a086e9d96d9f0c191"
+      },
+      {
+        "path": "plugins/A380XAileronDatarefs/win_x64/A380XAileronDatarefs.xpl",
+        "sha256": "345e68de8d953bbe57d9b09a1035394ffabcc52d3d295caade58221d7ad2f8dd"
+      }
+    ]
+  }
+}

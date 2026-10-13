@@ -1,0 +1,1017 @@
+{
+  "format": 1,
+  "files": [
+    {
+      "path": "/Volumes/Savs' drive/A380X-XPlane12/upstream-aircraft/fbw-a380x/src/base/flybywire-aircraft-a380-842/SimObjects/AirPlanes/FlyByWire_A380X/attachments/flybywire/Part_Exterior_Gear_Body_LH/model/A380_GEAR_BODY_LH_LOD00.gltf",
+      "nodes": 98,
+      "meshes": 62,
+      "materials": 4,
+      "animations": [
+        {
+          "index": 0,
+          "name": "l_b_gear",
+          "channels": [
+            {
+              "node_index": 10,
+              "node_name": "B_BLG_LH_MAIN",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 14,
+              "node_name": "B_BLG_LH_MAIN.005",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 14,
+              "node_name": "B_BLG_LH_MAIN.005",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 12,
+              "node_name": "B_B_BLG_LH_MAIN.006",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 16,
+              "node_name": "B_BLG_LH_Bone.004",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 15,
+              "node_name": "B_BLG_LH_Bone.005",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 22,
+              "node_name": "B_BLG_LH_Bone.006",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 20,
+              "node_name": "B_BLG_LH_Bone.007",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 23,
+              "node_name": "B_BLG_LH_Bone.008",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 23,
+              "node_name": "B_BLG_LH_Bone.008",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 25,
+              "node_name": "B_BLG_LH_MAIN.001",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 25,
+              "node_name": "B_BLG_LH_MAIN.001",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 30,
+              "node_name": "B_BLG_LH_MAIN.003",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 30,
+              "node_name": "B_BLG_LH_MAIN.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 28,
+              "node_name": "B_BLG_LH_MAIN.004",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 32,
+              "node_name": "B_BLG_LH_Bone",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 32,
+              "node_name": "B_BLG_LH_Bone",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 34,
+              "node_name": "B_BLG_LH_Bone.001",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 34,
+              "node_name": "B_BLG_LH_Bone.001",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 90,
+              "node_name": "B_BLG_LH_Bone.010",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 90,
+              "node_name": "B_BLG_LH_Bone.010",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 93,
+              "node_name": "B_BLG_LH_Bone.011",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 93,
+              "node_name": "B_BLG_LH_Bone.011",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 71,
+              "node_name": "B_MLG.008_Bone.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 81,
+              "node_name": "B_MLG.008_Bone.009",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "name": "l_b_gear_tilt",
+          "channels": [
+            {
+              "node_index": 88,
+              "node_name": "B_MLG.006_Bone.012",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 101,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                4.166666666666667
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "name": "left_bws",
+          "channels": [
+            {
+              "node_index": 79,
+              "node_name": "B_MLG.008_Bone.002",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0.041666666666666664
+              ],
+              "time_max": [
+                1.7083333333333333
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 71,
+              "node_name": "B_MLG.008_Bone.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0.041666666666666664
+              ],
+              "time_max": [
+                1.7083333333333333
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 81,
+              "node_name": "B_MLG.008_Bone.009",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0.041666666666666664
+              ],
+              "time_max": [
+                1.7083333333333333
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "name": "LL_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 74,
+              "node_name": "B_BLG_LL_TIRE",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "name": "LR_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 77,
+              "node_name": "B_BLG_LR_TIRE.01",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "name": "B_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 84,
+              "node_name": "TIRE_2_Bone",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 86,
+              "node_name": "TIRE_Bone",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Volumes/Savs' drive/A380X-XPlane12/upstream-aircraft/fbw-a380x/src/base/flybywire-aircraft-a380-842/SimObjects/AirPlanes/FlyByWire_A380X/attachments/flybywire/Part_Exterior_Gear_Body_RH/model/A380_GEAR_BODY_RH_LOD00.gltf",
+      "nodes": 102,
+      "meshes": 62,
+      "materials": 4,
+      "animations": [
+        {
+          "index": 0,
+          "name": "r_b_gear",
+          "channels": [
+            {
+              "node_index": 12,
+              "node_name": "B_BLG_RH_MAIN",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 16,
+              "node_name": "B_BLG_RH_MAIN.005",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 16,
+              "node_name": "B_BLG_RH_MAIN.005",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 14,
+              "node_name": "B_BLG_RH_MAIN.006",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 18,
+              "node_name": "B_BLG_RH_Bone.004",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 17,
+              "node_name": "B_BLG_RH_Bone.005",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 24,
+              "node_name": "B_BLG_RH_Bone.006",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 22,
+              "node_name": "B_BLG_RH_Bone.007",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 25,
+              "node_name": "B_BLG_RH_Bone.008",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 25,
+              "node_name": "B_BLG_RH_Bone.008",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 27,
+              "node_name": "B_BLG_RH_MAIN.001",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 27,
+              "node_name": "B_BLG_RH_MAIN.001",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 32,
+              "node_name": "B_BLG_RH_MAIN.003",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 32,
+              "node_name": "B_BLG_RH_MAIN.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 30,
+              "node_name": "B_BLG_RH_MAIN.004",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 34,
+              "node_name": "B_BLG_RH_Bone",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 34,
+              "node_name": "B_BLG_RH_Bone",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 36,
+              "node_name": "B_BLG_RH_Bone.001",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 36,
+              "node_name": "B_BLG_RH_Bone.001",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 96,
+              "node_name": "B_BLG_RH_Bone.010",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 96,
+              "node_name": "B_BLG_RH_Bone.010",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 99,
+              "node_name": "B_BLG_RH_Bone.011",
+              "path": "translation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC3"
+            },
+            {
+              "node_index": 99,
+              "node_name": "B_BLG_RH_Bone.011",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 78,
+              "node_name": "B_MLG.007_Bone.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 88,
+              "node_name": "B_MLG.007_Bone.009",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 201,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                8.333333333333334
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "name": "r_b_gear_tilt",
+          "channels": [
+            {
+              "node_index": 90,
+              "node_name": "B_MLG.005_Bone.012",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 101,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                4.166666666666667
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "name": "B_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 39,
+              "node_name": "B_BLG_R_MID",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 41,
+              "node_name": "B_BLG_R_FWD",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "name": "right_bws",
+          "channels": [
+            {
+              "node_index": 86,
+              "node_name": "B_MLG.007_Bone.002",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                1.6666666666666667
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 78,
+              "node_name": "B_MLG.007_Bone.003",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                1.6666666666666667
+              ],
+              "output_type": "VEC4"
+            },
+            {
+              "node_index": 88,
+              "node_name": "B_MLG.007_Bone.009",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 41,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                1.6666666666666667
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "name": "RL_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 81,
+              "node_name": "B_BLG_RL_TIRE.01",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "name": "RR_TIRE_KEY",
+          "channels": [
+            {
+              "node_index": 84,
+              "node_name": "B_BLG_RR_TIRE.01",
+              "path": "rotation",
+              "interpolation": "LINEAR",
+              "keyframes": 81,
+              "time_min": [
+                0
+              ],
+              "time_max": [
+                3.3333333333333335
+              ],
+              "output_type": "VEC4"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

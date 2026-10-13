@@ -9,9 +9,9 @@ __pycache__/
 .coverage
 htmlcov/
 
-# Local build products and generated aircraft packages
+# Local build products
 /build/
-/output/
+/output/*
 **/dist*/
 **/.install-backups/
 
@@ -33,3 +33,10 @@ htmlcov/
 venv/
 *.swp
 *~
+
+# Publish the complete installable aircraft, but not other generated outputs.
+!/output/A380X-XP12/
+!/output/A380X-XP12/**
+/output/A380X-XP12/.cockpit-material-backups/
+/output/A380X-XP12/**/._*
+/output/A380X-XP12/**/.DS_Store
