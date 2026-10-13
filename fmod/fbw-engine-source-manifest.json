@@ -1,0 +1,3068 @@
+{
+  "schema_version": 1,
+  "selection": {
+    "method": "Wwise TXTP graph contains an FBW engine-control RTPC",
+    "engine_control_rtpc_ids": [
+      895650072,
+      2750389324,
+      2750389327,
+      3898595254
+    ],
+    "event_name_mapping": "unresolved; optimized bank does not retain the XML WwiseEvent aliases",
+    "excluded": "ac1 and ac2 threshold cues have no engine RTPC and are not selected"
+  },
+  "sources": {
+    "txtp_dir": "/Volumes/MacGames/A380X-XPlane12-build/fmod/fbw-wwise/FBW_A320_NEO_3.PC/txtp",
+    "media_inventory": "/Volumes/MacGames/A380X-XPlane12-build/fmod/fbw-wwise/media-inventory.json",
+    "media_root": "/Volumes/MacGames/A380X-XPlane12-build/fmod/fbw-wwise",
+    "sound_xml": "../upstream-aircraft/fbw-a380x/src/base/flybywire-aircraft-a380-842/SimObjects/AirPlanes/FlyByWire_A380X/common/sound/sound.xml"
+  },
+  "expected_fbw_engine_events": [
+    {
+      "name": "Engine_1_Front",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME",
+        "SIMVAR_PLANE_ALT_ABOVE_GROUND",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_1_FF",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_1_Start",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "ac1",
+      "rtpcs": []
+    },
+    {
+      "name": "Engine_2_Front",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME",
+        "SIMVAR_PLANE_ALT_ABOVE_GROUND",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_2_Start",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "ac2",
+      "rtpcs": []
+    },
+    {
+      "name": "Engine_2_FF",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_3_Front",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME",
+        "SIMVAR_PLANE_ALT_ABOVE_GROUND",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_3_Start",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_3_FF",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_4_Front",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME",
+        "SIMVAR_PLANE_ALT_ABOVE_GROUND",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_4_Start",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_4_FF",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N2",
+        "SIMVAR_TURB_ENG_N1_DERIVED"
+      ]
+    },
+    {
+      "name": "Engine_1_Front_Ext",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_2_Front_Ext",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_3_Front_Ext",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_4_Front_Ext",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_1_Rear",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_2_Rear",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_3_Rear",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    },
+    {
+      "name": "Engine_4_Rear",
+      "rtpcs": [
+        "SIMVAR_TURB_ENG_N1",
+        "SIMVAR_AIRSPEED_TRUE",
+        "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "hirc_index": 450,
+      "event_id": 270236557,
+      "txtp_variants": [
+        "814486316-0450-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0450-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0450-event {s}=- {m}.txtp"
+      ],
+      "classification": "n1_spatial_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        }
+      ],
+      "source_ids": [
+        468009919,
+        867510340
+      ]
+    },
+    {
+      "hirc_index": 454,
+      "event_id": 462770327,
+      "txtp_variants": [
+        "814486316-0454-event.txtp"
+      ],
+      "classification": "n1_spatial_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        }
+      ],
+      "source_ids": [
+        438288134
+      ]
+    },
+    {
+      "hirc_index": 474,
+      "event_id": 648184694,
+      "txtp_variants": [
+        "814486316-0474-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0474-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        107424398,
+        203048862,
+        209588867,
+        378097296,
+        426605528,
+        428665539,
+        643480345,
+        660439986,
+        675159713,
+        706402962,
+        741679922,
+        918011295,
+        1037953038
+      ]
+    },
+    {
+      "hirc_index": 493,
+      "event_id": 909531764,
+      "txtp_variants": [
+        "814486316-0493-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0493-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        159724704,
+        349601280,
+        459089345,
+        483265828,
+        573640817,
+        575685018,
+        675159713,
+        707674942,
+        741679922,
+        806879307,
+        822481075,
+        859218797,
+        867520556,
+        888458016
+      ]
+    },
+    {
+      "hirc_index": 497,
+      "event_id": 1089987841,
+      "txtp_variants": [
+        "814486316-0497-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0497-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        48625709,
+        140231579,
+        154479959,
+        350670602,
+        426424848,
+        741679922,
+        797158014,
+        810706852,
+        962072798,
+        1007121766
+      ]
+    },
+    {
+      "hirc_index": 500,
+      "event_id": 1112053131,
+      "txtp_variants": [
+        "814486316-0500-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0500-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0500-event {s}=- {m}.txtp"
+      ],
+      "classification": "n1_spatial_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        }
+      ],
+      "source_ids": [
+        459841061,
+        573423939
+      ]
+    },
+    {
+      "hirc_index": 517,
+      "event_id": 1218263116,
+      "txtp_variants": [
+        "814486316-0517-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0517-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0517-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        140231579,
+        436799463
+      ]
+    },
+    {
+      "hirc_index": 526,
+      "event_id": 1325390780,
+      "txtp_variants": [
+        "814486316-0526-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0526-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0526-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        154479959,
+        810706852
+      ]
+    },
+    {
+      "hirc_index": 529,
+      "event_id": 1529664443,
+      "txtp_variants": [
+        "814486316-0529-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0529-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0529-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        70160241,
+        1059390296
+      ]
+    },
+    {
+      "hirc_index": 533,
+      "event_id": 1744293746,
+      "txtp_variants": [
+        "814486316-0533-event.txtp"
+      ],
+      "classification": "n1_spatial_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        }
+      ],
+      "source_ids": [
+        349601280
+      ]
+    },
+    {
+      "hirc_index": 542,
+      "event_id": 1933717410,
+      "txtp_variants": [
+        "814486316-0542-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0542-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0542-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        137270051,
+        676542732
+      ]
+    },
+    {
+      "hirc_index": 558,
+      "event_id": 2579637404,
+      "txtp_variants": [
+        "814486316-0558-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0558-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0558-event {s}=- {m}.txtp"
+      ],
+      "classification": "n1_spatial_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        }
+      ],
+      "source_ids": [
+        327446852,
+        668639489,
+        1026751918
+      ]
+    },
+    {
+      "hirc_index": 570,
+      "event_id": 2813898593,
+      "txtp_variants": [
+        "814486316-0570-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0570-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0570-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        68412542,
+        70160241
+      ]
+    },
+    {
+      "hirc_index": 572,
+      "event_id": 2857849550,
+      "txtp_variants": [
+        "814486316-0572-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0572-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        11516833,
+        203048862,
+        217164781,
+        360916375,
+        741679922,
+        871600288,
+        892817300,
+        927507872,
+        1059390296
+      ]
+    },
+    {
+      "hirc_index": 577,
+      "event_id": 3027719235,
+      "txtp_variants": [
+        "814486316-0577-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0577-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0577-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        1449532,
+        819772604
+      ]
+    },
+    {
+      "hirc_index": 602,
+      "event_id": 3549146165,
+      "txtp_variants": [
+        "814486316-0602-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0602-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        94192129,
+        100340015,
+        147014557,
+        283803777,
+        305556527,
+        337284839,
+        426424848,
+        438288134,
+        499404895,
+        613187662,
+        675159713,
+        741679922,
+        843186462,
+        985518487
+      ]
+    },
+    {
+      "hirc_index": 619,
+      "event_id": 3662688251,
+      "txtp_variants": [
+        "814486316-0619-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0619-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        11516833,
+        53162598,
+        78913569,
+        100033998,
+        362478382,
+        675159713,
+        702645070,
+        741679922,
+        940959013,
+        1024026864,
+        1044292535,
+        1045645554,
+        1049087035,
+        1057179411
+      ]
+    },
+    {
+      "hirc_index": 621,
+      "event_id": 3826118896,
+      "txtp_variants": [
+        "814486316-0621-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0621-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer_with_reverse",
+      "rtpcs": [
+        {
+          "id": 895650072,
+          "name": "SIMVAR_TURB_ENG_REVERSE_NOZZLE_PERCENT"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        1449532,
+        68412542,
+        84384101,
+        98984109,
+        172141348,
+        499067705,
+        741679922,
+        806879307,
+        819772604,
+        945129033
+      ]
+    },
+    {
+      "hirc_index": 625,
+      "event_id": 3922881723,
+      "txtp_variants": [
+        "814486316-0625-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0625-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        216128833,
+        557864325,
+        608622640,
+        676542732,
+        741679922,
+        860445276,
+        961698348,
+        1025418083,
+        1044292535
+      ]
+    },
+    {
+      "hirc_index": 628,
+      "event_id": 3960322546,
+      "txtp_variants": [
+        "814486316-0628-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0628-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0628-event {s}=- {m}.txtp"
+      ],
+      "classification": "n1_spatial_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        }
+      ],
+      "source_ids": [
+        286057283,
+        617338939
+      ]
+    },
+    {
+      "hirc_index": 633,
+      "event_id": 4172247750,
+      "txtp_variants": [
+        "814486316-0633-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0633-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0633-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        216128833,
+        608622640
+      ]
+    },
+    {
+      "hirc_index": 638,
+      "event_id": 4217730185,
+      "txtp_variants": [
+        "814486316-0638-event {s}=(4185053780=3553349781) {m}.txtp",
+        "814486316-0638-event {s}=(4185053780=438105790) {m}.txtp",
+        "814486316-0638-event {s}=- {m}.txtp"
+      ],
+      "classification": "multi_spool_layer",
+      "rtpcs": [
+        {
+          "id": 2508093411,
+          "name": "LOCALVAR_A32NX_INTERIOR_ENG_VOLUME"
+        },
+        {
+          "id": 2518329374,
+          "name": "unresolved"
+        },
+        {
+          "id": 2750389324,
+          "name": "SIMVAR_TURB_ENG_N1"
+        },
+        {
+          "id": 2750389327,
+          "name": "SIMVAR_TURB_ENG_N2"
+        },
+        {
+          "id": 2919001772,
+          "name": "SIMVAR_AIRSPEED_TRUE"
+        },
+        {
+          "id": 3763572042,
+          "name": "SIMVAR_PLANE_ALT_ABOVE_GROUND"
+        },
+        {
+          "id": 3898595254,
+          "name": "SIMVAR_TURB_ENG_N1_DERIVED"
+        }
+      ],
+      "source_ids": [
+        11516833,
+        217164781
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "id": 1449532,
+      "path": "FBW_A320_NEO_3.PC/media/1449532.wem",
+      "bytes": 265564,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 8.192,
+      "looped": true,
+      "loop_start_seconds": 2.635854166666667,
+      "loop_end_seconds": 3.9184791666666667,
+      "encoding": "Custom Vorbis",
+      "bitrate": 259181,
+      "sha256": "538ff800613397c1ad61e8436435260fb493cf2633274349a630e4fc41a15b87",
+      "event_ids": [
+        3027719235,
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1449532.wav",
+      "staged_bytes": 1572976,
+      "staged_sha256": "da654365106690a2a7b360063284a901a0233dac1e46dd7e37bf51bf95aea611",
+      "staged_verified": true
+    },
+    {
+      "id": 11516833,
+      "path": "FBW_A320_NEO_3.PC/media/11516833.wem",
+      "bytes": 91816,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.136190476190476,
+      "looped": true,
+      "loop_start_seconds": 0.18213151927437643,
+      "loop_end_seconds": 2.773514739229025,
+      "encoding": "Custom Vorbis",
+      "bitrate": 233797,
+      "sha256": "93c014842a0030ed4414b49149ed514fbb195144dba6d50d5d16f057e636af55",
+      "event_ids": [
+        2857849550,
+        3662688251,
+        4217730185
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/11516833.wav",
+      "staged_bytes": 553336,
+      "staged_sha256": "483a8a69a60633021a51b9118bb9179b803a508e5d8fff77dd3867ea1768ccf4",
+      "staged_verified": true
+    },
+    {
+      "id": 48625709,
+      "path": "FBW_A320_NEO_3.PC/media/48625709.wem",
+      "bytes": 75862,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.043356009070295,
+      "looped": true,
+      "loop_start_seconds": 0.669546485260771,
+      "loop_end_seconds": 1.9838321995464852,
+      "encoding": "Custom Vorbis",
+      "bitrate": 296375,
+      "sha256": "0546d73b09a4d9f103691132424cbbea5be219533e765e756c6a0d20d0e4f7ab",
+      "event_ids": [
+        1089987841
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/48625709.wav",
+      "staged_bytes": 360560,
+      "staged_sha256": "e7782fee791105bf438a4f61c121c8e0606507b1aa7722cfe85c5851745f0cab",
+      "staged_verified": true
+    },
+    {
+      "id": 53162598,
+      "path": "FBW_A320_NEO_3.PC/media/53162598.wem",
+      "bytes": 64213,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.8692063492063493,
+      "looped": true,
+      "loop_start_seconds": 0.15882086167800455,
+      "loop_end_seconds": 1.8463945578231293,
+      "encoding": "Custom Vorbis",
+      "bitrate": 274131,
+      "sha256": "4228a764091ab7b04e669ebe3d915fdce4237ebb5b0e856bf82ceb5eba4b0964",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/53162598.wav",
+      "staged_bytes": 329840,
+      "staged_sha256": "4dbf4f374224aaac426ffccf1c9c845ad7dcee8d7ec72b80737936018d87cc39",
+      "staged_verified": true
+    },
+    {
+      "id": 68412542,
+      "path": "FBW_A320_NEO_3.PC/media/68412542.wem",
+      "bytes": 446771,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 15.227936507936509,
+      "looped": true,
+      "loop_start_seconds": 7.793514739229025,
+      "loop_end_seconds": 14.859614512471655,
+      "encoding": "Custom Vorbis",
+      "bitrate": 234626,
+      "sha256": "a57ce1ea9f62449c6b5426c90f49eeeff11ff7b586881b5c486681d47d9ff0cc",
+      "event_ids": [
+        2813898593,
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/68412542.wav",
+      "staged_bytes": 2686320,
+      "staged_sha256": "df3cd28197a4a596cf81a3740924e55ee95bf14ced9f4ed7ce8e6de2ff12c3a7",
+      "staged_verified": true
+    },
+    {
+      "id": 70160241,
+      "path": "FBW_A320_NEO_3.PC/media/70160241.wem",
+      "bytes": 911069,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 28.40988662131519,
+      "looped": true,
+      "loop_start_seconds": 28.072290249433106,
+      "loop_end_seconds": 28.40988662131519,
+      "encoding": "Custom Vorbis",
+      "bitrate": 256504,
+      "sha256": "9561ee9ec9aa1d0ace26d3837e361cd2db3d50dc7a9b34f13bdaabfda93d9663",
+      "event_ids": [
+        1529664443,
+        2813898593
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/70160241.wav",
+      "staged_bytes": 5011616,
+      "staged_sha256": "178ef798cee507b113346c07cf3e7ba4d52ed5c07d76c1249da2de97ed824c0c",
+      "staged_verified": true
+    },
+    {
+      "id": 78913569,
+      "path": "FBW_A320_NEO_3.PC/media/78913569.wem",
+      "bytes": 104089,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.9938321995464854,
+      "looped": true,
+      "loop_start_seconds": 0.18984126984126984,
+      "loop_end_seconds": 3.9782766439909296,
+      "encoding": "Custom Vorbis",
+      "bitrate": 208174,
+      "sha256": "d3ecea29e0f21516f2ce777618a72011268527c9645cc6640170ae02072a21a3",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/78913569.wav",
+      "staged_bytes": 704624,
+      "staged_sha256": "9ef9ccf908519674c776afda56ea0e82e44f5cc7bdce69f49c949307fb224677",
+      "staged_verified": true
+    },
+    {
+      "id": 84384101,
+      "path": "FBW_A320_NEO_3.PC/media/84384101.wem",
+      "bytes": 81058,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.2291156462585033,
+      "looped": true,
+      "loop_start_seconds": 0.50140589569161,
+      "loop_end_seconds": 2.1710884353741497,
+      "encoding": "Custom Vorbis",
+      "bitrate": 290325,
+      "sha256": "470663be567ddb495520006191b5b0aea5555a4dea6a561a6634b4c4c5c5f88f",
+      "event_ids": [
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/84384101.wav",
+      "staged_bytes": 393328,
+      "staged_sha256": "7cb603032a2a26031ad131ab31d96c72baa69b595ef98094edfe10044d65d7cb",
+      "staged_verified": true
+    },
+    {
+      "id": 94192129,
+      "path": "FBW_A320_NEO_3.PC/media/94192129.wem",
+      "bytes": 151067,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 4.458231292517007,
+      "looped": true,
+      "loop_start_seconds": 0.1445124716553288,
+      "loop_end_seconds": 4.40657596371882,
+      "encoding": "Custom Vorbis",
+      "bitrate": 270789,
+      "sha256": "a6de7c0bc569f3d39ca8e156fbe421d5fdbb740bbe34c3fa0a8b2d80f5be281d",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/94192129.wav",
+      "staged_bytes": 786544,
+      "staged_sha256": "8c8c1f61f06b72d5bb57cc0f21127306410549639546965344568b146864f4ea",
+      "staged_verified": true
+    },
+    {
+      "id": 98984109,
+      "path": "FBW_A320_NEO_3.PC/media/98984109.wem",
+      "bytes": 156523,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 6.470166666666667,
+      "looped": true,
+      "loop_start_seconds": 1.5028125,
+      "loop_end_seconds": 4.697916666666667,
+      "encoding": "Custom Vorbis",
+      "bitrate": 193331,
+      "sha256": "f9c42dccf1a2539cc91695b0a89ff392a5641650e7884c6d1a9a3b9717ab66e5",
+      "event_ids": [
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/98984109.wav",
+      "staged_bytes": 1242384,
+      "staged_sha256": "2313325956fd09446e362e5db09e15a664fed8a5071792607f414f2a08850524",
+      "staged_verified": true
+    },
+    {
+      "id": 100033998,
+      "path": "FBW_A320_NEO_3.PC/media/100033998.wem",
+      "bytes": 464879,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 14.441768707482993,
+      "looped": true,
+      "loop_start_seconds": 1.211111111111111,
+      "loop_end_seconds": 7.8907709750566895,
+      "encoding": "Custom Vorbis",
+      "bitrate": 257429,
+      "sha256": "55a4565dd292240fd81badbc6af053efea97b69d9d3e50a840053af177ab86fd",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/100033998.wav",
+      "staged_bytes": 2547640,
+      "staged_sha256": "0b9544e0844e65abecf45d61877faed6b252e3261e8b25a8919dfbeea97cdcc0",
+      "staged_verified": true
+    },
+    {
+      "id": 100340015,
+      "path": "FBW_A320_NEO_3.PC/media/100340015.wem",
+      "bytes": 572543,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 18.310226757369616,
+      "looped": true,
+      "loop_start_seconds": 1.5063265306122449,
+      "loop_end_seconds": 9.590272108843537,
+      "encoding": "Custom Vorbis",
+      "bitrate": 250081,
+      "sha256": "f10479e6370c2f4b95c1aa0385b6afca1604902d6de2a48e9a1fb83d70c15dcf",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/100340015.wav",
+      "staged_bytes": 3230036,
+      "staged_sha256": "dd76e14b084a0e8e3051135ee48df8d2d7ff7c7a20f99f00e18dc8f91410e7ae",
+      "staged_verified": true
+    },
+    {
+      "id": 107424398,
+      "path": "FBW_A320_NEO_3.PC/media/107424398.wem",
+      "bytes": 97786,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 3.487041666666667,
+      "looped": true,
+      "loop_start_seconds": 0.9562291666666667,
+      "loop_end_seconds": 3.487041666666667,
+      "encoding": "Custom Vorbis",
+      "bitrate": 223969,
+      "sha256": "8e2f69698ea72519dab780f7695ee47e9a32679ca603a29efc88d7574165ccf7",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/107424398.wav",
+      "staged_bytes": 669624,
+      "staged_sha256": "482e7089d6d78fb9ababcf349d59680c9d04d6b6290841968f57a07289bfd532",
+      "staged_verified": true
+    },
+    {
+      "id": 137270051,
+      "path": "FBW_A320_NEO_3.PC/media/137270051.wem",
+      "bytes": 526655,
+      "sample_rate": 48000,
+      "channels": 1,
+      "duration_seconds": 32.001354166666665,
+      "looped": true,
+      "loop_start_seconds": 31.9465,
+      "loop_end_seconds": 32.001354166666665,
+      "encoding": "Custom Vorbis",
+      "bitrate": 131617,
+      "sha256": "35fc56f5287fcf78d82e737d72c076474e5c822ab148c8c1b327fcf961ddd73f",
+      "event_ids": [
+        1933717410
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/137270051.wav",
+      "staged_bytes": 3072242,
+      "staged_sha256": "444d5b2e15ee1dca134a8432aa1549d0fdc9dc665cc566171e533dbdbf6eaff4",
+      "staged_verified": true
+    },
+    {
+      "id": 140231579,
+      "path": "FBW_A320_NEO_3.PC/media/140231579.wem",
+      "bytes": 869941,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 26.51718820861678,
+      "looped": true,
+      "loop_start_seconds": 19.961201814058956,
+      "loop_end_seconds": 25.732403628117915,
+      "encoding": "Custom Vorbis",
+      "bitrate": 262404,
+      "sha256": "f1faf820b7276787951bcbfb4a3dda6be98a765daaa8a9038051bdcf9f09f6f3",
+      "event_ids": [
+        1089987841,
+        1218263116
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/140231579.wav",
+      "staged_bytes": 4677744,
+      "staged_sha256": "90a34ff1fd63f61a4cba27b3ffc697caaaf04a1bbf0e06b074b155d0659d3aee",
+      "staged_verified": true
+    },
+    {
+      "id": 147014557,
+      "path": "FBW_A320_NEO_3.PC/media/147014557.wem",
+      "bytes": 75564,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.1942857142857144,
+      "looped": true,
+      "loop_start_seconds": 0.27147392290249434,
+      "loop_end_seconds": 2.126598639455782,
+      "encoding": "Custom Vorbis",
+      "bitrate": 274903,
+      "sha256": "930e29d29375afaf30aac883152d5a947574de9630609d4079b2024c188a7a4d",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/147014557.wav",
+      "staged_bytes": 387184,
+      "staged_sha256": "7392a55c9bc31c851d89f25a7764346673a6d759517c714898c81cd4bfd13d9e",
+      "staged_verified": true
+    },
+    {
+      "id": 154479959,
+      "path": "FBW_A320_NEO_3.PC/media/154479959.wem",
+      "bytes": 301810,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 9.797166666666667,
+      "looped": true,
+      "loop_start_seconds": 5.989791666666667,
+      "loop_end_seconds": 9.684479166666666,
+      "encoding": "Custom Vorbis",
+      "bitrate": 246314,
+      "sha256": "7fded1197e912de43f91cd3e67b8813981998cc64eeeac3752841cd9421c7514",
+      "event_ids": [
+        1089987841,
+        1325390780
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/154479959.wav",
+      "staged_bytes": 1881168,
+      "staged_sha256": "b9b88de5271ec1aca1efa82d984d98ec1bd3e07090af745a74c28dc9690317dc",
+      "staged_verified": true
+    },
+    {
+      "id": 159724704,
+      "path": "FBW_A320_NEO_3.PC/media/159724704.wem",
+      "bytes": 200636,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 5.944308390022676,
+      "looped": true,
+      "loop_start_seconds": 0.2504308390022676,
+      "loop_end_seconds": 5.875442176870748,
+      "encoding": "Custom Vorbis",
+      "bitrate": 269802,
+      "sha256": "f20b8a33cf07e7fcccf89d6458a04d2ec2a07ddaeac9d6eee36ce92f5ae104f6",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/159724704.wav",
+      "staged_bytes": 1048688,
+      "staged_sha256": "2e6ddba6aa1bbe7b5c025c4d053e0e695edaa18d53579248045851235ffb2f98",
+      "staged_verified": true
+    },
+    {
+      "id": 172141348,
+      "path": "FBW_A320_NEO_3.PC/media/172141348.wem",
+      "bytes": 208744,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.8792743764172335,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 579729,
+      "sha256": "dc51b4b7d66483453b1021bb58945986223176a9175c9963897e38abe08bc46c",
+      "event_ids": [
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/172141348.wav",
+      "staged_bytes": 507948,
+      "staged_sha256": "098dc8c412f600f9c6b65003ba3a6382703f8e35a11a97e2af15d1311982e2c6",
+      "staged_verified": true
+    },
+    {
+      "id": 203048862,
+      "path": "FBW_A320_NEO_3.PC/media/203048862.wem",
+      "bytes": 256054,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.269251700680272,
+      "looped": true,
+      "loop_start_seconds": 0.36324263038548754,
+      "loop_end_seconds": 7.2129478458049885,
+      "encoding": "Custom Vorbis",
+      "bitrate": 281615,
+      "sha256": "5518e717081bb79052c3b51065564498a0fad3582160003d29458e678ebe7a3f",
+      "event_ids": [
+        648184694,
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/203048862.wav",
+      "staged_bytes": 1282408,
+      "staged_sha256": "31130d6a250d4d0d7c06b652936b2abbfb43add8abc15efa83f5fccb68c5765f",
+      "staged_verified": true
+    },
+    {
+      "id": 209588867,
+      "path": "FBW_A320_NEO_3.PC/media/209588867.wem",
+      "bytes": 451592,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 12.631655328798185,
+      "looped": true,
+      "loop_start_seconds": 1.5385034013605443,
+      "loop_end_seconds": 11.867573696145124,
+      "encoding": "Custom Vorbis",
+      "bitrate": 285903,
+      "sha256": "93eb6146fe26dbdbc5fea6c35068968f2bd80761e0e0292a6704cfb30c7adf93",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/209588867.wav",
+      "staged_bytes": 2228336,
+      "staged_sha256": "f64e1e356be88c1b0ced1a404fd02460ccc1cbabb181b19f306e1fe7dc8ecf40",
+      "staged_verified": true
+    },
+    {
+      "id": 216128833,
+      "path": "FBW_A320_NEO_3.PC/media/216128833.wem",
+      "bytes": 307786,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 9.797166666666667,
+      "looped": true,
+      "loop_start_seconds": 1.3867083333333334,
+      "loop_end_seconds": 4.7790625,
+      "encoding": "Custom Vorbis",
+      "bitrate": 251194,
+      "sha256": "de10eaa35ac677d4b2db7cd1cb553e4e707e9737495d61f1f0b1a885fe8a87a9",
+      "event_ids": [
+        3922881723,
+        4172247750
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/216128833.wav",
+      "staged_bytes": 1881168,
+      "staged_sha256": "2880a8972269aa49c73078b424d8501ea0aefba774a45c3a78f102aeca84c7fa",
+      "staged_verified": true
+    },
+    {
+      "id": 217164781,
+      "path": "FBW_A320_NEO_3.PC/media/217164781.wem",
+      "bytes": 265849,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 8.192,
+      "looped": true,
+      "loop_start_seconds": 6.881645833333334,
+      "loop_end_seconds": 8.131520833333333,
+      "encoding": "Custom Vorbis",
+      "bitrate": 259459,
+      "sha256": "a32479e09cf0ccf5d81c95fe50d99d4f39b678aabe0c668dd8a749659fdbb0f0",
+      "event_ids": [
+        2857849550,
+        4217730185
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/217164781.wav",
+      "staged_bytes": 1572976,
+      "staged_sha256": "5e7f1b3897e0b6c47927f17bdd57a59953083725c57bb2e6414c081ff066da83",
+      "staged_verified": true
+    },
+    {
+      "id": 283803777,
+      "path": "FBW_A320_NEO_3.PC/media/283803777.wem",
+      "bytes": 463924,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 14.441768707482993,
+      "looped": true,
+      "loop_start_seconds": 1.5215419501133787,
+      "loop_end_seconds": 6.881111111111111,
+      "encoding": "Custom Vorbis",
+      "bitrate": 256900,
+      "sha256": "35ae505fe8acd8dc2117a3e02a8e27c35aa8d18145aeae01fadf42f0dca6db20",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/283803777.wav",
+      "staged_bytes": 2547640,
+      "staged_sha256": "5db24f993f84377d6520123c9edb8949f2f20f20fba3a9b74e1e9a1a48bd473b",
+      "staged_verified": true
+    },
+    {
+      "id": 286057283,
+      "path": "FBW_A320_NEO_3.PC/media/286057283.wem",
+      "bytes": 77953,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 2.3684375,
+      "looped": true,
+      "loop_start_seconds": 0.3675,
+      "loop_end_seconds": 2.1919791666666666,
+      "encoding": "Custom Vorbis",
+      "bitrate": 262758,
+      "sha256": "bf5c1d958d76b868ee9f1175f66b1080ac34a37d96917ba9bef7e89c6b83096a",
+      "event_ids": [
+        3960322546
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/286057283.wav",
+      "staged_bytes": 454852,
+      "staged_sha256": "34dbb23336769950276a9f69025fd763297981813dc923ed252ffe31ef83e8e5",
+      "staged_verified": true
+    },
+    {
+      "id": 305556527,
+      "path": "FBW_A320_NEO_3.PC/media/305556527.wem",
+      "bytes": 506728,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 14.117732426303855,
+      "looped": true,
+      "loop_start_seconds": 0.36936507936507934,
+      "loop_end_seconds": 13.94718820861678,
+      "encoding": "Custom Vorbis",
+      "bitrate": 287052,
+      "sha256": "84cbaeee625c12973a940cdd0b669874299d1ca326a00fad279dabf322ac5092",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/305556527.wav",
+      "staged_bytes": 2490480,
+      "staged_sha256": "092efedbc8fbe2824d18fff4938ae8a87a0051813ab07545831bc3ea843999d1",
+      "staged_verified": true
+    },
+    {
+      "id": 327446852,
+      "path": "FBW_A320_NEO_3.PC/media/327446852.wem",
+      "bytes": 87256,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.020294784580499,
+      "looped": true,
+      "loop_start_seconds": 0.5556916099773243,
+      "loop_end_seconds": 2.88734693877551,
+      "encoding": "Custom Vorbis",
+      "bitrate": 230690,
+      "sha256": "9439eab0058f4a7963dac8d49608b905aa7e4729a478ca7f3f416eca2afc1e5c",
+      "event_ids": [
+        2579637404
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/327446852.wav",
+      "staged_bytes": 532892,
+      "staged_sha256": "985851850389fe930d9a9dc9adbd156d1b25095e27554591884bfe913748093c",
+      "staged_verified": true
+    },
+    {
+      "id": 337284839,
+      "path": "FBW_A320_NEO_3.PC/media/337284839.wem",
+      "bytes": 134093,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 4.345646258503401,
+      "looped": true,
+      "loop_start_seconds": 1.2668480725623583,
+      "loop_end_seconds": 4.030657596371882,
+      "encoding": "Custom Vorbis",
+      "bitrate": 246556,
+      "sha256": "fab8ef3fd09f91bf0bb4025f8c12a5c9fa5410df8a19dae48384bffb05943ed5",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/337284839.wav",
+      "staged_bytes": 766684,
+      "staged_sha256": "2ee83959a005468692c608593f4c177d3134c68092b3a8f7f0b4f860c95c5a78",
+      "staged_verified": true
+    },
+    {
+      "id": 349601280,
+      "path": "FBW_A320_NEO_3.PC/media/349601280.wem",
+      "bytes": 310830,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 8.730708333333334,
+      "looped": true,
+      "loop_start_seconds": 2.72675,
+      "loop_end_seconds": 8.5421875,
+      "encoding": "Custom Vorbis",
+      "bitrate": 284666,
+      "sha256": "b9b4590b38e42375f9c22273d96db1d05ddc3e70825dd9b3438d6130fa503d5a",
+      "event_ids": [
+        909531764,
+        1744293746
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/349601280.wav",
+      "staged_bytes": 1676408,
+      "staged_sha256": "a52e1756ddd3aaba80399071f9cfca08c681a3acb4f18829cd1e48eb2c0c5ac3",
+      "staged_verified": true
+    },
+    {
+      "id": 350670602,
+      "path": "FBW_A320_NEO_3.PC/media/350670602.wem",
+      "bytes": 81588,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.5541950113378684,
+      "looped": true,
+      "loop_start_seconds": 0.22750566893424037,
+      "loop_end_seconds": 2.5175056689342403,
+      "encoding": "Custom Vorbis",
+      "bitrate": 255034,
+      "sha256": "fbdc2b7ef6a1d89d93220c24ee6257227c6273eb93741092943ae702200ee92a",
+      "event_ids": [
+        1089987841
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/350670602.wav",
+      "staged_bytes": 450672,
+      "staged_sha256": "beaaca4f7827f61d626d76ed2b455282d9bd56c3fbabdd8327570f827fe0d591",
+      "staged_verified": true
+    },
+    {
+      "id": 360916375,
+      "path": "FBW_A320_NEO_3.PC/media/360916375.wem",
+      "bytes": 118108,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 4.031632653061225,
+      "looped": true,
+      "loop_start_seconds": 0.7351927437641723,
+      "loop_end_seconds": 3.9236961451247168,
+      "encoding": "Custom Vorbis",
+      "bitrate": 234041,
+      "sha256": "944ccd32eba3bec4b56b20fc5d75c8454250361a5a3b2077db4b09bdd9cb4e6a",
+      "event_ids": [
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/360916375.wav",
+      "staged_bytes": 711292,
+      "staged_sha256": "ffe298a0497a392758ae37f6f8d997deba596097846585c30b5fec198b02c852",
+      "staged_verified": true
+    },
+    {
+      "id": 362478382,
+      "path": "FBW_A320_NEO_3.PC/media/362478382.wem",
+      "bytes": 83681,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.6586848072562357,
+      "looped": true,
+      "loop_start_seconds": 0.2883219954648526,
+      "loop_end_seconds": 2.6485260770975056,
+      "encoding": "Custom Vorbis",
+      "bitrate": 251309,
+      "sha256": "2f7c8b44038618f226d5e9ea228c58f0ebfe1ff7ef4fa4bc01cec9d6e648659d",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/362478382.wav",
+      "staged_bytes": 469104,
+      "staged_sha256": "2feccc2d5da31d28c13d812d10e906b69cd872417293e3cc35cb2d930ba80d45",
+      "staged_verified": true
+    },
+    {
+      "id": 378097296,
+      "path": "FBW_A320_NEO_3.PC/media/378097296.wem",
+      "bytes": 63898,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.8575963718820863,
+      "looped": true,
+      "loop_start_seconds": 0.17335600907029478,
+      "loop_end_seconds": 1.843061224489796,
+      "encoding": "Custom Vorbis",
+      "bitrate": 274488,
+      "sha256": "31b1f01fc5b0598d6c5dab59e6b69f43df88512323f40ce73efb9bb5bb1701b4",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/378097296.wav",
+      "staged_bytes": 327792,
+      "staged_sha256": "16dab84ed0fbc74950c2a5fb6c67d262a5b6b2d3c1ac53f199c2fa5cbde3363f",
+      "staged_verified": true
+    },
+    {
+      "id": 426424848,
+      "path": "FBW_A320_NEO_3.PC/media/426424848.wem",
+      "bytes": 231733,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 6.620294784580499,
+      "looped": true,
+      "loop_start_seconds": 0.41235827664399094,
+      "loop_end_seconds": 6.597596371882086,
+      "encoding": "Custom Vorbis",
+      "bitrate": 279831,
+      "sha256": "a59a4c01b3f01d57ce41f299c1b6d7e8bef7285b3614ef37597906009c7de447",
+      "event_ids": [
+        1089987841,
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/426424848.wav",
+      "staged_bytes": 1167932,
+      "staged_sha256": "242a8e27e9eb7015b9eaca4c3293b0d3379f7ebf5787dd4c0c83242bc7efbe3c",
+      "staged_verified": true
+    },
+    {
+      "id": 426605528,
+      "path": "FBW_A320_NEO_3.PC/media/426605528.wem",
+      "bytes": 243142,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.5377097505668935,
+      "looped": true,
+      "loop_start_seconds": 1.6667573696145124,
+      "loop_end_seconds": 7.527959183673469,
+      "encoding": "Custom Vorbis",
+      "bitrate": 257882,
+      "sha256": "603f96ac7d44ebeea1d5fe0769174d5000c0c3becfc5818a0b9b619062607901",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/426605528.wav",
+      "staged_bytes": 1329764,
+      "staged_sha256": "b7a6e8b51a3b9f2842c479ce4f3892ceafffea3372426a13703eb5ceed35bf1e",
+      "staged_verified": true
+    },
+    {
+      "id": 428665539,
+      "path": "FBW_A320_NEO_3.PC/media/428665539.wem",
+      "bytes": 55697,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.089795918367347,
+      "looped": true,
+      "loop_start_seconds": 0.14029478458049888,
+      "loop_end_seconds": 2.0620408163265305,
+      "encoding": "Custom Vorbis",
+      "bitrate": 212594,
+      "sha256": "da9274c0d0a05ae1f05f2a41f21ec9a1e62ff0f09c04699e6a1d53304e0b8540",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/428665539.wav",
+      "staged_bytes": 368752,
+      "staged_sha256": "1d0d9a5805dcc5bc8fc4467452577b0f86c69f189d903de4eedaf6b90a2de43d",
+      "staged_verified": true
+    },
+    {
+      "id": 436799463,
+      "path": "FBW_A320_NEO_3.PC/media/436799463.wem",
+      "bytes": 856168,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 26.51718820861678,
+      "looped": true,
+      "loop_start_seconds": 26.250566893424036,
+      "loop_end_seconds": 26.51718820861678,
+      "encoding": "Custom Vorbis",
+      "bitrate": 258249,
+      "sha256": "8aab401ca853c455408923b5bf53c0d21a1960699a3193be3337a6f92872a341",
+      "event_ids": [
+        1218263116
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/436799463.wav",
+      "staged_bytes": 4677744,
+      "staged_sha256": "a8fcbcf75dac264bfce8c8069ddbe0e421d2a7f0605c7338b83f7acd68c37f1b",
+      "staged_verified": true
+    },
+    {
+      "id": 438288134,
+      "path": "FBW_A320_NEO_3.PC/media/438288134.wem",
+      "bytes": 282074,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.997619047619048,
+      "looped": true,
+      "loop_start_seconds": 2.713605442176871,
+      "loop_end_seconds": 7.343809523809524,
+      "encoding": "Custom Vorbis",
+      "bitrate": 281995,
+      "sha256": "3fb7e2c5e3a8ffad37734d64ccf7da198bfc1d99603799c029c87dd447002342",
+      "event_ids": [
+        462770327,
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/438288134.wav",
+      "staged_bytes": 1410892,
+      "staged_sha256": "b4a04d6c0f681d84baa908b10e223647040457d343d62faf2d37bf9793e2d000",
+      "staged_verified": true
+    },
+    {
+      "id": 459089345,
+      "path": "FBW_A320_NEO_3.PC/media/459089345.wem",
+      "bytes": 205721,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 6.362834467120181,
+      "looped": true,
+      "loop_start_seconds": 1.3431292517006803,
+      "loop_end_seconds": 6.253854875283447,
+      "encoding": "Custom Vorbis",
+      "bitrate": 258449,
+      "sha256": "0f7351d036e429a69404e5fe78cd1fd83aeb36a06427721cbb7756613f9b9cd5",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/459089345.wav",
+      "staged_bytes": 1122516,
+      "staged_sha256": "a1361319cee3862dcfd7599ab56dbaf2d5d0c90f3b5e55ed1af37c2aec15b8fb",
+      "staged_verified": true
+    },
+    {
+      "id": 459841061,
+      "path": "FBW_A320_NEO_3.PC/media/459841061.wem",
+      "bytes": 70489,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 2.08175,
+      "looped": true,
+      "loop_start_seconds": 0.26197916666666665,
+      "loop_end_seconds": 1.4065833333333333,
+      "encoding": "Custom Vorbis",
+      "bitrate": 270261,
+      "sha256": "6fb6d232f40ddf828c33083405b001cdddcfbe6f7186feeb1cca98cc9e7cce4b",
+      "event_ids": [
+        1112053131
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/459841061.wav",
+      "staged_bytes": 399808,
+      "staged_sha256": "6fc2e4d522954df0d223ade6c65688d3b1b77e14868eca215b54c27ee3debb10",
+      "staged_verified": true
+    },
+    {
+      "id": 468009919,
+      "path": "FBW_A320_NEO_3.PC/media/468009919.wem",
+      "bytes": 69352,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.4468027210884356,
+      "looped": true,
+      "loop_start_seconds": 0.4878004535147392,
+      "loop_end_seconds": 2.375328798185941,
+      "encoding": "Custom Vorbis",
+      "bitrate": 226221,
+      "sha256": "ff281e18d7a4a0b235d394c39b34b0f4f95844a333c481677fcb515ce7ec9d2c",
+      "event_ids": [
+        270236557
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/468009919.wav",
+      "staged_bytes": 431728,
+      "staged_sha256": "25733734fd82a00cced2d122f366c07d236e5902c29957b743a29e52e9dfa2f7",
+      "staged_verified": true
+    },
+    {
+      "id": 483265828,
+      "path": "FBW_A320_NEO_3.PC/media/483265828.wem",
+      "bytes": 328726,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 10.607052154195012,
+      "looped": true,
+      "loop_start_seconds": 2.978140589569161,
+      "loop_end_seconds": 10.607052154195012,
+      "encoding": "Custom Vorbis",
+      "bitrate": 247807,
+      "sha256": "4ede20f12f45497adab347877321c49fcc45eb837c8b64872024d4bcd35d80c8",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/483265828.wav",
+      "staged_bytes": 1871196,
+      "staged_sha256": "552cf9e09e2c2a9904039d7fb07febc93c35fe54d98e9bae5883229bfe164d9f",
+      "staged_verified": true
+    },
+    {
+      "id": 499067705,
+      "path": "FBW_A320_NEO_3.PC/media/499067705.wem",
+      "bytes": 91574,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.8560544217687074,
+      "looped": true,
+      "loop_start_seconds": 0.29582766439909297,
+      "loop_end_seconds": 2.750408163265306,
+      "encoding": "Custom Vorbis",
+      "bitrate": 256051,
+      "sha256": "cec27775e3f1a2ba9133451c4cb0e0767f5da18a62233b2c20ba49b56f307943",
+      "event_ids": [
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/499067705.wav",
+      "staged_bytes": 503920,
+      "staged_sha256": "8cde08a8cb2524739b81f7d965b5082567a0743042283f8f264804fe644d6d27",
+      "staged_verified": true
+    },
+    {
+      "id": 499404895,
+      "path": "FBW_A320_NEO_3.PC/media/499404895.wem",
+      "bytes": 97345,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.786394557823129,
+      "looped": true,
+      "loop_start_seconds": 0.09081632653061225,
+      "loop_end_seconds": 2.7530385487528344,
+      "encoding": "Custom Vorbis",
+      "bitrate": 279021,
+      "sha256": "bfa27a56c691872ceb9c3a2889c9149ba986d9e411a71a1548d649f8c217ea77",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/499404895.wav",
+      "staged_bytes": 491632,
+      "staged_sha256": "2a2ea74b16641c012e5859c134f774f85c92d983e17e974ab0f3ea82fedac1c6",
+      "staged_verified": true
+    },
+    {
+      "id": 557864325,
+      "path": "FBW_A320_NEO_3.PC/media/557864325.wem",
+      "bytes": 22299,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.6124263038548753,
+      "looped": true,
+      "loop_start_seconds": 0.0626530612244898,
+      "loop_end_seconds": 0.6124263038548753,
+      "encoding": "Custom Vorbis",
+      "bitrate": 289171,
+      "sha256": "f9394ae5c9e2625d8cc65e9a008e33b666abe9d9e511df698892ed0e0dc60fad",
+      "event_ids": [
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/557864325.wav",
+      "staged_bytes": 108144,
+      "staged_sha256": "877dd420c7d08eff3ce561090e31175a9ed74c28a9adfef3f029b929f2a0e0ec",
+      "staged_verified": true
+    },
+    {
+      "id": 573423939,
+      "path": "FBW_A320_NEO_3.PC/media/573423939.wem",
+      "bytes": 47386,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.6439455782312926,
+      "looped": true,
+      "loop_start_seconds": 0.3171201814058957,
+      "loop_end_seconds": 1.5712244897959184,
+      "encoding": "Custom Vorbis",
+      "bitrate": 229808,
+      "sha256": "ace32ac5d73a3efc9bc7804bd30e0c3f8a4bd5a2f28989c7821c9d0befe69ca1",
+      "event_ids": [
+        1112053131
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/573423939.wav",
+      "staged_bytes": 290104,
+      "staged_sha256": "8f0d0174b7231f795f2ae363b29dc6c34b09474dd3d1c8d4f74f0574d8981378",
+      "staged_verified": true
+    },
+    {
+      "id": 573640817,
+      "path": "FBW_A320_NEO_3.PC/media/573640817.wem",
+      "bytes": 106051,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.9383673469387754,
+      "looped": true,
+      "loop_start_seconds": 0.19369614512471656,
+      "loop_end_seconds": 2.9036961451247167,
+      "encoding": "Custom Vorbis",
+      "bitrate": 288293,
+      "sha256": "d1203865715b30fd998b725b977d350182c468ef7a01f4d4acc91516fbbd5f7a",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/573640817.wav",
+      "staged_bytes": 518440,
+      "staged_sha256": "b78304a6c6e8d9c807d51288620441d2372a84b649f94dd2c5f76deb68c705a1",
+      "staged_verified": true
+    },
+    {
+      "id": 575685018,
+      "path": "FBW_A320_NEO_3.PC/media/575685018.wem",
+      "bytes": 72467,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.200793650793651,
+      "looped": true,
+      "loop_start_seconds": 0.3881859410430839,
+      "loop_end_seconds": 2.1440362811791385,
+      "encoding": "Custom Vorbis",
+      "bitrate": 262832,
+      "sha256": "73d52b0f9489f24acb2e4bb7d6775275e00839e0fa684155390757f6b42c3fef",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/575685018.wav",
+      "staged_bytes": 388332,
+      "staged_sha256": "6381387e501a0f6928f2b741cedbb78015b5e9307cf65768a8282fd4bedeae6a",
+      "staged_verified": true
+    },
+    {
+      "id": 608622640,
+      "path": "FBW_A320_NEO_3.PC/media/608622640.wem",
+      "bytes": 265663,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 8.192,
+      "looped": true,
+      "loop_start_seconds": 0.7156041666666667,
+      "loop_end_seconds": 1.8250208333333333,
+      "encoding": "Custom Vorbis",
+      "bitrate": 259278,
+      "sha256": "96b1b5285d9d103327c63500a7819b84a04958e2c171df0c50a2ef1f4e65366f",
+      "event_ids": [
+        3922881723,
+        4172247750
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/608622640.wav",
+      "staged_bytes": 1572976,
+      "staged_sha256": "fe084c298dcf4d71dade91757c065eefe603a100727ca88607a49751e3f8645e",
+      "staged_verified": true
+    },
+    {
+      "id": 613187662,
+      "path": "FBW_A320_NEO_3.PC/media/613187662.wem",
+      "bytes": 85895,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.697755102040816,
+      "looped": true,
+      "loop_start_seconds": 0.252562358276644,
+      "loop_end_seconds": 2.6528344671201816,
+      "encoding": "Custom Vorbis",
+      "bitrate": 254235,
+      "sha256": "c287e98dada154c469567f8e4e5fab6844679ac9e9b2d80099501aa421c869cd",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/613187662.wav",
+      "staged_bytes": 475996,
+      "staged_sha256": "d0f0003fc27b8351184b1a1069d144dfdb357abbafb49d81f891f36dc164802a",
+      "staged_verified": true
+    },
+    {
+      "id": 617338939,
+      "path": "FBW_A320_NEO_3.PC/media/617338939.wem",
+      "bytes": 50544,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.7586621315192743,
+      "looped": true,
+      "loop_start_seconds": 0.3873922902494331,
+      "loop_end_seconds": 1.6847845804988661,
+      "encoding": "Custom Vorbis",
+      "bitrate": 229183,
+      "sha256": "ab94addd214f4fe91502fbd3da267776afaef89092bc5b507e9f952ce95226ed",
+      "event_ids": [
+        3960322546
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/617338939.wav",
+      "staged_bytes": 310340,
+      "staged_sha256": "0547b10a9b4cbd0c0f5e5e6cd274d4efb1a45554049c6b95e7d3ca8e7bf018e9",
+      "staged_verified": true
+    },
+    {
+      "id": 643480345,
+      "path": "FBW_A320_NEO_3.PC/media/643480345.wem",
+      "bytes": 99169,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.972154195011338,
+      "looped": true,
+      "loop_start_seconds": 0.38895691609977323,
+      "loop_end_seconds": 2.9042403628117914,
+      "encoding": "Custom Vorbis",
+      "bitrate": 266492,
+      "sha256": "1dbfcbcaf34aa010cd60cabf780e3c14c292910b4dd0f6845276012dd74ada89",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/643480345.wav",
+      "staged_bytes": 524400,
+      "staged_sha256": "6ec64b59f9f6c5248e8627a1c8f955b481048f61158f5f54dee4c7905fcaca6f",
+      "staged_verified": true
+    },
+    {
+      "id": 660439986,
+      "path": "FBW_A320_NEO_3.PC/media/660439986.wem",
+      "bytes": 93983,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.9791156462585033,
+      "looped": true,
+      "loop_start_seconds": 0.3056462585034014,
+      "loop_end_seconds": 2.8889115646258503,
+      "encoding": "Custom Vorbis",
+      "bitrate": 251943,
+      "sha256": "bdbbda4696c1e23d4f28bb31df1f4e28fb07003d03c7586473139e0db9a1a75f",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/660439986.wav",
+      "staged_bytes": 525628,
+      "staged_sha256": "d6f40a3b86c1a1db19b9123e0153724ef435ab6bcbed5d942005a981b7d52710",
+      "staged_verified": true
+    },
+    {
+      "id": 668639489,
+      "path": "FBW_A320_NEO_3.PC/media/668639489.wem",
+      "bytes": 67812,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 2.400125,
+      "looped": true,
+      "loop_start_seconds": 0.5615208333333334,
+      "loop_end_seconds": 2.1726041666666664,
+      "encoding": "Custom Vorbis",
+      "bitrate": 225488,
+      "sha256": "f366e677947b2e803c6f91ff42d3cd638e7fd747731b046958e8422329502bd5",
+      "event_ids": [
+        2579637404
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/668639489.wav",
+      "staged_bytes": 460936,
+      "staged_sha256": "c38eafb2c257a8ea6e4d5fbd46c9dfd0098c2eecb42d83849b436b20d3ebf655",
+      "staged_verified": true
+    },
+    {
+      "id": 675159713,
+      "path": "FBW_A320_NEO_3.PC/media/675159713.wem",
+      "bytes": 114716,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 6.158412698412699,
+      "looped": true,
+      "loop_start_seconds": 1.4073242630385487,
+      "loop_end_seconds": 3.028548752834467,
+      "encoding": "Custom Vorbis",
+      "bitrate": 148809,
+      "sha256": "bf78a6a0ff7633f2e35ac24aea465591656cecde45844a632b4aa17d20f0194f",
+      "event_ids": [
+        648184694,
+        909531764,
+        3549146165,
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/675159713.wav",
+      "staged_bytes": 1086456,
+      "staged_sha256": "6f2f352e35cf4bbf89625e6d90349b5650abe1e81f87717ecf75c127ddaf0257",
+      "staged_verified": true
+    },
+    {
+      "id": 676542732,
+      "path": "FBW_A320_NEO_3.PC/media/676542732.wem",
+      "bytes": 531044,
+      "sample_rate": 48000,
+      "channels": 1,
+      "duration_seconds": 32.001354166666665,
+      "looped": true,
+      "loop_start_seconds": 23.704625,
+      "loop_end_seconds": 31.97072916666667,
+      "encoding": "Custom Vorbis",
+      "bitrate": 132714,
+      "sha256": "4f32d0efbcdf336758fb6ccf2aba99d9b8686040c2aa97495332aa5d95c3ed70",
+      "event_ids": [
+        1933717410,
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/676542732.wav",
+      "staged_bytes": 3072242,
+      "staged_sha256": "a310280bbbd46bae2629fa164affa66a8c9d54871fbe9bda4558dc924afb5593",
+      "staged_verified": true
+    },
+    {
+      "id": 702645070,
+      "path": "FBW_A320_NEO_3.PC/media/702645070.wem",
+      "bytes": 686327,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 22.315600907029477,
+      "looped": true,
+      "loop_start_seconds": 1.835827664399093,
+      "loop_end_seconds": 11.484172335600906,
+      "encoding": "Custom Vorbis",
+      "bitrate": 245985,
+      "sha256": "2833ce1d56c9f6f616ab8c67d1e88e1d499a03343fd1e8bf9ad66ca58604caaa",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/702645070.wav",
+      "staged_bytes": 3936584,
+      "staged_sha256": "13be518361fc93d750f907e157740ef746dfc5f876a33de9a8f8e67a85423833",
+      "staged_verified": true
+    },
+    {
+      "id": 706402962,
+      "path": "FBW_A320_NEO_3.PC/media/706402962.wem",
+      "bytes": 200250,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 6.343310657596372,
+      "looped": true,
+      "loop_start_seconds": 1.3222222222222222,
+      "loop_end_seconds": 6.343310657596372,
+      "encoding": "Custom Vorbis",
+      "bitrate": 252345,
+      "sha256": "0cc0bdd955d14ae966b64b7b1cbd5536b0dddd6bfb4a2b2b67aaedeca395de64",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/706402962.wav",
+      "staged_bytes": 1119072,
+      "staged_sha256": "59776d86f2082f2541b5b5821d6a28383962bc919df949d901d6ca630efd375c",
+      "staged_verified": true
+    },
+    {
+      "id": 707674942,
+      "path": "FBW_A320_NEO_3.PC/media/707674942.wem",
+      "bytes": 365204,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 10.867097505668934,
+      "looped": true,
+      "loop_start_seconds": 1.0052154195011338,
+      "loop_end_seconds": 3.5317913832199546,
+      "encoding": "Custom Vorbis",
+      "bitrate": 268731,
+      "sha256": "28e7830135422942aa093c35bf012a03545dd26327a6ed71471b01ff340e68cd",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/707674942.wav",
+      "staged_bytes": 1917068,
+      "staged_sha256": "af9f1b02d1dcfe934cf3c5aed02ca131db314d1affaaf02b9617361085b13b38",
+      "staged_verified": true
+    },
+    {
+      "id": 741679922,
+      "path": "FBW_A320_NEO_3.PC/media/741679922.wem",
+      "bytes": 93358,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 3.4133333333333336,
+      "looped": true,
+      "loop_start_seconds": 0.15097916666666666,
+      "loop_end_seconds": 2.934645833333333,
+      "encoding": "Custom Vorbis",
+      "bitrate": 218428,
+      "sha256": "717e5ffb067c64e2c635f391acfea78af392ca8128b78cb18f821daf8f7751a7",
+      "event_ids": [
+        648184694,
+        909531764,
+        1089987841,
+        2857849550,
+        3549146165,
+        3662688251,
+        3826118896,
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/741679922.wav",
+      "staged_bytes": 655472,
+      "staged_sha256": "057589373413f9251a2c6bc0605a92e31a23fd36137b93b267254d14e938edb0",
+      "staged_verified": true
+    },
+    {
+      "id": 797158014,
+      "path": "FBW_A320_NEO_3.PC/media/797158014.wem",
+      "bytes": 20228,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.5659863945578232,
+      "looped": true,
+      "loop_start_seconds": 0.05829931972789116,
+      "loop_end_seconds": 0.5373015873015873,
+      "encoding": "Custom Vorbis",
+      "bitrate": 283625,
+      "sha256": "69f20b53a29a2b391175e97865f3782c85510cbb5a7b39895464c238018e42b4",
+      "event_ids": [
+        1089987841
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/797158014.wav",
+      "staged_bytes": 99952,
+      "staged_sha256": "41cf453301d11daee17e44fdc8beb77f6e73c7f588d45f2306ff9f6508452169",
+      "staged_verified": true
+    },
+    {
+      "id": 806879307,
+      "path": "FBW_A320_NEO_3.PC/media/806879307.wem",
+      "bytes": 249837,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.138866213151927,
+      "looped": true,
+      "loop_start_seconds": 0.22324263038548753,
+      "loop_end_seconds": 7.121428571428571,
+      "encoding": "Custom Vorbis",
+      "bitrate": 279792,
+      "sha256": "ce150ea06e256e84fad4e83052b44eccd6e29236edbb171f62b7efd5f58d9e5b",
+      "event_ids": [
+        909531764,
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/806879307.wav",
+      "staged_bytes": 1259408,
+      "staged_sha256": "7613b1c098e233f2f1f80a939f541937f393606152d34764615d45889f71beec",
+      "staged_verified": true
+    },
+    {
+      "id": 810706852,
+      "path": "FBW_A320_NEO_3.PC/media/810706852.wem",
+      "bytes": 265665,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 8.192,
+      "looped": true,
+      "loop_start_seconds": 4.343479166666667,
+      "loop_end_seconds": 5.644833333333334,
+      "encoding": "Custom Vorbis",
+      "bitrate": 259280,
+      "sha256": "a018985b513e786e5c03246ef55106afda42a05486cd5f388f98efe884b49569",
+      "event_ids": [
+        1089987841,
+        1325390780
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/810706852.wav",
+      "staged_bytes": 1572976,
+      "staged_sha256": "abdc3afa70d0d65d1a4a79560e7b8b5ed769f837979367bc99beba3e1815c079",
+      "staged_verified": true
+    },
+    {
+      "id": 819772604,
+      "path": "FBW_A320_NEO_3.PC/media/819772604.wem",
+      "bytes": 91929,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.136190476190476,
+      "looped": true,
+      "loop_start_seconds": 0.12478458049886622,
+      "loop_end_seconds": 3.106848072562358,
+      "encoding": "Custom Vorbis",
+      "bitrate": 234085,
+      "sha256": "0945a701d79c6e597327a10341c73d96d6e7122acc19fd372b14873d56b74403",
+      "event_ids": [
+        3027719235,
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/819772604.wav",
+      "staged_bytes": 553336,
+      "staged_sha256": "c9fce4e50ee1b67e273b6762191a549078bc33682fad0ac6a831e07a17dd70be",
+      "staged_verified": true
+    },
+    {
+      "id": 822481075,
+      "path": "FBW_A320_NEO_3.PC/media/822481075.wem",
+      "bytes": 81063,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.3568253968253967,
+      "looped": true,
+      "loop_start_seconds": 0.17038548752834468,
+      "loop_end_seconds": 2.2763038548752834,
+      "encoding": "Custom Vorbis",
+      "bitrate": 274610,
+      "sha256": "6ad9eada4bdb4bb174127e3ce8da343c3cc9e043f18b56e654b1edefaa8226a8",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/822481075.wav",
+      "staged_bytes": 415856,
+      "staged_sha256": "b28622b79982bde560fa83ac86c7c769d36e0965b14ff02c71dfb6667f0e2821",
+      "staged_verified": true
+    },
+    {
+      "id": 843186462,
+      "path": "FBW_A320_NEO_3.PC/media/843186462.wem",
+      "bytes": 142700,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 5.0619375,
+      "looped": true,
+      "loop_start_seconds": 1.0827291666666667,
+      "loop_end_seconds": 5.0619375,
+      "encoding": "Custom Vorbis",
+      "bitrate": 225270,
+      "sha256": "55798cf7e9ccd5ce5f532e6bd5415e8c5939fd16027ad1f8ad015ecff9211470",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/843186462.wav",
+      "staged_bytes": 972004,
+      "staged_sha256": "b57bcba7329fa3f0b7eadd670df8629307d338607637e7602cde29f986725bb1",
+      "staged_verified": true
+    },
+    {
+      "id": 859218797,
+      "path": "FBW_A320_NEO_3.PC/media/859218797.wem",
+      "bytes": 103123,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 3.7035833333333334,
+      "looped": true,
+      "loop_start_seconds": 1.022375,
+      "loop_end_seconds": 3.6900416666666667,
+      "encoding": "Custom Vorbis",
+      "bitrate": 222402,
+      "sha256": "e7a4bafd9dc887c16aa307a2b8d53e073e7a4543e9172ba56c3fbcb76abe6f9e",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/859218797.wav",
+      "staged_bytes": 711200,
+      "staged_sha256": "07ee9f84f8528dd39df3fa146199eb47f2cb4c4e1de5a49504f9f03990f9db1c",
+      "staged_verified": true
+    },
+    {
+      "id": 860445276,
+      "path": "FBW_A320_NEO_3.PC/media/860445276.wem",
+      "bytes": 80832,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.2291156462585033,
+      "looped": true,
+      "loop_start_seconds": 0.19582766439909297,
+      "loop_end_seconds": 2.1885714285714286,
+      "encoding": "Custom Vorbis",
+      "bitrate": 289513,
+      "sha256": "b050b5fe7cf3af9c8abcd4c912c2326487ae70988a9129986ea421e89f62f4e5",
+      "event_ids": [
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/860445276.wav",
+      "staged_bytes": 393328,
+      "staged_sha256": "2b5641711fdcf695b9d75cdf0f2e6b9c86dee3e888c6b46c21b11be40d5556b2",
+      "staged_verified": true
+    },
+    {
+      "id": 867510340,
+      "path": "FBW_A320_NEO_3.PC/media/867510340.wem",
+      "bytes": 36019,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 1.2403333333333333,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 231711,
+      "sha256": "b426675ac3b068b667d654b7fca4ab567b2f7767a4ece98dc7ad475f650abccc",
+      "event_ids": [
+        270236557
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/867510340.wav",
+      "staged_bytes": 238188,
+      "staged_sha256": "11732a71ab14c33857e92d83b3b69d890e5b3208d49662531dc6e751779f7ae1",
+      "staged_verified": true
+    },
+    {
+      "id": 867520556,
+      "path": "FBW_A320_NEO_3.PC/media/867520556.wem",
+      "bytes": 82670,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.3901133786848074,
+      "looped": true,
+      "loop_start_seconds": 0.15970521541950114,
+      "loop_end_seconds": 3.2867573696145125,
+      "encoding": "Custom Vorbis",
+      "bitrate": 194702,
+      "sha256": "d43d58d1ad6305b379b1878b7ab2a3895ad723c97ecbc31c17f88e8f164cc130",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/867520556.wav",
+      "staged_bytes": 598128,
+      "staged_sha256": "1a47ce6041571bdd15f6a7d9947a0598de11ef3d3bb1b9d54a87b88d54209dff",
+      "staged_verified": true
+    },
+    {
+      "id": 871600288,
+      "path": "FBW_A320_NEO_3.PC/media/871600288.wem",
+      "bytes": 169431,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.454988662131519,
+      "looped": true,
+      "loop_start_seconds": 0.0,
+      "loop_end_seconds": 1.3888208616780044,
+      "encoding": "Custom Vorbis",
+      "bitrate": 551591,
+      "sha256": "c17e2d1f25bd1f32bb2e6cd91e3c90a7fcd9b08fb01f72107273a1aadb6d059b",
+      "event_ids": [
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/871600288.wav",
+      "staged_bytes": 433172,
+      "staged_sha256": "ab64b9cbd0c4ec48eebb4ecdbb5de00f694b090906d7b15177854aa5e285269e",
+      "staged_verified": true
+    },
+    {
+      "id": 888458016,
+      "path": "FBW_A320_NEO_3.PC/media/888458016.wem",
+      "bytes": 98955,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.972154195011338,
+      "looped": true,
+      "loop_start_seconds": 0.6777551020408163,
+      "loop_end_seconds": 2.8346938775510204,
+      "encoding": "Custom Vorbis",
+      "bitrate": 265916,
+      "sha256": "4d02394b4d03fa143659501218781efc6c890ce992f49239258202810b9986af",
+      "event_ids": [
+        909531764
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/888458016.wav",
+      "staged_bytes": 524400,
+      "staged_sha256": "4faed6ca01f1ee93e9564a7c849281a0993c4b99c21fa55ed3d166312c9fa939",
+      "staged_verified": true
+    },
+    {
+      "id": 892817300,
+      "path": "FBW_A320_NEO_3.PC/media/892817300.wem",
+      "bytes": 74271,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.043356009070295,
+      "looped": true,
+      "loop_start_seconds": 0.39281179138322,
+      "loop_end_seconds": 1.9551020408163264,
+      "encoding": "Custom Vorbis",
+      "bitrate": 290146,
+      "sha256": "fa7841965225eb1ee36dd7b7db39fb35e18a8570006328712bd1c48f14c417d1",
+      "event_ids": [
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/892817300.wav",
+      "staged_bytes": 360560,
+      "staged_sha256": "5565a20ed9edc0f74747c9cef3de69b2a7e0226b6e3e8e0fa4b68e4e42df8d9c",
+      "staged_verified": true
+    },
+    {
+      "id": 918011295,
+      "path": "FBW_A320_NEO_3.PC/media/918011295.wem",
+      "bytes": 101344,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.972154195011338,
+      "looped": true,
+      "loop_start_seconds": 0.19895691609977323,
+      "loop_end_seconds": 2.9299319727891158,
+      "encoding": "Custom Vorbis",
+      "bitrate": 272346,
+      "sha256": "72f83fe4974a05a1ea5f395161a6ded922b46e8f9e21231506c3778389220119",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/918011295.wav",
+      "staged_bytes": 524400,
+      "staged_sha256": "146d530bc82c80318dc706c19c0e36e473211ba3fd08607f45b9ced153c1533e",
+      "staged_verified": true
+    },
+    {
+      "id": 927507872,
+      "path": "FBW_A320_NEO_3.PC/media/927507872.wem",
+      "bytes": 20769,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.5804988662131519,
+      "looped": true,
+      "loop_start_seconds": 0.053061224489795916,
+      "loop_end_seconds": 0.5748526077097506,
+      "encoding": "Custom Vorbis",
+      "bitrate": 283990,
+      "sha256": "1a6745ec102423dce986e3fe254a4ff10ab37cc7489bcdc8c1436b79c4a42341",
+      "event_ids": [
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/927507872.wav",
+      "staged_bytes": 102512,
+      "staged_sha256": "ee259f62b821e3d30d9256cf56e85ab633045be709a38b0b5a7cf69ed23594e6",
+      "staged_verified": true
+    },
+    {
+      "id": 940959013,
+      "path": "FBW_A320_NEO_3.PC/media/940959013.wem",
+      "bytes": 120869,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.8732426303854877,
+      "looped": true,
+      "loop_start_seconds": 0.5081632653061224,
+      "loop_end_seconds": 3.6310884353741497,
+      "encoding": "Custom Vorbis",
+      "bitrate": 249314,
+      "sha256": "ad2fd22e21848dc6068386fd78723b0a90af7a05f7d34bb99472b27cb01529b7",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/940959013.wav",
+      "staged_bytes": 683352,
+      "staged_sha256": "72a90e0a762e0e1795973d014e348f5131073268afe7a547cf4f5220f06b7c28",
+      "staged_verified": true
+    },
+    {
+      "id": 945129033,
+      "path": "FBW_A320_NEO_3.PC/media/945129033.wem",
+      "bytes": 23988,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 0.6704761904761904,
+      "looped": true,
+      "loop_start_seconds": 0.04492063492063492,
+      "loop_end_seconds": 0.6606122448979592,
+      "encoding": "Custom Vorbis",
+      "bitrate": 284287,
+      "sha256": "eede4c042400dd929632ec803a3af07e939eff6adbffcc8dd99956123de56d7b",
+      "event_ids": [
+        3826118896
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/945129033.wav",
+      "staged_bytes": 118384,
+      "staged_sha256": "27fef5b8f3857b1a59633ee81bd55cedddf38e24ac7e48dcec71651047be026e",
+      "staged_verified": true
+    },
+    {
+      "id": 961698348,
+      "path": "FBW_A320_NEO_3.PC/media/961698348.wem",
+      "bytes": 222522,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.0650340136054424,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 580556,
+      "sha256": "bdf509b24f0870ea106042224071bc366b3c54203eb733d5038b9721ea09fb0c",
+      "event_ids": [
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/961698348.wav",
+      "staged_bytes": 540716,
+      "staged_sha256": "ec8869931d9b9ce7e1ebe479369ac1589bb71bad21c2c46c5414e6beb304a2c2",
+      "staged_verified": true
+    },
+    {
+      "id": 962072798,
+      "path": "FBW_A320_NEO_3.PC/media/962072798.wem",
+      "bytes": 144931,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 1.9969160997732427,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 580242,
+      "sha256": "79ba0e3972d7a5fe96dfb03b396c91527c17601d408923e98be2f7e5b53d2649",
+      "event_ids": [
+        1089987841
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/962072798.wav",
+      "staged_bytes": 352300,
+      "staged_sha256": "05c78edd5e73657a946316f49be14debd190c15133a1add0b7ca4252c6aebfc1",
+      "staged_verified": true
+    },
+    {
+      "id": 985518487,
+      "path": "FBW_A320_NEO_3.PC/media/985518487.wem",
+      "bytes": 243423,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.226621315192744,
+      "looped": true,
+      "loop_start_seconds": 0.8150340136054421,
+      "loop_end_seconds": 3.4774603174603174,
+      "encoding": "Custom Vorbis",
+      "bitrate": 269294,
+      "sha256": "38cda1b49bb05f5a3221a38e490643355cf959cb3c6402bce7a7c718add882d1",
+      "event_ids": [
+        3549146165
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/985518487.wav",
+      "staged_bytes": 1274888,
+      "staged_sha256": "8e52f9b95bf8bdfb3f9efaae93a5c726675ea586549c8afc3add210513af5590",
+      "staged_verified": true
+    },
+    {
+      "id": 1007121766,
+      "path": "FBW_A320_NEO_3.PC/media/1007121766.wem",
+      "bytes": 198886,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 7.872229166666667,
+      "looped": true,
+      "loop_start_seconds": 1.0252083333333333,
+      "loop_end_seconds": 6.4096875,
+      "encoding": "Custom Vorbis",
+      "bitrate": 201949,
+      "sha256": "6367c9190028cf74432bcf19841d854a52b07cdb88371659eb953695e99b471d",
+      "event_ids": [
+        1089987841
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1007121766.wav",
+      "staged_bytes": 1511580,
+      "staged_sha256": "1afb4474b9048caf7a46a27a5bff1fb2f1cc34b0c0a7cac3fd25d39bb864fdf2",
+      "staged_verified": true
+    },
+    {
+      "id": 1024026864,
+      "path": "FBW_A320_NEO_3.PC/media/1024026864.wem",
+      "bytes": 315988,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 9.91233560090703,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 254950,
+      "sha256": "542dc65cd626b30fd360f13a4c14ca4c599d9217df7661bdf78c18d137d63b8f",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1024026864.wav",
+      "staged_bytes": 1748580,
+      "staged_sha256": "c139c997d49cc90939675ec63086d0bdbad32528f1be11138515e592ed842c8e",
+      "staged_verified": true
+    },
+    {
+      "id": 1025418083,
+      "path": "FBW_A320_NEO_3.PC/media/1025418083.wem",
+      "bytes": 144331,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 5.033990929705215,
+      "looped": true,
+      "loop_start_seconds": 0.34922902494331065,
+      "loop_end_seconds": 5.028095238095238,
+      "encoding": "Custom Vorbis",
+      "bitrate": 229112,
+      "sha256": "485a218a42ee506dac90e332dd4ffb0078b4354fab118476479e921d278bc207",
+      "event_ids": [
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1025418083.wav",
+      "staged_bytes": 888108,
+      "staged_sha256": "3cf086b560e26b9ec676204eb0c347464055f04d2bce13d55d64a7a3a3db4dca",
+      "staged_verified": true
+    },
+    {
+      "id": 1026751918,
+      "path": "FBW_A320_NEO_3.PC/media/1026751918.wem",
+      "bytes": 329490,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 9.329138321995465,
+      "looped": true,
+      "loop_start_seconds": 4.177619047619047,
+      "loop_end_seconds": 9.329138321995465,
+      "encoding": "Custom Vorbis",
+      "bitrate": 282408,
+      "sha256": "13a1ccb4de552c4a8112ec6dbec8b4a5703a34cfd11fe2f08e4b279e986e7954",
+      "event_ids": [
+        2579637404
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1026751918.wav",
+      "staged_bytes": 1645772,
+      "staged_sha256": "1fa69c45fe4a9e7bfc002420e7468f2c366bdda63e4fdbab0955920947b55318",
+      "staged_verified": true
+    },
+    {
+      "id": 1037953038,
+      "path": "FBW_A320_NEO_3.PC/media/1037953038.wem",
+      "bytes": 120319,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 3.5046485260770974,
+      "looped": true,
+      "loop_start_seconds": 0.5433560090702948,
+      "loop_end_seconds": 3.3688208616780044,
+      "encoding": "Custom Vorbis",
+      "bitrate": 274280,
+      "sha256": "f5b2c7b71e42364e102da3ad2b409359fc5b60f65ae5042f783ae89ee3644aa6",
+      "event_ids": [
+        648184694
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1037953038.wav",
+      "staged_bytes": 618332,
+      "staged_sha256": "2bd0feebaf42497a7b84e53b48390e222629e9c858abf4ac6cab642e1fe2dc17",
+      "staged_verified": true
+    },
+    {
+      "id": 1044292535,
+      "path": "FBW_A320_NEO_3.PC/media/1044292535.wem",
+      "bytes": 256993,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 7.904897959183674,
+      "looped": false,
+      "loop_start_seconds": null,
+      "loop_end_seconds": null,
+      "encoding": "Custom Vorbis",
+      "bitrate": 259989,
+      "sha256": "3d9857cc7e8ff6291e8f437925ea7af57bd1c6ee93efb64857fd68ed55cf8556",
+      "event_ids": [
+        3662688251,
+        3922881723
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1044292535.wav",
+      "staged_bytes": 1394468,
+      "staged_sha256": "67cfaf7ab23d3b0a21681b97b687978e387b0c9cfb066c6ea11c04a2f3210f3e",
+      "staged_verified": true
+    },
+    {
+      "id": 1045645554,
+      "path": "FBW_A320_NEO_3.PC/media/1045645554.wem",
+      "bytes": 499477,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 14.86077097505669,
+      "looped": true,
+      "loop_start_seconds": 0.6520181405895692,
+      "loop_end_seconds": 3.5046485260770974,
+      "encoding": "Custom Vorbis",
+      "bitrate": 268796,
+      "sha256": "d6a3803b97e0c0f41dce16297cdb7a4cc6e91ed0fe30384c79377538225773a3",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1045645554.wav",
+      "staged_bytes": 2621552,
+      "staged_sha256": "448e9f5771fe69267ba8c646cfd3406ecfa7bc969b51094c80ae3624a9388ce6",
+      "staged_verified": true
+    },
+    {
+      "id": 1049087035,
+      "path": "FBW_A320_NEO_3.PC/media/1049087035.wem",
+      "bytes": 94287,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 2.6341496598639456,
+      "looped": true,
+      "loop_start_seconds": 0.21158730158730157,
+      "loop_end_seconds": 2.5913605442176872,
+      "encoding": "Custom Vorbis",
+      "bitrate": 285860,
+      "sha256": "c2ac8d5f5503af063e67113b650ce56e4d3ffc1ae0446d1c44bb39bde89438aa",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1049087035.wav",
+      "staged_bytes": 464776,
+      "staged_sha256": "3ee3a22bbae51fa60758d598bed665ae2bf38a607ea6cbbf4b78bd7c934c53ad",
+      "staged_verified": true
+    },
+    {
+      "id": 1057179411,
+      "path": "FBW_A320_NEO_3.PC/media/1057179411.wem",
+      "bytes": 139928,
+      "sample_rate": 48000,
+      "channels": 2,
+      "duration_seconds": 4.957458333333333,
+      "looped": true,
+      "loop_start_seconds": 0.9062916666666667,
+      "loop_end_seconds": 4.9483958333333335,
+      "encoding": "Custom Vorbis",
+      "bitrate": 225544,
+      "sha256": "04dc99b3042d41fa7109df0ed0d0353db08d4f6209b621b627eb8ed879d4721a",
+      "event_ids": [
+        3662688251
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1057179411.wav",
+      "staged_bytes": 951944,
+      "staged_sha256": "de40cd231f40d1b7adfefefe41690607881213dea939d4c20885dd33a990a83d",
+      "staged_verified": true
+    },
+    {
+      "id": 1059390296,
+      "path": "FBW_A320_NEO_3.PC/media/1059390296.wem",
+      "bytes": 832414,
+      "sample_rate": 44100,
+      "channels": 2,
+      "duration_seconds": 27.911927437641722,
+      "looped": true,
+      "loop_start_seconds": 12.969274376417234,
+      "loop_end_seconds": 27.404172335600908,
+      "encoding": "Custom Vorbis",
+      "bitrate": 238536,
+      "sha256": "be6edcbfc466d150d95fafbe09bf2afe8639078dd00bbad2c782e6a24e8fd422",
+      "event_ids": [
+        1529664443,
+        2857849550
+      ],
+      "staged_path": "fmod/project/Assets/FBW_Trent900/1059390296.wav",
+      "staged_bytes": 4923776,
+      "staged_sha256": "e4daffbc9807d592916490d0471c1c18092d148dacd2d62c168eae0bf5646dc8",
+      "staged_verified": true
+    }
+  ],
+  "summary": {
+    "events": 22,
+    "samples": 90,
+    "looped_samples": 84,
+    "encoded_bytes": 19616801,
+    "staged_bytes": 108292528,
+    "staged_samples": 90,
+    "verified_staged_samples": 90
+  },
+  "rights_notice": "FBW-provided compiled audio staged for local development. Confirm sound-specific redistribution rights before packaging or publishing it."
+}

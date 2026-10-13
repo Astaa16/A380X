@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "acf_stem": "A380X-XP12",
+  "events": [
+    {
+      "event": "event:/A380X/Engines/Trent972",
+      "part": "engine",
+      "indices": [0, 1, 2, 3],
+      "parameter_dataref_index": true,
+      "allowed_for_ai": true,
+      "start_conditions": [
+        ["sim/flightmodel2/engines/N1_percent[{index}]", ">", 1.0]
+      ],
+      "end_conditions": [
+        ["sim/flightmodel2/engines/N1_percent[{index}]", "<=", 0.5]
+      ]
+    },
+    {
+      "event": "event:/A380X/Airframe/Wind",
+      "part": "cockpit",
+      "indices": [0],
+      "start_conditions": [
+        ["sim/flightmodel/position/indicated_airspeed", ">", 20.0]
+      ],
+      "end_conditions": [
+        ["sim/flightmodel/position/indicated_airspeed", "<=", 18.0]
+      ]
+    },
+    {
+      "event": "event:/A380X/HighLift/Flaps",
+      "part": "cockpit",
+      "indices": [0],
+      "start_conditions": [
+        ["ABS_DELTA=sim/flightmodel2/controls/flap1_deploy_ratio", ">", 0.001]
+      ],
+      "end_conditions": [
+        ["ABS_DELTA=sim/flightmodel2/controls/flap1_deploy_ratio", "<=", 0.001]
+      ]
+    },
+    {
+      "event": "event:/A380X/Gear/Tire",
+      "part": "tire",
+      "indices": [0, 1, 2, 3, 4],
+      "parameter_dataref_index": true,
+      "allowed_for_ai": true,
+      "start_conditions": [
+        ["sim/flightmodel2/gear/tire_rotation_speed_rad_sec[{index}]", ">", 1.0]
+      ],
+      "end_conditions": [
+        ["sim/flightmodel2/gear/tire_rotation_speed_rad_sec[{index}]", "<=", 0.5]
+      ]
+    }
+  ]
+}

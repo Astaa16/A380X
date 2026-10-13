@@ -1,0 +1,35 @@
+# macOS / external-drive metadata
+.DS_Store
+._*
+
+# Python caches and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local build products and generated aircraft packages
+/build/
+/output/
+**/dist*/
+**/.install-backups/
+
+# Compiled/native intermediates
+*.o
+*.obj.d
+*.dylib
+*.so
+*.dll
+*.xpl
+
+# Staged upstream audio is intentionally not redistributed here
+/fmod/project/Assets/
+
+# Editor and local environment files
+.idea/
+.vscode/
+.venv/
+venv/
+*.swp
+*~

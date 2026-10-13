@@ -1,0 +1,28 @@
+I
+1140 Version - data cycle 2609, build 20260826, metadata HoldXP1140. Test excerpt.
+
+LOGAN EG ENRT 11    287.0      1.5      0.0 L    15000    41000      240
+LOGAN EG ENRT 11    287.0      1.5      0.0 L    15000    41000      240
+LOGAN EG ENRT 11    287.0      1.0      0.0 L    10000    14000      220
+  BNN EG ENRT  3    115.0      1.5      0.0 R    14000    17000        0
+  LAM EG ENRT  3    262.0      1.5      0.0 L    14000    17000        0
+LOGAN EG ENRT 11    289.0      1.0      0.0 L    10000    14000      220
+  OCK EG ENRT  3    327.0      1.0      0.0 R     7000        0      220
+  BIG EG ENRT  3    301.0      1.0      0.0 R     7000    14000      220
+  BNN EG ENRT  3    115.0      1.0      0.0 R     7000    14000      220
+  LAM EG ENRT  3    262.0      1.0      0.0 L     7000    14000      220
+LOGAN EG ENRT 11    287.0      1.0      0.0 L    10000    14000      220
+  OCK EG ENRT  3    327.0      1.0      0.0 R     7000    14000      220
+  BIG EG ENRT  3    301.0      1.5      0.0 R    14000    15000      240
+LOGAN EG ENRT 11    287.0      1.5      0.0 L    15000    41000      240
+  OCK EG ENRT  3    327.0      1.5      0.0 R    14000    15000        0
+LOGAN EG ENRT 11    289.0      1.5      0.0 L    15000    41000      240
+  BIG EG ENRT  3    301.0      1.5      0.0 R    14000    15000        0
+  BNN EG ENRT  3    115.0      1.0      0.0 R     7000    14000      220
+  LAM EG ENRT  3    262.0      1.0      0.0 L     7000    14000      220
+  OCK EG ENRT  3    328.0      1.0      0.0 R     7000    14000      220
+  BIG EG ENRT  3    301.0      1.0      0.0 R     7000    14000      220
+  BNN EG ENRT  3    115.0      1.5      0.0 R    14000    17000        0
+  LAM EG ENRT  3    262.0      1.5      0.0 L    14000    17000        0
+  OCK EG ENRT  3    328.0      1.5      0.0 R    14000    15000        0
+99

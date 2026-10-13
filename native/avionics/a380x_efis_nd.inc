@@ -1,0 +1,225 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Read-only, cached X-Plane navigation/FMS/TCAS/scenery sources for both NDs.
+ * Include after a380x_efis.inc and before the flight loop. No synthetic traffic,
+ * terrain or airport-layout geometry is generated when source data is absent.
+ */
+#include "a380x_efis_nd.h"
+static EfisNdData nd_data;
+static struct {
+    XPLMDataRef latitude,longitude,true_heading,elevation;
+    XPLMDataRef traffic_bearing,traffic_distance,traffic_altitude,traffic_count;
+    XPLMDataRef nav_type;
+    XPLMDataRef vor_id[2],vor_frequency[2],vor_bearing[2],vor_dme[2],vor_has_dme[2];
+    XPLMDataRef vor_deviation[2],vor_course[2];
+    XPLMNavRef cursor;
+    XPLMProbeRef probe;
+    double scan_lat,scan_lon;
+    float nav_age,slow_timer;
+    int initialized;
+} nd_source;
+
+static void efis_nd_cache_nav(XPLMNavRef ref)
+{
+    XPLMNavType type=0;
+    float lat=0.0f,lon=0.0f,dx,dy;
+    int kind=-1,count,at;
+    char id[256]={0};
+    EfisNdNavPoint point;
+    if (ref==XPLM_NAV_NOT_FOUND) return;
+    XPLMGetNavAidInfo(ref,&type,&lat,&lon,NULL,NULL,NULL,id,NULL,NULL);
+    if (type==xplm_Nav_Airport) kind=0;
+    else if (type==xplm_Nav_VOR || type==xplm_Nav_DME || type==xplm_Nav_TACAN) kind=1;
+    else if (type==xplm_Nav_NDB) kind=2;
+    else if (type==xplm_Nav_Fix) kind=3;
+    if (kind<0 || !efis_nd_project(nd_source.scan_lat,nd_source.scan_lon,
+                                  lat,lon,0.0f,&dx,&dy)) return;
+    point.distance_nm=hypotf(dx,dy);
+    if (point.distance_nm>700.0f) return;
+    point.lat=lat; point.lon=lon;
+    snprintf(point.id,sizeof(point.id),"%.15s",id);
+    count=nd_data.nav_count[kind];
+    for (at=0;at<count;++at) {
+        if (fabs(nd_data.nav[kind][at].lat-lat)<0.00001 &&
+            fabs(nd_data.nav[kind][at].lon-lon)<0.00001 &&
+            strcmp(nd_data.nav[kind][at].id,point.id)==0) return;
+        if (point.distance_nm<nd_data.nav[kind][at].distance_nm) break;
+    }
+    if (at==EFIS_ND_NAV_MAX) return;
+    if (count<EFIS_ND_NAV_MAX) ++count;
+    memmove(&nd_data.nav[kind][at+1],&nd_data.nav[kind][at],
+            (size_t)(count-at-1)*sizeof(point));
+    nd_data.nav[kind][at]=point;
+    nd_data.nav_count[kind]=count;
+}
+
+static void efis_nd_begin_scan(void)
+{
+    static const XPLMNavType types[]={xplm_Nav_Airport,xplm_Nav_VOR,xplm_Nav_NDB,xplm_Nav_Fix};
+    float lat=(float)nd_data.lat,lon=(float)nd_data.lon;
+    int i;
+    nd_source.scan_lat=nd_data.lat; nd_source.scan_lon=nd_data.lon;
+    memset(nd_data.nav_count,0,sizeof(nd_data.nav_count));
+    /* Seed one real nearby item per layer immediately, then fill gradually. */
+    for (i=0;i<4;++i)
+        efis_nd_cache_nav(XPLMFindNavAid(NULL,NULL,&lat,&lon,NULL,types[i]));
+    nd_source.cursor=XPLMGetFirstNavAid();
+    nd_source.nav_age=0.0f;
+    nd_data.nav_scanning=nd_source.cursor!=XPLM_NAV_NOT_FOUND;
+}
+
+static void efis_nd_read_route(void)
+{
+    int i,count=XPLMCountFMSEntries();
+    nd_data.route_count=count<0?0:(count>EFIS_ND_ROUTE_MAX?EFIS_ND_ROUTE_MAX:count);
+    nd_data.route_active=XPLMGetDestinationFMSEntry();
+    nd_data.route_displayed=XPLMGetDisplayedFMSEntry();
+    for (i=0;i<nd_data.route_count;++i) {
+        char id[256]={0};
+        float lat=NAN,lon=NAN;
+        XPLMNavRef nav=XPLM_NAV_NOT_FOUND;
+        EfisNdRoutePoint *point=&nd_data.route[i];
+        XPLMGetFMSEntryInfo(i,NULL,id,&nav,&point->altitude_ft,&lat,&lon);
+        point->lat=lat; point->lon=lon;
+        snprintf(point->id,sizeof(point->id),"%.15s",id);
+    }
+}
+
+static void efis_nd_read_radios(void)
+{
+    int i,types[12]={0};
+    if (nd_source.nav_type) XPLMGetDatavi(nd_source.nav_type,types,0,12);
+    for (i=0;i<2;++i) {
+        EfisNdVor *vor=&nd_data.vor[i];
+        memset(vor->id,0,sizeof(vor->id));
+        if (nd_source.vor_id[i]) XPLMGetDatab(nd_source.vor_id[i],vor->id,0,15);
+        vor->frequency_mhz=nd_source.vor_frequency[i]?
+            XPLMGetDatai(nd_source.vor_frequency[i])*0.01f:0.0f;
+        vor->bearing_mag=nd_source.vor_bearing[i]?XPLMGetDataf(nd_source.vor_bearing[i]):NAN;
+        vor->distance_nm=nd_source.vor_dme[i]?XPLMGetDataf(nd_source.vor_dme[i]):NAN;
+        vor->deviation_dots=nd_source.vor_deviation[i]?XPLMGetDataf(nd_source.vor_deviation[i]):NAN;
+        vor->course_mag=nd_source.vor_course[i]?XPLMGetDataf(nd_source.vor_course[i]):NAN;
+        /* nav_type uses XPLMNavType bit values, received station only. */
+        vor->valid=(types[i]&xplm_Nav_VOR)!=0 && vor->id[0] && isfinite(vor->bearing_mag);
+        vor->dme_valid=vor->valid && nd_source.vor_has_dme[i] &&
+            XPLMGetDatai(nd_source.vor_has_dme[i]) && isfinite(vor->distance_nm);
+    }
+}
+
+static void efis_nd_update_terrain(int side,float dt)
+{
+    EfisNdTerrain *terrain=&nd_data.terrain[side];
+    float span=fminf(40.0f,fmaxf(1.0f,efis[side].range_nm)),mx=0,my=0;
+    int sample;
+    if (!efis[side].terr || efis[side].zoom || !nd_data.position_valid || !nd_source.probe) return;
+    terrain->age+=dt;
+    efis_nd_project(terrain->lat,terrain->lon,nd_data.lat,nd_data.lon,0,&mx,&my);
+    if (terrain->span_nm!=span || hypotf(mx,my)>span*.1f ||
+        (terrain->next_sample>=EFIS_ND_TERRAIN_COUNT && terrain->age>10.0f)) {
+        memset(terrain,0,sizeof(*terrain));
+        terrain->lat=nd_data.lat; terrain->lon=nd_data.lon; terrain->span_nm=span;
+    }
+    /* Two probes per side per frame. Scenery probing is expensive; once the
+     * grid is filled it is retained for ten seconds or until the map moves. */
+    for (sample=0;sample<2 && terrain->next_sample<EFIS_ND_TERRAIN_COUNT;++sample) {
+        int index=terrain->next_sample++;
+        float north=((float)(index/EFIS_ND_TERRAIN_DIM)-4.0f)*span*.25f;
+        float east=((float)(index%EFIS_ND_TERRAIN_DIM)-4.0f)*span*.25f;
+        EfisNdTerrainPoint *point=&terrain->points[index];
+        double local_x,local_y,local_z,hit_lat,hit_lon,hit_alt;
+        XPLMProbeInfo_t hit;
+        double distance_nm=hypot(east,north),bearing=atan2(east,north);
+        double d=distance_nm/3440.065,lat=terrain->lat*M_PI/180.0,lon=terrain->lon*M_PI/180.0;
+        double target_lat=asin(sin(lat)*cos(d)+cos(lat)*sin(d)*cos(bearing));
+        double target_lon=lon+atan2(sin(bearing)*sin(d)*cos(lat),cos(d)-sin(lat)*sin(target_lat));
+        if (distance_nm>40.0) continue; /* Never color distant unloaded scenery. */
+        point->lat=target_lat*180.0/M_PI; point->lon=target_lon*180.0/M_PI;
+        XPLMWorldToLocal(point->lat,point->lon,20000.0,&local_x,&local_y,&local_z);
+        memset(&hit,0,sizeof(hit)); hit.structSize=sizeof(hit);
+        if (XPLMProbeTerrainXYZ(nd_source.probe,(float)local_x,(float)local_y,(float)local_z,&hit)
+            !=xplm_ProbeHitTerrain) continue;
+        XPLMLocalToWorld(hit.locationX,hit.locationY,hit.locationZ,&hit_lat,&hit_lon,&hit_alt);
+        if (!isfinite(hit_alt)) continue;
+        point->altitude_ft=(float)(hit_alt*3.280839895);
+        point->water=hit.is_wet; point->valid=1; ++terrain->valid_count;
+    }
+}
+
+static void efis_nd_init(void)
+{
+    int i;
+    char name[160];
+    memset(&nd_source,0,sizeof(nd_source)); memset(&nd_data,0,sizeof(nd_data));
+    nd_source.cursor=XPLM_NAV_NOT_FOUND;
+#define ND_REF(field,path) nd_source.field=XPLMFindDataRef(path)
+    ND_REF(latitude,"sim/flightmodel/position/latitude");
+    ND_REF(longitude,"sim/flightmodel/position/longitude");
+    ND_REF(true_heading,"sim/flightmodel/position/true_psi");
+    ND_REF(elevation,"sim/flightmodel/position/elevation");
+    ND_REF(traffic_bearing,"sim/cockpit2/tcas/indicators/relative_bearing_degs");
+    ND_REF(traffic_distance,"sim/cockpit2/tcas/indicators/relative_distance_mtrs");
+    ND_REF(traffic_altitude,"sim/cockpit2/tcas/indicators/relative_altitude_mtrs");
+    ND_REF(traffic_count,"sim/cockpit2/tcas/indicators/tcas_num_acf");
+    ND_REF(nav_type,"sim/cockpit2/radios/indicators/nav_type");
+#undef ND_REF
+    for (i=0;i<2;++i) {
+#define VOR_REF(field,section,stem) do { \
+        snprintf(name,sizeof(name),"sim/cockpit2/radios/" section "/nav%d_" stem,i+1); \
+        nd_source.field[i]=XPLMFindDataRef(name); \
+    } while(0)
+        VOR_REF(vor_id,"indicators","nav_id");
+        VOR_REF(vor_frequency,"actuators","frequency_hz");
+        VOR_REF(vor_bearing,"indicators","bearing_deg_mag");
+        VOR_REF(vor_dme,"indicators","dme_distance_nm");
+        VOR_REF(vor_has_dme,"indicators","has_dme");
+        VOR_REF(vor_deviation,"indicators","hdef_dots_pilot");
+        VOR_REF(vor_course,"actuators","obs_deg_mag_pilot");
+#undef VOR_REF
+    }
+    nd_source.probe=XPLMCreateProbe(xplm_ProbeY);
+    nd_source.slow_timer=1.0f;
+}
+
+static void efis_nd_shutdown(void)
+{
+    if (nd_source.probe) XPLMDestroyProbe(nd_source.probe);
+    memset(&nd_source,0,sizeof(nd_source));
+    memset(&nd_data,0,sizeof(nd_data));
+}
+
+static void efis_nd_update(float dt)
+{
+    int i;
+    float dx=0,dy=0;
+    dt=isfinite(dt)?fminf(1.0f,fmaxf(0.0f,dt)):0.0f;
+    nd_data.lat=nd_source.latitude?XPLMGetDatad(nd_source.latitude):NAN;
+    nd_data.lon=nd_source.longitude?XPLMGetDatad(nd_source.longitude):NAN;
+    nd_data.true_heading=nd_source.true_heading?XPLMGetDataf(nd_source.true_heading):NAN;
+    nd_data.altitude_ft=nd_source.elevation?(float)(XPLMGetDatad(nd_source.elevation)*3.280839895):NAN;
+    nd_data.position_valid=isfinite(nd_data.lat)&&isfinite(nd_data.lon)&&fabs(nd_data.lat)<=90.0&&
+        isfinite(nd_data.true_heading)&&isfinite(nd_data.altitude_ft);
+    if (!nd_data.position_valid) return;
+    nd_source.nav_age+=dt; nd_source.slow_timer+=dt;
+    efis_nd_project(nd_source.scan_lat,nd_source.scan_lon,nd_data.lat,nd_data.lon,0,&dx,&dy);
+    if (!nd_source.initialized || (!nd_data.nav_scanning && nd_source.nav_age>20.0f && hypotf(dx,dy)>5.0f)) {
+        efis_nd_begin_scan(); nd_source.initialized=1;
+    }
+    /* Bound navigation API work to 512 navaids per frame, never a full global
+     * navdb scan in one callback. Keep the nearest 64 of each display type. */
+    for (i=0;i<512 && nd_source.cursor!=XPLM_NAV_NOT_FOUND;++i) {
+        efis_nd_cache_nav(nd_source.cursor);
+        nd_source.cursor=XPLMGetNextNavAid(nd_source.cursor);
+    }
+    nd_data.nav_scanning=nd_source.cursor!=XPLM_NAV_NOT_FOUND;
+    if (nd_source.slow_timer>=0.5f) {
+        nd_source.slow_timer=0.0f;
+        efis_nd_read_route(); efis_nd_read_radios();
+        nd_data.traffic_available=nd_source.traffic_bearing&&nd_source.traffic_distance&&nd_source.traffic_altitude;
+        memset(nd_data.traffic_distance_m,0,sizeof(nd_data.traffic_distance_m));
+        if (nd_data.traffic_available && (!nd_source.traffic_count || XPLMGetDatai(nd_source.traffic_count)>0)) {
+            XPLMGetDatavf(nd_source.traffic_bearing,nd_data.traffic_bearing,0,64);
+            XPLMGetDatavf(nd_source.traffic_distance,nd_data.traffic_distance_m,0,64);
+            XPLMGetDatavf(nd_source.traffic_altitude,nd_data.traffic_altitude_m,0,64);
+        }
+    }
+    efis_nd_update_terrain(0,dt); efis_nd_update_terrain(1,dt);
+}

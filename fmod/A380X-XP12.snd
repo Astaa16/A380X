@@ -1,0 +1,98 @@
+A
+1000
+ACF_SOUNDS
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Engines/Trent972
+VEH_PART engine 0
+PARAM_DREF_IDX 0
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/engines/N1_percent[0] > 1
+EVENT_END_COND sim/flightmodel2/engines/N1_percent[0] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Engines/Trent972
+VEH_PART engine 1
+PARAM_DREF_IDX 1
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/engines/N1_percent[1] > 1
+EVENT_END_COND sim/flightmodel2/engines/N1_percent[1] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Engines/Trent972
+VEH_PART engine 2
+PARAM_DREF_IDX 2
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/engines/N1_percent[2] > 1
+EVENT_END_COND sim/flightmodel2/engines/N1_percent[2] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Engines/Trent972
+VEH_PART engine 3
+PARAM_DREF_IDX 3
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/engines/N1_percent[3] > 1
+EVENT_END_COND sim/flightmodel2/engines/N1_percent[3] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Airframe/Wind
+VEH_PART cockpit 0
+EVENT_START_COND sim/flightmodel/position/indicated_airspeed > 20
+EVENT_END_COND sim/flightmodel/position/indicated_airspeed <= 18
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/HighLift/Flaps
+VEH_PART cockpit 0
+EVENT_START_COND ABS_DELTA=sim/flightmodel2/controls/flap1_deploy_ratio > 0.001
+EVENT_END_COND ABS_DELTA=sim/flightmodel2/controls/flap1_deploy_ratio <= 0.001
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Gear/Tire
+VEH_PART tire 0
+PARAM_DREF_IDX 0
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[0] > 1
+EVENT_END_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[0] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Gear/Tire
+VEH_PART tire 1
+PARAM_DREF_IDX 1
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[1] > 1
+EVENT_END_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[1] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Gear/Tire
+VEH_PART tire 2
+PARAM_DREF_IDX 2
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[2] > 1
+EVENT_END_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[2] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Gear/Tire
+VEH_PART tire 3
+PARAM_DREF_IDX 3
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[3] > 1
+EVENT_END_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[3] <= 0.5
+END_SOUND_ATTACHMENT
+
+BEGIN_SOUND_ATTACHMENT
+EVENT_NAME event:/A380X/Gear/Tire
+VEH_PART tire 4
+PARAM_DREF_IDX 4
+EVENT_ALLOWED_FOR_AI
+EVENT_START_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[4] > 1
+EVENT_END_COND sim/flightmodel2/gear/tire_rotation_speed_rad_sec[4] <= 0.5
+END_SOUND_ATTACHMENT

@@ -1,0 +1,66 @@
+{
+  "upstream": "https://github.com/flybywiresim/aircraft",
+  "revision": "2baa2b35eadaf4c78e172ce41bbe6b40b4aeafb2",
+  "license": "GPL-3.0",
+  "purpose": "A380X FADEC numeric idle and thrust-limit tables for native EWD normalization. Simulator-independent numeric subset; does not implement a complete FADEC or certify engine performance.",
+  "files": [
+    {
+      "path": "fbw-a380x/src/wasm/fadec_a380x/src/Fadec/ThrustLimits_A380X.hpp",
+      "filename": "ThrustLimits_A380X.hpp",
+      "upstream_sha256": "25c9b31c9503097ecc6e7ed785445833a3086b78036cd2f544a016e75ef55319",
+      "sha256": "cb500b8f13a14cc329cfecffff7e4dd35fe38cf57c13be6555e0bd7629588cf1",
+      "changes": [
+        "Removed unused MSFS logging include. Numeric implementation and tables unchanged."
+      ]
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fadec_a380x/src/Fadec/Table1502_A380X.hpp",
+      "filename": "Table1502_A380X.hpp",
+      "upstream_sha256": "a3b6c7ff708ec2666404ab433b0401e47b075ab531a092f04728b387aee21561",
+      "sha256": "a3b6c7ff708ec2666404ab433b0401e47b075ab531a092f04728b387aee21561",
+      "changes": []
+    },
+    {
+      "path": "fbw-common/src/wasm/fadec_common/src/EngineRatios.hpp",
+      "filename": "EngineRatios.hpp",
+      "upstream_sha256": "69832b980f3ba14a52b32dc671e9cdc6b956b45e4c77e9c4e692d79349016ee2",
+      "sha256": "04c5b590c44ca8b6ea5ef8407648f1cbffe3079849778428dff4f94561fdcad4",
+      "changes": [
+        "Removed MSFS gauges include; replaced MSFS FLOAT64 typedef with its underlying double. Equations unchanged."
+      ]
+    },
+    {
+      "path": "fbw-common/src/wasm/fadec_common/src/Fadec.cpp",
+      "filename": "Fadec.cpp",
+      "upstream_sha256": "a3dc9f18608fa2a5bf32a24dcc3edf0d54e70f1cd9ee0fc426ef4791421c567b",
+      "sha256": "a3dc9f18608fa2a5bf32a24dcc3edf0d54e70f1cd9ee0fc426ef4791421c567b",
+      "changes": []
+    },
+    {
+      "path": "fbw-common/src/wasm/fadec_common/src/Fadec.h",
+      "upstream_sha256": "d3735609797c8cb6b5b5339077901cc376d171dfa134a57a8ae1c8d8865e4a4c",
+      "role": "Equation provenance for standalone C ABI; original file is not compiled."
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fadec_a380x/src/Fadec/EngineControl_A380X.cpp",
+      "upstream_sha256": "d96b5308140378e6594a9fe9d60a8a2897d713dd89fb43e52def8aa0fc59fc42",
+      "role": "Equation provenance for standalone C ABI; original file is not compiled."
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/FlyByWireInterface.cpp",
+      "upstream_sha256": "05702c785bbcff63d72f8035b4f561be576bad982c632abd0d11a138f64797e2",
+      "role": "Equation provenance for standalone C ABI; original file is not compiled."
+    },
+    {
+      "path": "fbw-a380x/src/systems/instruments/src/EWD/elements/ThrustGauge.tsx",
+      "upstream_sha256": "d82d5e3a55685402fa36bafbe99f2186870a2c445296d1081af5befdfb0a0cc9",
+      "role": "Equation provenance for standalone C ABI; original file is not compiled."
+    }
+  ],
+  "local_files": [
+    {
+      "filename": "Fadec.h",
+      "sha256": "978fdf7f8eec2fa6b72d78ed25be9ad682366080b54722fd6f54fee1d2daab72"
+    }
+  ]
+}

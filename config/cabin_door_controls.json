@@ -1,0 +1,52 @@
+[
+  {
+    "node": "ANIM_DOOR_M1L_CLICK",
+    "command": "sim/flight_controls/door_toggle_1",
+    "label": "MAIN DECK 1 LEFT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M1R_CLICK",
+    "command": "sim/flight_controls/door_toggle_2",
+    "label": "MAIN DECK 1 RIGHT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M2L_CLICK",
+    "command": "sim/flight_controls/door_toggle_3",
+    "label": "MAIN DECK 2 LEFT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M2R_CLICK",
+    "command": "sim/flight_controls/door_toggle_4",
+    "label": "MAIN DECK 2 RIGHT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M3L_CLICK",
+    "command": "sim/flight_controls/door_toggle_5",
+    "label": "MAIN DECK 3 LEFT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M3R_CLICK",
+    "command": "sim/flight_controls/door_toggle_6",
+    "label": "MAIN DECK 3 RIGHT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M4L_CLICK",
+    "command": "sim/flight_controls/door_toggle_7",
+    "label": "MAIN DECK 4 LEFT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M4R_CLICK",
+    "command": "sim/flight_controls/door_toggle_8",
+    "label": "MAIN DECK 4 RIGHT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M5L_CLICK",
+    "command": "sim/flight_controls/door_toggle_9",
+    "label": "MAIN DECK 5 LEFT - open / close"
+  },
+  {
+    "node": "ANIM_DOOR_M5R_CLICK",
+    "command": "sim/flight_controls/door_toggle_10",
+    "label": "MAIN DECK 5 RIGHT - open / close"
+  }
+]

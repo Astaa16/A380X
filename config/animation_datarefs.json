@@ -1,0 +1,2586 @@
+{
+  "format": 2,
+  "fallback_prefix": "a380x/xp12/anim",
+  "unmapped_policy": "source_rest_pose",
+  "notes": [
+    "Patterns match the complete glTF action name, never a mesh or bone name.",
+    "Exterior aileron, elevator, rudder and spoiler animation refs require the packaged native bootstrap and FlyWithLua hydraulic surface driver.",
+    "FBW Anims_Exterior.xml defines aileron/elevator/rudder clips as signed -1..1 and spoiler clips as 0..65 source degrees; the hydraulic driver preserves the existing clipped native spoiler degree mapping.",
+    "Main gear clips combine deployment (first half) and compression (second half). Deployment mapping intentionally uses only the first half until compression is independently implemented.",
+    "Primary landing-gear doors use explicit source samples: closed at either deployment endpoint and open through the middle of travel. Auxiliary body and aft nose doors remain open with the extended gear.",
+    "Unknown animations retain source rest pose. Suggested custom dataref names in reports are planning metadata and are not emitted into OBJ files."
+  ],
+  "synthetic_rigid_animations": [
+    {
+      "name": "ANIM_DOOR_U1L",
+      "objects": [
+        "PAX_DOOR_U1L",
+        "PAX_DOOR_U1L_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U1L",
+      "side": "left",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    },
+    {
+      "name": "ANIM_DOOR_U1R",
+      "objects": [
+        "PAX_DOOR_U1R",
+        "PAX_DOOR_U1R_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U1R",
+      "side": "right",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    },
+    {
+      "name": "ANIM_DOOR_U2L",
+      "objects": [
+        "PAX_DOOR_U2L",
+        "PAX_DOOR_U2L_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U2L",
+      "side": "left",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    },
+    {
+      "name": "ANIM_DOOR_U2R",
+      "objects": [
+        "PAX_DOOR_U2R",
+        "PAX_DOOR_U2R_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U2R",
+      "side": "right",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    },
+    {
+      "name": "ANIM_DOOR_U3L",
+      "objects": [
+        "PAX_DOOR_U3L",
+        "PAX_DOOR_U3L_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U3L",
+      "side": "left",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    },
+    {
+      "name": "ANIM_DOOR_U3R",
+      "objects": [
+        "PAX_DOOR_U3R",
+        "PAX_DOOR_U3R_HANDLE"
+      ],
+      "primary_object": "PAX_DOOR_U3R",
+      "side": "right",
+      "hinge_longitudinal": "min",
+      "open_angle_degrees": 0,
+      "plug_distance": 0.55,
+      "plug_fraction": 0.2,
+      "slide_distance": 1.3,
+      "double_sided": true
+    }
+  ],
+  "static_rigid_clones": [
+    {
+      "name": "UPPER_DOOR_SURROUND",
+      "objects": [
+        "PAX_DOOR_U1L.001",
+        "PAX_DOOR_U1L.003"
+      ],
+      "instances": [
+        {
+          "name": "U1L",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U1R",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": true
+        },
+        {
+          "name": "U2L",
+          "translation": [
+            -0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U2R",
+          "translation": [
+            0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": true
+        },
+        {
+          "name": "U3L",
+          "translation": [
+            -0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U3R",
+          "translation": [
+            0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": true
+        }
+      ],
+      "double_sided": true
+    },
+    {
+      "name": "UPPER_DOOR_INNER",
+      "objects": [
+        "PAX_DOOR_U1L.004",
+        "PAX_DOOR_U1L.005",
+        "PAX_DOOR_U1L.006",
+        "PAX_DOOR_U1L.007",
+        "PAX_DOOR_U1L.008"
+      ],
+      "instances": [
+        {
+          "name": "U1L",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U1L"
+        },
+        {
+          "name": "U1R",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U1R"
+        },
+        {
+          "name": "U2L",
+          "translation": [
+            -0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U2L"
+        },
+        {
+          "name": "U2R",
+          "translation": [
+            0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U2R"
+        },
+        {
+          "name": "U3L",
+          "translation": [
+            -0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U3L"
+        },
+        {
+          "name": "U3R",
+          "translation": [
+            0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U3R"
+        }
+      ],
+      "double_sided": true
+    },
+    {
+      "name": "UPPER_DOOR_FIXED_HARDWARE",
+      "objects": [
+        "PAX_DOOR_M3L.036",
+        "PAX_DOOR_M3L.043",
+        "PAX_DOOR_M3L.048"
+      ],
+      "instances": [
+        {
+          "name": "U1L",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U1R",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": true
+        },
+        {
+          "name": "U2L",
+          "translation": [
+            -0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U2R",
+          "translation": [
+            0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": true
+        },
+        {
+          "name": "U3L",
+          "translation": [
+            -0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": false
+        },
+        {
+          "name": "U3R",
+          "translation": [
+            0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": true
+        }
+      ],
+      "double_sided": true
+    },
+    {
+      "name": "UPPER_DOOR_MOVING_HARDWARE",
+      "objects": [
+        "ANIM_DOOR_M3L_CLICK.001",
+        "PAX_DOOR_M3L.033",
+        "PAX_DOOR_M3L.034",
+        "PAX_DOOR_M3L.035",
+        "PAX_DOOR_M3L.037",
+        "PAX_DOOR_M3L.038",
+        "PAX_DOOR_M3L.039",
+        "PAX_DOOR_M3L.040",
+        "PAX_DOOR_M3L.042",
+        "PAX_DOOR_M3L.044",
+        "PAX_DOOR_M3L.045",
+        "PAX_DOOR_M3L.046",
+        "PAX_DOOR_M3L.047",
+        "PAX_DOOR_M3L_UNLOCK.001",
+        "PAX_DOOR_M3L.049"
+      ],
+      "instances": [
+        {
+          "name": "U1L",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U1L"
+        },
+        {
+          "name": "U1R",
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U1R"
+        },
+        {
+          "name": "U2L",
+          "translation": [
+            -0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U2L"
+        },
+        {
+          "name": "U2R",
+          "translation": [
+            0.0086273,
+            19.401937,
+            -0.00336933
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U2R"
+        },
+        {
+          "name": "U3L",
+          "translation": [
+            -0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": false,
+          "animation": "ANIM_DOOR_U3L"
+        },
+        {
+          "name": "U3R",
+          "translation": [
+            0.01176906,
+            28.29398203,
+            -0.00523174
+          ],
+          "mirror_x": true,
+          "animation": "ANIM_DOOR_U3R"
+        }
+      ],
+      "double_sided": true
+    }
+  ],
+  "static_doorway_liners": [
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U1L",
+      "anchor_object": "UPPER_DOOR_SURROUND_U1L_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.84,
+          2.658
+        ],
+        [
+          4,
+          2.657
+        ],
+        [
+          4.2,
+          2.656
+        ],
+        [
+          4.4,
+          2.655
+        ],
+        [
+          4.6,
+          2.8705
+        ],
+        [
+          4.8,
+          2.7835
+        ],
+        [
+          5,
+          2.6852
+        ],
+        [
+          5.2,
+          2.57
+        ],
+        [
+          5.4,
+          2.4307
+        ],
+        [
+          5.6,
+          2.2077
+        ],
+        [
+          5.8,
+          1.7998
+        ],
+        [
+          6,
+          1.5362
+        ],
+        [
+          6.04,
+          1.49
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "end_profile": [
+        [
+          3.84,
+          2.7986
+        ],
+        [
+          4,
+          2.7979
+        ],
+        [
+          4.2,
+          2.7968
+        ],
+        [
+          4.4,
+          2.7958
+        ],
+        [
+          4.6,
+          2.8705
+        ],
+        [
+          4.8,
+          2.7835
+        ],
+        [
+          5,
+          2.6852
+        ],
+        [
+          5.2,
+          2.57
+        ],
+        [
+          5.4,
+          2.4307
+        ],
+        [
+          5.6,
+          2.1564
+        ],
+        [
+          5.8,
+          1.7998
+        ],
+        [
+          6,
+          1.5362
+        ],
+        [
+          6.04,
+          1.49
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.84,
+          2.908
+        ],
+        [
+          4,
+          2.908
+        ],
+        [
+          4.2,
+          2.908
+        ],
+        [
+          4.4,
+          2.908
+        ],
+        [
+          4.6,
+          2.867
+        ],
+        [
+          4.8,
+          2.79
+        ],
+        [
+          5,
+          2.715
+        ],
+        [
+          5.2,
+          2.587
+        ],
+        [
+          5.4,
+          2.402
+        ],
+        [
+          5.6,
+          2.252
+        ],
+        [
+          5.8,
+          1.98
+        ],
+        [
+          6,
+          1.55
+        ],
+        [
+          6.04,
+          1.505
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "longitudinal_min": 12.17,
+      "longitudinal_max": 15.06,
+      "portal_min": 13.557443,
+      "portal_max": 14.837443,
+      "portal_bottom": 3.84,
+      "portal_top": 5.55,
+      "mirror_x": false
+    },
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U1R",
+      "anchor_object": "UPPER_DOOR_SURROUND_U1R_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.84,
+          2.658
+        ],
+        [
+          4,
+          2.657
+        ],
+        [
+          4.2,
+          2.656
+        ],
+        [
+          4.4,
+          2.655
+        ],
+        [
+          4.6,
+          2.8705
+        ],
+        [
+          4.8,
+          2.7835
+        ],
+        [
+          5,
+          2.6852
+        ],
+        [
+          5.2,
+          2.57
+        ],
+        [
+          5.4,
+          2.4307
+        ],
+        [
+          5.6,
+          2.2077
+        ],
+        [
+          5.8,
+          1.7998
+        ],
+        [
+          6,
+          1.5362
+        ],
+        [
+          6.04,
+          1.49
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "end_profile": [
+        [
+          3.84,
+          2.7986
+        ],
+        [
+          4,
+          2.7979
+        ],
+        [
+          4.2,
+          2.7968
+        ],
+        [
+          4.4,
+          2.7958
+        ],
+        [
+          4.6,
+          2.8705
+        ],
+        [
+          4.8,
+          2.7835
+        ],
+        [
+          5,
+          2.6852
+        ],
+        [
+          5.2,
+          2.57
+        ],
+        [
+          5.4,
+          2.4307
+        ],
+        [
+          5.6,
+          2.1564
+        ],
+        [
+          5.8,
+          1.7998
+        ],
+        [
+          6,
+          1.5362
+        ],
+        [
+          6.04,
+          1.49
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.84,
+          2.908
+        ],
+        [
+          4,
+          2.908
+        ],
+        [
+          4.2,
+          2.908
+        ],
+        [
+          4.4,
+          2.908
+        ],
+        [
+          4.6,
+          2.867
+        ],
+        [
+          4.8,
+          2.79
+        ],
+        [
+          5,
+          2.715
+        ],
+        [
+          5.2,
+          2.587
+        ],
+        [
+          5.4,
+          2.402
+        ],
+        [
+          5.6,
+          2.252
+        ],
+        [
+          5.8,
+          1.98
+        ],
+        [
+          6,
+          1.55
+        ],
+        [
+          6.04,
+          1.505
+        ],
+        [
+          6.18,
+          1.31
+        ]
+      ],
+      "longitudinal_min": 12.17,
+      "longitudinal_max": 15.06,
+      "portal_min": 13.557443,
+      "portal_max": 14.837443,
+      "portal_bottom": 3.84,
+      "portal_top": 5.55,
+      "mirror_x": true
+    },
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U2L",
+      "anchor_object": "UPPER_DOOR_SURROUND_U2L_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.83663067,
+          2.6493727
+        ],
+        [
+          3.99663067,
+          2.6483727
+        ],
+        [
+          4.19663067,
+          2.6473727
+        ],
+        [
+          4.39663067,
+          2.6463727
+        ],
+        [
+          4.59663067,
+          2.8618727
+        ],
+        [
+          4.79663067,
+          2.7748727
+        ],
+        [
+          4.99663067,
+          2.6765727
+        ],
+        [
+          5.19663067,
+          2.5613727
+        ],
+        [
+          5.39663067,
+          2.4220727
+        ],
+        [
+          5.59663067,
+          2.1990727
+        ],
+        [
+          5.79663067,
+          1.7911727
+        ],
+        [
+          5.99663067,
+          1.5275727
+        ],
+        [
+          6.03663067,
+          1.4813727
+        ],
+        [
+          6.17663067,
+          1.3013727
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.83663067,
+          2.8993727
+        ],
+        [
+          3.99663067,
+          2.8993727
+        ],
+        [
+          4.19663067,
+          2.8993727
+        ],
+        [
+          4.39663067,
+          2.8993727
+        ],
+        [
+          4.59663067,
+          2.8583727
+        ],
+        [
+          4.79663067,
+          2.7813727
+        ],
+        [
+          4.99663067,
+          2.7063727
+        ],
+        [
+          5.19663067,
+          2.5783727
+        ],
+        [
+          5.39663067,
+          2.3933727
+        ],
+        [
+          5.59663067,
+          2.2433727
+        ],
+        [
+          5.79663067,
+          1.9713727
+        ],
+        [
+          5.99663067,
+          1.5413727
+        ],
+        [
+          6.03663067,
+          1.4963727
+        ],
+        [
+          6.17663067,
+          1.3013727
+        ]
+      ],
+      "longitudinal_min": -6.52,
+      "longitudinal_max": -3.81,
+      "portal_min": -5.844494,
+      "portal_max": -4.564494,
+      "portal_bottom": 3.83663067,
+      "portal_top": 5.54663067,
+      "mirror_x": false
+    },
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U2R",
+      "anchor_object": "UPPER_DOOR_SURROUND_U2R_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.83663067,
+          2.6493727
+        ],
+        [
+          3.99663067,
+          2.6483727
+        ],
+        [
+          4.19663067,
+          2.6473727
+        ],
+        [
+          4.39663067,
+          2.6463727
+        ],
+        [
+          4.59663067,
+          2.8618727
+        ],
+        [
+          4.79663067,
+          2.7748727
+        ],
+        [
+          4.99663067,
+          2.6765727
+        ],
+        [
+          5.19663067,
+          2.5613727
+        ],
+        [
+          5.39663067,
+          2.4220727
+        ],
+        [
+          5.59663067,
+          2.1990727
+        ],
+        [
+          5.79663067,
+          1.7911727
+        ],
+        [
+          5.99663067,
+          1.5275727
+        ],
+        [
+          6.03663067,
+          1.4813727
+        ],
+        [
+          6.17663067,
+          1.3013727
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.83663067,
+          2.8993727
+        ],
+        [
+          3.99663067,
+          2.8993727
+        ],
+        [
+          4.19663067,
+          2.8993727
+        ],
+        [
+          4.39663067,
+          2.8993727
+        ],
+        [
+          4.59663067,
+          2.8583727
+        ],
+        [
+          4.79663067,
+          2.7813727
+        ],
+        [
+          4.99663067,
+          2.7063727
+        ],
+        [
+          5.19663067,
+          2.5783727
+        ],
+        [
+          5.39663067,
+          2.3933727
+        ],
+        [
+          5.59663067,
+          2.2433727
+        ],
+        [
+          5.79663067,
+          1.9713727
+        ],
+        [
+          5.99663067,
+          1.5413727
+        ],
+        [
+          6.03663067,
+          1.4963727
+        ],
+        [
+          6.17663067,
+          1.3013727
+        ]
+      ],
+      "longitudinal_min": -6.52,
+      "longitudinal_max": -3.81,
+      "portal_min": -5.844494,
+      "portal_max": -4.564494,
+      "portal_bottom": 3.83663067,
+      "portal_top": 5.54663067,
+      "mirror_x": true
+    },
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U3L",
+      "anchor_object": "UPPER_DOOR_SURROUND_U3L_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.83476826,
+          2.64623094
+        ],
+        [
+          3.99476826,
+          2.64523094
+        ],
+        [
+          4.19476826,
+          2.64423094
+        ],
+        [
+          4.39476826,
+          2.64323094
+        ],
+        [
+          4.59476826,
+          2.85873094
+        ],
+        [
+          4.79476826,
+          2.77173094
+        ],
+        [
+          4.99476826,
+          2.67343094
+        ],
+        [
+          5.19476826,
+          2.55823094
+        ],
+        [
+          5.39476826,
+          2.41893094
+        ],
+        [
+          5.59476826,
+          2.19593094
+        ],
+        [
+          5.79476826,
+          1.78803094
+        ],
+        [
+          5.99476826,
+          1.52443094
+        ],
+        [
+          6.03476826,
+          1.47823094
+        ],
+        [
+          6.17476826,
+          1.29823094
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.83476826,
+          2.89623094
+        ],
+        [
+          3.99476826,
+          2.89623094
+        ],
+        [
+          4.19476826,
+          2.89623094
+        ],
+        [
+          4.39476826,
+          2.89623094
+        ],
+        [
+          4.59476826,
+          2.85523094
+        ],
+        [
+          4.79476826,
+          2.77823094
+        ],
+        [
+          4.99476826,
+          2.70323094
+        ],
+        [
+          5.19476826,
+          2.57523094
+        ],
+        [
+          5.39476826,
+          2.39023094
+        ],
+        [
+          5.59476826,
+          2.24023094
+        ],
+        [
+          5.79476826,
+          1.96823094
+        ],
+        [
+          5.99476826,
+          1.53823094
+        ],
+        [
+          6.03476826,
+          1.49323094
+        ],
+        [
+          6.17476826,
+          1.29823094
+        ]
+      ],
+      "longitudinal_min": -15,
+      "longitudinal_max": -12.84,
+      "portal_min": -14.736539,
+      "portal_max": -13.456539,
+      "portal_bottom": 3.83476826,
+      "portal_top": 5.54476826,
+      "mirror_x": false
+    },
+    {
+      "name": "UPPER_DOOR_BAY_LINER_U3R",
+      "anchor_object": "UPPER_DOOR_SURROUND_U3R_PAX_DOOR_U1L.001",
+      "profile": [
+        [
+          3.83476826,
+          2.64623094
+        ],
+        [
+          3.99476826,
+          2.64523094
+        ],
+        [
+          4.19476826,
+          2.64423094
+        ],
+        [
+          4.39476826,
+          2.64323094
+        ],
+        [
+          4.59476826,
+          2.85873094
+        ],
+        [
+          4.79476826,
+          2.77173094
+        ],
+        [
+          4.99476826,
+          2.67343094
+        ],
+        [
+          5.19476826,
+          2.55823094
+        ],
+        [
+          5.39476826,
+          2.41893094
+        ],
+        [
+          5.59476826,
+          2.19593094
+        ],
+        [
+          5.79476826,
+          1.78803094
+        ],
+        [
+          5.99476826,
+          1.52443094
+        ],
+        [
+          6.03476826,
+          1.47823094
+        ],
+        [
+          6.17476826,
+          1.29823094
+        ]
+      ],
+      "portal_profile": [
+        [
+          3.83476826,
+          2.89623094
+        ],
+        [
+          3.99476826,
+          2.89623094
+        ],
+        [
+          4.19476826,
+          2.89623094
+        ],
+        [
+          4.39476826,
+          2.89623094
+        ],
+        [
+          4.59476826,
+          2.85523094
+        ],
+        [
+          4.79476826,
+          2.77823094
+        ],
+        [
+          4.99476826,
+          2.70323094
+        ],
+        [
+          5.19476826,
+          2.57523094
+        ],
+        [
+          5.39476826,
+          2.39023094
+        ],
+        [
+          5.59476826,
+          2.24023094
+        ],
+        [
+          5.79476826,
+          1.96823094
+        ],
+        [
+          5.99476826,
+          1.53823094
+        ],
+        [
+          6.03476826,
+          1.49323094
+        ],
+        [
+          6.17476826,
+          1.29823094
+        ]
+      ],
+      "longitudinal_min": -15,
+      "longitudinal_max": -12.84,
+      "portal_min": -14.736539,
+      "portal_max": -13.456539,
+      "portal_bottom": 3.83476826,
+      "portal_top": 5.54476826,
+      "mirror_x": true
+    }
+  ],
+  "mappings": [
+    {
+      "pattern": "(?i)N1_1_anim",
+      "dataref": "sim/flightmodel2/engines/prop_rotation_angle_deg[0]",
+      "value_min": 0,
+      "value_max": 360,
+      "note": "Authored fan/spinner revolution, driven by the native visual engine-fan angle."
+    },
+    {
+      "pattern": "(?i)N1_2_anim",
+      "dataref": "sim/flightmodel2/engines/prop_rotation_angle_deg[1]",
+      "value_min": 0,
+      "value_max": 360,
+      "note": "Authored fan/spinner revolution, driven by the native visual engine-fan angle."
+    },
+    {
+      "pattern": "(?i)N1_3_anim",
+      "dataref": "sim/flightmodel2/engines/prop_rotation_angle_deg[2]",
+      "value_min": 0,
+      "value_max": 360,
+      "note": "Authored fan/spinner revolution, driven by the native visual engine-fan angle."
+    },
+    {
+      "pattern": "(?i)N1_4_anim",
+      "dataref": "sim/flightmodel2/engines/prop_rotation_angle_deg[3]",
+      "value_min": 0,
+      "value_max": 360,
+      "note": "Authored fan/spinner revolution, driven by the native visual engine-fan angle."
+    },
+    {
+      "pattern": "(?i)thrust_rev_1",
+      "dataref": "sim/flightmodel2/engines/thrust_reverser_deploy_ratio[1]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "FBW thrust_rev_1 belongs to inboard engine 2; engines 1 and 4 have no reverser."
+    },
+    {
+      "pattern": "(?i)thrust_rev_2",
+      "dataref": "sim/flightmodel2/engines/thrust_reverser_deploy_ratio[2]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "FBW thrust_rev_2 belongs to inboard engine 3; engines 1 and 4 have no reverser."
+    },
+    {
+      "pattern": "(?i)c_gear",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[0]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)c_gear_door1",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[0]",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.12
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.88
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Forward nose doors are closed gear-up and gear-down, and open during transit. Aft nose doors are part of c_gear and remain open when extended."
+    },
+    {
+      "pattern": "(?i)l_wing_gear_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[1]",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.12
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.88
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Large wing-gear door opens for transit and recloses at either endpoint."
+    },
+    {
+      "pattern": "(?i)r_wing_gear_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[2]",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.12
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.88
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Large wing-gear door opens for transit and recloses at either endpoint."
+    },
+    {
+      "pattern": "(?i)l_body_gear_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[3]",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.12
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.88
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Large body-gear doors open for transit and reclose at either endpoint."
+    },
+    {
+      "pattern": "(?i)r_body_gear_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[4]",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.12
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 0.88
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Large body-gear doors open for transit and reclose at either endpoint."
+    },
+    {
+      "pattern": "(?i)l_blg_inner_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[3]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Auxiliary body-gear door remains open with the body gear extended, matching the source system behavior."
+    },
+    {
+      "pattern": "(?i)r_blg_inner_door",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[4]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Auxiliary body-gear door remains open with the body gear extended, matching the source system behavior."
+    },
+    {
+      "pattern": "(?i)l_w_gear",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[1]",
+      "value_min": 0,
+      "value_max": 1,
+      "source_end": 0.5
+    },
+    {
+      "pattern": "(?i)r_w_gear",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[2]",
+      "value_min": 0,
+      "value_max": 1,
+      "source_end": 0.5
+    },
+    {
+      "pattern": "(?i)l_b_gear",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[3]",
+      "value_min": 0,
+      "value_max": 1,
+      "source_end": 0.5
+    },
+    {
+      "pattern": "(?i)r_b_gear",
+      "dataref": "sim/flightmodel2/gear/deploy_ratio[4]",
+      "value_min": 0,
+      "value_max": 1,
+      "source_end": 0.5
+    },
+    {
+      "pattern": "(?i)l_aileron1_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_l_inboard_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)l_aileron2_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_l_midboard_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)l_aileron3_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_l_outboard_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)r_aileron1_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_r_inboard_ratio",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "FBW's right clip already moves opposite the left clip. Do not invert it again; verified from glTF joint endpoint matrices."
+    },
+    {
+      "pattern": "(?i)r_aileron2_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_r_midboard_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)r_aileron3_percent_key",
+      "dataref": "a380x/xp12/hydraulics/aileron_r_outboard_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)l_outer_elevator_deflection",
+      "dataref": "a380x/xp12/hydraulics/elevator_ratio",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "Exterior elevator actuator output; powered pitch command and unpressurized ground droop are selected by the hydraulic driver. Cockpit input refs remain independent."
+    },
+    {
+      "pattern": "(?i)l_inner_elevator_deflection",
+      "dataref": "a380x/xp12/hydraulics/elevator_ratio",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "Exterior elevator actuator output; powered pitch command and unpressurized ground droop are selected by the hydraulic driver. Cockpit input refs remain independent."
+    },
+    {
+      "pattern": "(?i)r_outer_elevator_deflection",
+      "dataref": "a380x/xp12/hydraulics/elevator_ratio",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "Exterior elevator actuator output; powered pitch command and unpressurized ground droop are selected by the hydraulic driver. Cockpit input refs remain independent."
+    },
+    {
+      "pattern": "(?i)r_inner_elevator_deflection",
+      "dataref": "a380x/xp12/hydraulics/elevator_ratio",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "Exterior elevator actuator output; powered pitch command and unpressurized ground droop are selected by the hydraulic driver. Cockpit input refs remain independent."
+    },
+    {
+      "pattern": "(?i)(lower|upper)_rudder_percent_key",
+      "dataref": "a380x/xp12/hydraulics/rudder_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)trimtab_elevator_key",
+      "dataref": "sim/flightmodel2/controls/stabilizer_deflection_degrees",
+      "sample_points": [
+        {
+          "source_fraction": 0,
+          "dataref_value": -10.2182739077
+        },
+        {
+          "source_fraction": 0.05,
+          "dataref_value": -9.197421644
+        },
+        {
+          "source_fraction": 0.1,
+          "dataref_value": -8.1759120515
+        },
+        {
+          "source_fraction": 0.15,
+          "dataref_value": -7.1539311542
+        },
+        {
+          "source_fraction": 0.2,
+          "dataref_value": -6.1316114365
+        },
+        {
+          "source_fraction": 0.25,
+          "dataref_value": -5.1091335709
+        },
+        {
+          "source_fraction": 0.3,
+          "dataref_value": -4.0866543057
+        },
+        {
+          "source_fraction": 0.35,
+          "dataref_value": -3.0643347459
+        },
+        {
+          "source_fraction": 0.4,
+          "dataref_value": -2.0423486375
+        },
+        {
+          "source_fraction": 0.45,
+          "dataref_value": -1.0208468836
+        },
+        {
+          "source_fraction": 0.5,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 0.55,
+          "dataref_value": 0.7509945276
+        },
+        {
+          "source_fraction": 0.6,
+          "dataref_value": 1.5022403601
+        },
+        {
+          "source_fraction": 0.65,
+          "dataref_value": 2.2536938045
+        },
+        {
+          "source_fraction": 0.7,
+          "dataref_value": 3.0052654949
+        },
+        {
+          "source_fraction": 0.75,
+          "dataref_value": 3.7569041008
+        },
+        {
+          "source_fraction": 0.8,
+          "dataref_value": 4.5085491424
+        },
+        {
+          "source_fraction": 0.85,
+          "dataref_value": 5.2601243411
+        },
+        {
+          "source_fraction": 0.9,
+          "dataref_value": 6.0115671968
+        },
+        {
+          "source_fraction": 0.95,
+          "dataref_value": 6.7628195201
+        },
+        {
+          "source_fraction": 1,
+          "dataref_value": 7.5138181433
+        }
+      ],
+      "note": "Native stabilizer degrees are positive leading-edge UP, not aircraft nose-up trim. These 21 values are the signed world-X angles of the pinned FBW trim quaternion keys relative to source fraction 0.5; the authored travel is asymmetric, not +/-10 degrees. Geometry follows actual incidence one-for-one without changing the flight model."
+    },
+    {
+      "pattern": "(?i)[lr]_flap_percent_key",
+      "dataref": "sim/flightmodel2/controls/flap1_deploy_ratio",
+      "priority": 100,
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)[lr]_slat_percent_key",
+      "dataref": "sim/flightmodel2/controls/slat1_deploy_ratio",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)l_spoiler[12]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_l_inboard_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.5384615384615384,
+      "clamp": true,
+      "note": "Inboard speedbrake-only panels. Approximate native 0..50 degrees as FBW 0..35 degrees; exact flap-dependent flight scheduling is not implemented. Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)r_spoiler[12]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_r_inboard_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.5384615384615384,
+      "clamp": true,
+      "note": "Mirrored right inboard speedbrake-only panels, clamped at 35 source degrees. Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)l_spoiler3_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_l_inner_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": "Native combined roll/speedbrake output; positive-open sign verified against shipped Laminar 737 geometry. No second additive speedbrake transform. Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)r_spoiler3_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_r_inner_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": " Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)l_spoiler[456]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_l_middle_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": "Spatially matched shared native segment; not independent FBW actuator or flap-dependent scheduling. Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)r_spoiler[456]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_r_middle_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": " Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)l_spoiler[78]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_l_outer_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": " Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)r_spoiler[78]_key",
+      "dataref": "a380x/xp12/hydraulics/spoiler_r_outer_deg",
+      "value_min": 0,
+      "value_max": 50,
+      "source_end": 0.7692307692307693,
+      "clamp": true,
+      "note": " Hydraulic driver follows the native output when powered and holds position when unpressurized."
+    },
+    {
+      "pattern": "(?i)flaps_lever",
+      "dataref": "sim/cockpit2/controls/flap_handle_request_ratio",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)lever_speed_brake",
+      "dataref": "sim/cockpit2/controls/speedbrake_ratio",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)lever_landing_gear",
+      "dataref": "a380x/xp12/center_right/gear_lever",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The native center-right provider smooths gear-handle motion; preserve the existing authored lever hierarchy."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_BAT1",
+      "dataref": "sim/cockpit2/electrical/battery_on[0]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Animate the FBW overhead pushbutton from the native battery 1 state used by its click command."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_BAT2",
+      "dataref": "sim/cockpit2/electrical/battery_on[1]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Animate the FBW overhead pushbutton from the native battery 2 state used by its click command."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_GEN1",
+      "dataref": "sim/cockpit2/electrical/generator_on[0]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_GEN2",
+      "dataref": "sim/cockpit2/electrical/generator_on[1]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_GEN3",
+      "dataref": "sim/cockpit2/electrical/generator_on[2]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ELEC_GEN4",
+      "dataref": "sim/cockpit2/electrical/generator_on[3]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_APU_MASTERSW",
+      "dataref": "sim/cockpit2/electrical/APU_starter_switch",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The APU master uses the OFF/ON portion of the native three-state starter switch."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_APU_START",
+      "dataref": "sim/cockpit2/electrical/APU_starter_switch",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Native APU start is a three-state OFF/ON/START switch; the two-pose FBW button follows its full range."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ANTIICE_ENG1",
+      "dataref": "sim/cockpit2/ice/ice_inlet_heat_on_per_engine[0]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ANTIICE_ENG2",
+      "dataref": "sim/cockpit2/ice/ice_inlet_heat_on_per_engine[1]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ANTIICE_ENG3",
+      "dataref": "sim/cockpit2/ice/ice_inlet_heat_on_per_engine[2]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ANTIICE_ENG4",
+      "dataref": "sim/cockpit2/ice/ice_inlet_heat_on_per_engine[3]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ANTIICE_WING",
+      "dataref": "sim/cockpit2/ice/ice_surface_hot_bleed_air_on",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_PROBESWINDOW",
+      "dataref": "sim/cockpit2/ice/ice_window_heat_on",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_ENG1BLEED",
+      "dataref": "sim/cockpit2/bleedair/actuators/engine_bleed_sov[0]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_ENG2BLEED",
+      "dataref": "sim/cockpit2/bleedair/actuators/engine_bleed_sov[1]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_ENG3BLEED",
+      "dataref": "sim/cockpit2/bleedair/actuators/engine_bleed_sov[2]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_ENG4BLEED",
+      "dataref": "sim/cockpit2/bleedair/actuators/engine_bleed_sov[3]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_PACK1",
+      "dataref": "sim/cockpit2/bleedair/actuators/pack_left",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_PACK2",
+      "dataref": "sim/cockpit2/bleedair/actuators/pack_right",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_AIRCOND_APUBLEED",
+      "dataref": "sim/cockpit2/bleedair/actuators/apu_bleed",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_FUEL_FEEDTK1_MAIN",
+      "dataref": "sim/cockpit2/engine/actuators/fuel_pump_on[0]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_FUEL_FEEDTK2_MAIN",
+      "dataref": "sim/cockpit2/engine/actuators/fuel_pump_on[1]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_FUEL_FEEDTK3_MAIN",
+      "dataref": "sim/cockpit2/engine/actuators/fuel_pump_on[2]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_FUEL_FEEDTK4_MAIN",
+      "dataref": "sim/cockpit2/engine/actuators/fuel_pump_on[3]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_ENGINES_ENG1",
+      "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[0]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Native mixture cutoff is used as the development engine-master OFF/RUN state."
+    },
+    {
+      "pattern": "(?i)SWITCH_ENGINES_ENG2",
+      "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[1]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_ENGINES_ENG3",
+      "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[2]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_ENGINES_ENG4",
+      "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[3]",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_EXTLT_NAVLOGO",
+      "dataref": "sim/cockpit2/switches/navigation_lights_on",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_EXTLT_BEACON",
+      "dataref": "sim/cockpit2/switches/beacon_on",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_EXTLT_STROBE",
+      "dataref": "sim/cockpit2/switches/strobe_lights_on",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The native boolean uses the source three-position switch's two end poses."
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_EXTLT_NOSE",
+      "dataref": "sim/cockpit2/switches/taxi_light_on",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The native boolean uses the source three-position switch's two end poses."
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_EXTLT_LANDL",
+      "dataref": "sim/cockpit2/switches/landing_lights_on",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_INTLT_SEATBELT",
+      "dataref": "sim/cockpit2/switches/fasten_seat_belts",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The native boolean uses the source three-position switch's two end poses."
+    },
+    {
+      "pattern": "(?i)SWITCH_OVHD_INTLT_NOSMOKING",
+      "dataref": "sim/cockpit2/switches/no_smoking",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The native boolean uses the source three-position switch's two end poses."
+    },
+    {
+      "pattern": "(?i)HANDLING_RudderPedals_brake_l",
+      "dataref": "sim/cockpit2/controls/left_brake_ratio",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)HANDLING_RudderPedals_brake_r",
+      "dataref": "sim/cockpit2/controls/right_brake_ratio",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)pedals_lever_l_r",
+      "dataref": "sim/cockpit2/controls/yoke_heading_ratio",
+      "value_min": -1,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)INSTRUMENT_Dial_Compass",
+      "dataref": "sim/cockpit2/gauges/indicators/compass_heading_deg_mag",
+      "value_min": 0,
+      "value_max": 360
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M1L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[0]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 1 left follows native X-Plane door 1."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M1R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[1]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 1 right follows native X-Plane door 2."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M2L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[2]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 2 left follows native X-Plane door 3."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M2R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[3]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 2 right follows native X-Plane door 4."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M3L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[4]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 3 left follows native X-Plane door 5."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M3R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[5]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 3 right follows native X-Plane door 6."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M4L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[6]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 4 left follows native X-Plane door 7."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M4R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[7]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 4 right follows native X-Plane door 8."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M5L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[8]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 5 left follows native X-Plane door 9."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_M5R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[9]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Main-deck door 5 right follows native X-Plane door 10."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U1L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[10]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 1 left follows native X-Plane door 11. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U1R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[11]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 1 right follows native X-Plane door 12. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U2L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[12]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 2 left follows native X-Plane door 13. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U2R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[13]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 2 right follows native X-Plane door 14. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U3L",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[14]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 3 left follows native X-Plane door 15. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)ANIM_DOOR_U3R",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[15]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Upper-deck door 3 right follows native X-Plane door 16. The source has no clip, so the converter authors a guarded rigid plug-and-forward-slide motion matching the authored main-deck door path."
+    },
+    {
+      "pattern": "(?i)^SWITCH_DOOR_LOCK$",
+      "dataref": "a380x/xp12/cockpit_door/position",
+      "value_min": -1,
+      "value_max": 1,
+      "note": "The pedestal CKPT DOOR switch is momentary: UNLOCK=-1, NORM=0, LOCK=1."
+    },
+    {
+      "pattern": "(?i)COCKPITDOOR_OPEN_ANIM",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[16]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "The authored cockpit-door clip follows native X-Plane door 17."
+    },
+    {
+      "pattern": "(?i)(fwd_door_cargo|aft_door_cargo|door_cargo)",
+      "static_fraction": 0,
+      "note": "Keep unimplemented cargo doors closed."
+    },
+    {
+      "pattern": "(?i)(CPT|FO)_SLIDING_WINDOW_ANIM",
+      "static_fraction": 0,
+      "note": "Closed window; interaction not yet implemented."
+    },
+    {
+      "pattern": "(?i)(left|right)_inboard_flex",
+      "static_fraction": 0.5535,
+      "note": "Zero-flex offset in FBW A380_WINGS.xml."
+    },
+    {
+      "pattern": "(?i)(left|right)_inner_midboard_flex",
+      "static_fraction": 0.67,
+      "note": "Zero-flex offset in FBW A380_WINGS.xml."
+    },
+    {
+      "pattern": "(?i)(left|right)_outer_midboard_flex",
+      "static_fraction": 0.319,
+      "note": "Zero-flex offset in FBW A380_WINGS.xml."
+    },
+    {
+      "pattern": "(?i)(left|right)_outboard_flex",
+      "static_fraction": 0.5,
+      "note": "Zero-flex offset in FBW A380_WINGS.xml."
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_LS",
+      "dataref": "a380x/xp12/efis/captain/ls",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_VV",
+      "dataref": "a380x/xp12/efis/captain/vv",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_TAXI",
+      "dataref": "a380x/xp12/efis/captain/taxi_requested",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_WX",
+      "dataref": "a380x/xp12/efis/captain/wx_requested",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_TERR",
+      "dataref": "a380x/xp12/efis/captain/terr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_TRAF",
+      "dataref": "a380x/xp12/efis/captain/traf",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_CSTR",
+      "dataref": "a380x/xp12/efis/captain/cstr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_WPT",
+      "dataref": "a380x/xp12/efis/captain/wpt",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_VORD",
+      "dataref": "a380x/xp12/efis/captain/vord",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_VOR",
+      "dataref": "a380x/xp12/efis/captain/vor1",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_ADF",
+      "dataref": "a380x/xp12/efis/captain/vor2",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_NDB",
+      "dataref": "a380x/xp12/efis/captain/ndb",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_CS_ARPT",
+      "dataref": "a380x/xp12/efis/captain/arpt",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_PFD",
+      "dataref": "a380x/xp12/du/captain_pfd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_ND_SMALL",
+      "dataref": "a380x/xp12/du/captain_nd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_ND",
+      "dataref": "a380x/xp12/du/captain_wx_terr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_MFD",
+      "dataref": "a380x/xp12/du/captain_mfd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_RANGE",
+      "dataref": "a380x/xp12/efis/captain/range_index",
+      "value_min": 0,
+      "value_max": 7
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_ROSE",
+      "dataref": "a380x/xp12/efis/captain/mode",
+      "value_min": 0,
+      "value_max": 4
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_BARO1",
+      "dataref": "a380x/xp12/efis/captain/baro_preset_hpa",
+      "value_min": 745,
+      "value_max": 1100
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_CS_BARO2",
+      "dataref": "a380x/xp12/efis/captain/baro_inhg",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 1,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Source rest pose points to in Hg; native baro_inhg=1 uses that pose, hPa=0 uses final authored pose."
+    },
+    {
+      "pattern": "(?i)PUSH_KNOB_EFIS_CS_BARO1",
+      "dataref": "a380x/xp12/efis/captain/baro_std",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_LS",
+      "dataref": "a380x/xp12/efis/first_officer/ls",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_VV",
+      "dataref": "a380x/xp12/efis/first_officer/vv",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_TAXI",
+      "dataref": "a380x/xp12/efis/first_officer/taxi_requested",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_WX",
+      "dataref": "a380x/xp12/efis/first_officer/wx_requested",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_TERR",
+      "dataref": "a380x/xp12/efis/first_officer/terr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_TRAF",
+      "dataref": "a380x/xp12/efis/first_officer/traf",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_CSTR",
+      "dataref": "a380x/xp12/efis/first_officer/cstr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_WPT",
+      "dataref": "a380x/xp12/efis/first_officer/wpt",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_VORD",
+      "dataref": "a380x/xp12/efis/first_officer/vord",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_VOR",
+      "dataref": "a380x/xp12/efis/first_officer/vor1",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_ADF",
+      "dataref": "a380x/xp12/efis/first_officer/vor2",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_NDB",
+      "dataref": "a380x/xp12/efis/first_officer/ndb",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)PUSH_EFIS_FO_ARPT",
+      "dataref": "a380x/xp12/efis/first_officer/arpt",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_PFD",
+      "dataref": "a380x/xp12/du/first_officer_pfd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_ND_SMALL",
+      "dataref": "a380x/xp12/du/first_officer_nd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_ND",
+      "dataref": "a380x/xp12/du/first_officer_wx_terr",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_MFD",
+      "dataref": "a380x/xp12/du/first_officer_mfd",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_RANGE",
+      "dataref": "a380x/xp12/efis/first_officer/range_index",
+      "value_min": 0,
+      "value_max": 7
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_ROSE",
+      "dataref": "a380x/xp12/efis/first_officer/mode",
+      "value_min": 0,
+      "value_max": 4
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_BARO1",
+      "dataref": "a380x/xp12/efis/first_officer/baro_preset_hpa",
+      "value_min": 745,
+      "value_max": 1100
+    },
+    {
+      "pattern": "(?i)KNOB_EFIS_FO_BARO2",
+      "dataref": "a380x/xp12/efis/first_officer/baro_inhg",
+      "value_min": 0,
+      "value_max": 1,
+      "sample_points": [
+        {
+          "source_fraction": 1,
+          "dataref_value": 0
+        },
+        {
+          "source_fraction": 0,
+          "dataref_value": 1
+        }
+      ],
+      "note": "Source rest pose points to in Hg; native baro_inhg=1 uses that pose, hPa=0 uses final authored pose."
+    },
+    {
+      "pattern": "(?i)PUSH_KNOB_EFIS_FO_BARO1",
+      "dataref": "a380x/xp12/efis/first_officer/baro_std",
+      "value_min": 0,
+      "value_max": 1
+    },
+    {
+      "pattern": "(?i)KNOB_SWITCHING_BRK",
+      "dataref": "a380x/xp12/center_right/autobrake_selected",
+      "value_min": 0,
+      "value_max": 5,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)SWITCH_AUTOBKR_ASKID",
+      "dataref": "a380x/xp12/center_right/antiskid_on",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)PUSH_RTO_ARM",
+      "dataref": "a380x/xp12/center_right/rto_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)Accu_Press",
+      "dataref": "a380x/xp12/center_right/body_accu_psi",
+      "value_min": 0,
+      "value_max": 5000,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)Press_Arc_L",
+      "dataref": "a380x/xp12/center_right/brake_left_ratio_milli",
+      "value_min": 0,
+      "value_max": 1000,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)Press_Arc_R",
+      "dataref": "a380x/xp12/center_right/brake_right_ratio_milli",
+      "value_min": 0,
+      "value_max": 1000,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)KNOB_CHRONO_GPS",
+      "dataref": "a380x/xp12/clock/mode",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)KNOB_CHRONO_RUN",
+      "dataref": "a380x/xp12/clock/et_selector",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)PUSH_CHRONO_CHR",
+      "dataref": "a380x/xp12/clock/chr_held",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)PUSH_CHRONO_RST",
+      "dataref": "a380x/xp12/clock/rst_held",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)PUSH_CHRONO_SET",
+      "dataref": "a380x/xp12/clock/date_held",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)KNOB_OVHD_ADIRS_1",
+      "dataref": "a380x/xp12/adirs/ir1_knob",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Authored OFF/NAV/ATT detents; smoothed native selector position."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_IR1",
+      "dataref": "a380x/xp12/adirs/ir1_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_1",
+      "dataref": "a380x/xp12/adirs/adr1_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    },
+    {
+      "pattern": "(?i)KNOB_OVHD_ADIRS_2",
+      "dataref": "a380x/xp12/adirs/ir2_knob",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Authored OFF/NAV/ATT detents; smoothed native selector position."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_IR2",
+      "dataref": "a380x/xp12/adirs/ir2_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_2",
+      "dataref": "a380x/xp12/adirs/adr2_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    },
+    {
+      "pattern": "(?i)KNOB_OVHD_ADIRS_3",
+      "dataref": "a380x/xp12/adirs/ir3_knob",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "Authored OFF/NAV/ATT detents; smoothed native selector position."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_IR3",
+      "dataref": "a380x/xp12/adirs/ir3_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    },
+    {
+      "pattern": "(?i)PUSH_OVHD_ADIRS_3",
+      "dataref": "a380x/xp12/adirs/adr3_pressed",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Momentary pushbutton travel, independent of latched OFF state; child legends follow."
+    }
+  ]
+}

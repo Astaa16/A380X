@@ -1,0 +1,1733 @@
+[
+  {
+    "node": "LEVER_LANDINGGEAR",
+    "command": "a380x/xp12/center_right/gear_toggle",
+    "label": "LANDING GEAR - UP or DOWN"
+  },
+  {
+    "node": "PUSH_RTO_ARM",
+    "command": "a380x/xp12/center_right/rto_toggle",
+    "label": "RTO - arm or disarm on ground"
+  },
+  {
+    "node": "KNOB_SWITCHING_BRK",
+    "command": null,
+    "command_up": "a380x/xp12/center_right/autobrake_up",
+    "command_down": "a380x/xp12/center_right/autobrake_down",
+    "cursor": "rotate_medium",
+    "label": "AUTO BRK - DIS, BTV, LO, L2, L3, HI"
+  },
+  {
+    "node": "SWITCH_AUTOBKR_ASKID",
+    "command": "a380x/xp12/center_right/antiskid_toggle",
+    "label": "A-SKID - ON or OFF"
+  },
+  {
+    "node": "KNOB_CHRONO_GPS",
+    "command": null,
+    "command_up": "a380x/xp12/clock/mode_up",
+    "command_down": "a380x/xp12/clock/mode_down",
+    "cursor": "rotate_small",
+    "label": "CLOCK MODE - GPS, INT, SET"
+  },
+  {
+    "node": "KNOB_CHRONO_RUN",
+    "command": null,
+    "command_up": "a380x/xp12/clock/et_up",
+    "command_down": "a380x/xp12/clock/et_down",
+    "cursor": "rotate_small",
+    "label": "CLOCK ET - RUN, STP, RST"
+  },
+  {
+    "node": "PUSH_CHRONO_CHR",
+    "command": "a380x/xp12/clock/chr_toggle",
+    "label": "CLOCK CHR - start or stop; increase setting in SET"
+  },
+  {
+    "node": "PUSH_CHRONO_RST",
+    "command": "a380x/xp12/clock/chr_reset",
+    "label": "CLOCK RST - reset CHR; decrease setting in SET"
+  },
+  {
+    "node": "PUSH_CHRONO_SET",
+    "command": "a380x/xp12/clock/date",
+    "label": "CLOCK DATE - hold to show date; select field in SET"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_CHRONO",
+    "command": "a380x/xp12/glareshield/chrono_left",
+    "label": "CAPT CHRONO - start, stop, reset"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_CHRONO",
+    "command": "a380x/xp12/glareshield/chrono_right",
+    "label": "FO CHRONO - start, stop, reset"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_SIDESTICK",
+    "command": "a380x/xp12/glareshield/takeover_left",
+    "label": "CAPT SIDESTICK PRIORITY - select sidestick priority"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_SIDESTICK",
+    "command": "a380x/xp12/glareshield/takeover_right",
+    "label": "FO SIDESTICK PRIORITY - select sidestick priority"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_MASTERCAUT",
+    "command": "a380x/xp12/glareshield/master_caution_left",
+    "label": "CAPT MASTER CAUTION - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_MASTERCAUT",
+    "command": "a380x/xp12/glareshield/master_caution_right",
+    "label": "FO MASTER CAUTION - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_MASTERWARN",
+    "command": "a380x/xp12/glareshield/master_warning_left",
+    "label": "CAPT MASTER WARNING - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_MASTERWARN",
+    "command": "a380x/xp12/glareshield/master_warning_right",
+    "label": "FO MASTER WARNING - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_ATCMSG",
+    "command": "a380x/xp12/glareshield/atc_ack_left",
+    "label": "CAPT ATC MSG - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_ATCMSG",
+    "command": "a380x/xp12/glareshield/atc_ack_right",
+    "label": "FO ATC MSG - acknowledge"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_CS_PTT",
+    "command": "a380x/xp12/glareshield/ptt_left",
+    "label": "CAPT RADIO PTT - hold to transmit"
+  },
+  {
+    "node": "PUSH_GLARESHIELD_FO_PTT",
+    "command": "a380x/xp12/glareshield/ptt_right",
+    "label": "FO RADIO PTT - hold to transmit"
+  },
+  {
+    "node": "KNOB_GLARESHIELD_CS_SPEAKER",
+    "command": null,
+    "command_up": "a380x/xp12/glareshield/volume_left_up",
+    "command_down": "a380x/xp12/glareshield/volume_left_down",
+    "cursor": "rotate_medium",
+    "label": "CAPT LOUDSPEAKER - volume"
+  },
+  {
+    "node": "KNOB_GLARESHIELD_FO_SPEAKER",
+    "command": null,
+    "command_up": "a380x/xp12/glareshield/volume_right_up",
+    "command_down": "a380x/xp12/glareshield/volume_right_down",
+    "cursor": "rotate_medium",
+    "label": "FO LOUDSPEAKER - volume"
+  },
+  {
+    "node": "LIGHTING_Knob_Glareshield_1",
+    "command": null,
+    "command_up": "a380x/xp12/lighting/captain_flood_up",
+    "command_down": "a380x/xp12/lighting/captain_flood_down",
+    "cursor": "rotate_small",
+    "label": "CAPT FLOOD - instrument panel flood"
+  },
+  {
+    "node": "LIGHTING_Knob_Glareshield_2",
+    "command": null,
+    "command_up": "a380x/xp12/lighting/lcd_up",
+    "command_down": "a380x/xp12/lighting/lcd_down",
+    "cursor": "rotate_small",
+    "label": "FCU LCD - display brightness"
+  },
+  {
+    "node": "LIGHTING_Knob_Glareshield_3",
+    "command": null,
+    "command_up": "a380x/xp12/lighting/integral_up",
+    "command_down": "a380x/xp12/lighting/integral_down",
+    "cursor": "rotate_small",
+    "label": "GLARESHIELD INTEG - panel legend brightness"
+  },
+  {
+    "node": "LIGHTING_Knob_Glareshield_4",
+    "command": null,
+    "command_up": "a380x/xp12/lighting/first_officer_flood_up",
+    "command_down": "a380x/xp12/lighting/first_officer_flood_down",
+    "cursor": "rotate_small",
+    "label": "F/O FLOOD - instrument panel flood"
+  },
+  {
+    "node": "KNOB_EFIS_CS_PFD",
+    "command_up": "a380x/xp12/du/captain_pfd_up",
+    "command_down": "a380x/xp12/du/captain_pfd_down",
+    "cursor": "rotate_small",
+    "label": "CAPT PFD DU - brightness and off",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_CS_ND_SMALL",
+    "command_up": "a380x/xp12/du/captain_nd_up",
+    "command_down": "a380x/xp12/du/captain_nd_down",
+    "cursor": "rotate_small",
+    "label": "CAPT ND DU inner knob - brightness and off",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_CS_ND",
+    "command_up": "a380x/xp12/du/captain_wx_terr_up",
+    "command_down": "a380x/xp12/du/captain_wx_terr_down",
+    "cursor": "rotate_small",
+    "label": "CAPT ND outer knob - weather and terrain brightness",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_CS_MFD",
+    "command_up": "a380x/xp12/du/captain_mfd_up",
+    "command_down": "a380x/xp12/du/captain_mfd_down",
+    "cursor": "rotate_small",
+    "label": "CAPT MFD DU - brightness and off",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_FO_PFD",
+    "command_up": "a380x/xp12/du/first_officer_pfd_up",
+    "command_down": "a380x/xp12/du/first_officer_pfd_down",
+    "cursor": "rotate_small",
+    "label": "F/O PFD DU - brightness and off",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_FO_ND_SMALL",
+    "command_up": "a380x/xp12/du/first_officer_nd_up",
+    "command_down": "a380x/xp12/du/first_officer_nd_down",
+    "cursor": "rotate_small",
+    "label": "F/O ND DU inner knob - brightness and off",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_FO_ND",
+    "command_up": "a380x/xp12/du/first_officer_wx_terr_up",
+    "command_down": "a380x/xp12/du/first_officer_wx_terr_down",
+    "cursor": "rotate_small",
+    "label": "F/O ND outer knob - weather and terrain brightness",
+    "command": null
+  },
+  {
+    "node": "KNOB_EFIS_FO_MFD",
+    "command_up": "a380x/xp12/du/first_officer_mfd_up",
+    "command_down": "a380x/xp12/du/first_officer_mfd_down",
+    "cursor": "rotate_small",
+    "label": "F/O MFD DU - brightness and off",
+    "command": null
+  },
+  {
+    "node": "PUSH_FCU_ALT",
+    "command": "a380x/xp12/fcu/altitude_hold",
+    "label": "ALT - altitude hold"
+  },
+  {
+    "node": "PUSH_FCU_LOC",
+    "command": "a380x/xp12/fcu/loc_toggle",
+    "label": "LOC - localizer arm"
+  },
+  {
+    "node": "PUSH_FCU_AP1",
+    "command": "a380x/xp12/fcu/ap1_toggle",
+    "label": "AP1 - autopilot 1"
+  },
+  {
+    "node": "PUSH_FCU_FD",
+    "command": "a380x/xp12/fcu/fd_toggle",
+    "label": "FD - flight director"
+  },
+  {
+    "node": "PUSH_FCU_ATHR",
+    "command": "a380x/xp12/fcu/athr_toggle",
+    "label": "A/THR - autothrust"
+  },
+  {
+    "node": "PUSH_FCU_SPDMACH",
+    "command": "a380x/xp12/fcu/speed_mach_toggle",
+    "label": "SPD/MACH - toggle selected speed units"
+  },
+  {
+    "node": "PUSH_FCU_TRUEMAG",
+    "command": "a380x/xp12/fcu/true_mag_toggle",
+    "label": "TRUE/MAG - heading reference"
+  },
+  {
+    "node": "PUSH_FCU_METER",
+    "command": "a380x/xp12/fcu/metric_toggle",
+    "label": "METER - metric altitude display"
+  },
+  {
+    "node": "PUSH_FCU_HDGTRK",
+    "command": "a380x/xp12/fcu/trk_fpa_toggle",
+    "label": "HDG/TRK - toggle HDG/VS and TRK/FPA"
+  },
+  {
+    "node": "KNOB_FCU_SPEED",
+    "command": null,
+    "command_up": "a380x/xp12/fcu/speed_up",
+    "command_down": "a380x/xp12/fcu/speed_down",
+    "cursor": "rotate_medium",
+    "label": "SPD/MACH - rotate outer edge",
+    "command_push": "a380x/xp12/fcu/speed_push",
+    "command_pull": "a380x/xp12/fcu/speed_pull",
+    "push_label": "SPD/MACH PUSH - managed speed (upper center)",
+    "pull_label": "SPD/MACH PULL - selected speed (lower center)"
+  },
+  {
+    "node": "KNOB_FCU_HDG",
+    "command": null,
+    "command_up": "a380x/xp12/fcu/heading_up",
+    "command_down": "a380x/xp12/fcu/heading_down",
+    "cursor": "rotate_medium",
+    "label": "HDG/TRK - rotate outer edge",
+    "command_push": "a380x/xp12/fcu/heading_push",
+    "command_pull": "a380x/xp12/fcu/heading_pull",
+    "push_label": "HDG/TRK PUSH - managed lateral guidance (upper center)",
+    "pull_label": "HDG/TRK PULL - selected heading/track (lower center)"
+  },
+  {
+    "node": "KNOB_FCU_ALT",
+    "command": null,
+    "command_up": "a380x/xp12/fcu/altitude_up",
+    "command_down": "a380x/xp12/fcu/altitude_down",
+    "cursor": "rotate_large",
+    "label": "ALT - rotate outer edge",
+    "command_push": "a380x/xp12/fcu/altitude_push",
+    "command_pull": "a380x/xp12/fcu/altitude_pull",
+    "push_label": "ALT PUSH - managed climb/descent (upper center)",
+    "pull_label": "ALT PULL - open climb/descent (lower center)"
+  },
+  {
+    "node": "KNOB_FCU_SELECTOR_ALT",
+    "command": "a380x/xp12/fcu/altitude_step_toggle",
+    "cursor": "button",
+    "label": "ALT increment - toggle 100 / 1000 feet"
+  },
+  {
+    "node": "KNOB_FCU_UPDN",
+    "command": null,
+    "command_up": "a380x/xp12/fcu/vertical_speed_up",
+    "command_down": "a380x/xp12/fcu/vertical_speed_down",
+    "cursor": "rotate_medium",
+    "label": "V/S/FPA - rotate outer edge",
+    "command_push": "a380x/xp12/fcu/vertical_speed_push",
+    "command_pull": "a380x/xp12/fcu/vertical_speed_pull",
+    "push_label": "V/S/FPA PUSH - level off (upper center)",
+    "pull_label": "V/S/FPA PULL - selected vertical speed/path (lower center)"
+  },
+  {
+    "node": "PUSH_FCU_AP2",
+    "command": "a380x/xp12/fcu/ap2_toggle",
+    "label": "AP2 - autopilot 2"
+  },
+  {
+    "node": "PUSH_FCU_APPR",
+    "command": "a380x/xp12/fcu/approach_toggle",
+    "label": "APPR - approach arm"
+  },
+  {
+    "node": "PUSH_EFIS_CS_LS",
+    "command": "a380x/xp12/efis/captain/ls_toggle",
+    "label": "CAPT LS - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_WX",
+    "command": "a380x/xp12/efis/captain/wx_toggle",
+    "label": "CAPT WX - weather radar INOP"
+  },
+  {
+    "node": "PUSH_EFIS_CS_TERR",
+    "command": "a380x/xp12/efis/captain/terr_toggle",
+    "label": "CAPT TERR - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_TRAF",
+    "command": "a380x/xp12/efis/captain/traf_toggle",
+    "label": "CAPT TRAF - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_CSTR",
+    "command": "a380x/xp12/efis/captain/cstr_toggle",
+    "label": "CAPT CSTR - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_WPT",
+    "command": "a380x/xp12/efis/captain/wpt_toggle",
+    "label": "CAPT WPT - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_VORD",
+    "command": "a380x/xp12/efis/captain/vord_toggle",
+    "label": "CAPT VORD - VOR/DME station layer"
+  },
+  {
+    "node": "PUSH_EFIS_CS_NDB",
+    "command": "a380x/xp12/efis/captain/ndb_toggle",
+    "label": "CAPT NDB - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_CS_ARPT",
+    "command": "a380x/xp12/efis/captain/arpt_toggle",
+    "label": "CAPT ARPT - toggle display information"
+  },
+  {
+    "node": "KNOB_EFIS_CS_RANGE",
+    "command": null,
+    "command_up": "a380x/xp12/efis/captain/range_up",
+    "command_down": "a380x/xp12/efis/captain/range_down",
+    "cursor": "rotate_medium",
+    "label": "CAPT ND RANGE - rotate range"
+  },
+  {
+    "node": "KNOB_EFIS_CS_ROSE",
+    "command": null,
+    "command_up": "a380x/xp12/efis/captain/mode_up",
+    "command_down": "a380x/xp12/efis/captain/mode_down",
+    "cursor": "rotate_medium",
+    "label": "CAPT ND MODE - rotate display mode"
+  },
+  {
+    "node": "KNOB_EFIS_CS_BARO1",
+    "command": null,
+    "command_up": "a380x/xp12/efis/captain/baro_up",
+    "command_down": "a380x/xp12/efis/captain/baro_down",
+    "cursor": "rotate_small",
+    "label": "CAPT BARO - rotate pressure setting",
+    "command_push": "a380x/xp12/efis/captain/baro_std",
+    "command_pull": "a380x/xp12/efis/captain/baro_qnh",
+    "push_label": "CAPT BARO PUSH - standard (upper center)",
+    "pull_label": "CAPT BARO PULL - QNH preset (lower center)"
+  },
+  {
+    "node": "PUSH_EFIS_FO_LS",
+    "command": "a380x/xp12/efis/first_officer/ls_toggle",
+    "label": "FO LS - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_WX",
+    "command": "a380x/xp12/efis/first_officer/wx_toggle",
+    "label": "FO WX - weather radar INOP"
+  },
+  {
+    "node": "PUSH_EFIS_FO_TERR",
+    "command": "a380x/xp12/efis/first_officer/terr_toggle",
+    "label": "FO TERR - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_TRAF",
+    "command": "a380x/xp12/efis/first_officer/traf_toggle",
+    "label": "FO TRAF - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_CSTR",
+    "command": "a380x/xp12/efis/first_officer/cstr_toggle",
+    "label": "FO CSTR - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_WPT",
+    "command": "a380x/xp12/efis/first_officer/wpt_toggle",
+    "label": "FO WPT - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_VORD",
+    "command": "a380x/xp12/efis/first_officer/vord_toggle",
+    "label": "FO VORD - VOR/DME station layer"
+  },
+  {
+    "node": "PUSH_EFIS_FO_NDB",
+    "command": "a380x/xp12/efis/first_officer/ndb_toggle",
+    "label": "FO NDB - toggle display information"
+  },
+  {
+    "node": "PUSH_EFIS_FO_ARPT",
+    "command": "a380x/xp12/efis/first_officer/arpt_toggle",
+    "label": "FO ARPT - toggle display information"
+  },
+  {
+    "node": "KNOB_EFIS_FO_RANGE",
+    "command": null,
+    "command_up": "a380x/xp12/efis/first_officer/range_up",
+    "command_down": "a380x/xp12/efis/first_officer/range_down",
+    "cursor": "rotate_medium",
+    "label": "FO ND RANGE - rotate range"
+  },
+  {
+    "node": "KNOB_EFIS_FO_ROSE",
+    "command": null,
+    "command_up": "a380x/xp12/efis/first_officer/mode_up",
+    "command_down": "a380x/xp12/efis/first_officer/mode_down",
+    "cursor": "rotate_medium",
+    "label": "FO ND MODE - rotate display mode"
+  },
+  {
+    "node": "KNOB_EFIS_FO_BARO1",
+    "command": null,
+    "command_up": "a380x/xp12/efis/first_officer/baro_up",
+    "command_down": "a380x/xp12/efis/first_officer/baro_down",
+    "cursor": "rotate_small",
+    "label": "FO BARO - rotate pressure setting",
+    "command_push": "a380x/xp12/efis/first_officer/baro_std",
+    "command_pull": "a380x/xp12/efis/first_officer/baro_qnh",
+    "push_label": "FO BARO PUSH - standard (upper center)",
+    "pull_label": "FO BARO PULL - QNH preset (lower center)"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_BAT1",
+    "command": "sim/electrical/battery_1_toggle",
+    "label": "BAT 1 - native battery toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_BAT2",
+    "command": "sim/electrical/battery_2_toggle",
+    "label": "BAT 2 - native battery toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_GEN1",
+    "command": "sim/electrical/generator_1_toggle",
+    "label": "GEN 1 - native generator toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_GEN2",
+    "command": "sim/electrical/generator_2_toggle",
+    "label": "GEN 2 - native generator toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_GEN3",
+    "command": "sim/electrical/generator_3_toggle",
+    "label": "GEN 3 - native generator toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ELEC_GEN4",
+    "command": "sim/electrical/generator_4_toggle",
+    "label": "GEN 4 - native generator toggle"
+  },
+  {
+    "node": "PUSH_OVHD_APU_MASTERSW",
+    "command": null,
+    "dataref": "sim/cockpit2/electrical/APU_starter_switch",
+    "toggle_values": [
+      0,
+      1
+    ],
+    "cursor": "button",
+    "label": "APU MASTER - OFF / ON"
+  },
+  {
+    "node": "PUSH_OVHD_APU_START",
+    "command": "sim/electrical/APU_start",
+    "label": "APU START - start native APU"
+  },
+  {
+    "node": "PUSH_OVHD_ANTIICE_ENG1",
+    "command": "sim/ice/inlet_eai0_tog",
+    "label": "ENG 1 ANTI ICE - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ANTIICE_ENG2",
+    "command": "sim/ice/inlet_eai1_tog",
+    "label": "ENG 2 ANTI ICE - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ANTIICE_ENG3",
+    "command": "sim/ice/inlet_eai2_tog",
+    "label": "ENG 3 ANTI ICE - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ANTIICE_ENG4",
+    "command": "sim/ice/inlet_eai3_tog",
+    "label": "ENG 4 ANTI ICE - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_ANTIICE_WING",
+    "command": "sim/ice/wing_tai_tog",
+    "label": "WING ANTI ICE - native bleed-air toggle"
+  },
+  {
+    "node": "PUSH_OVHD_PROBESWINDOW",
+    "command": "sim/ice/window_heat_tog",
+    "label": "PROBES/WINDOW HEAT - native window-heat toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_ENG1BLEED",
+    "command": "sim/bleed_air/engine_1_toggle",
+    "label": "ENG 1 BLEED - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_ENG2BLEED",
+    "command": "sim/bleed_air/engine_2_toggle",
+    "label": "ENG 2 BLEED - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_ENG3BLEED",
+    "command": "sim/bleed_air/engine_3_toggle",
+    "label": "ENG 3 BLEED - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_ENG4BLEED",
+    "command": "sim/bleed_air/engine_4_toggle",
+    "label": "ENG 4 BLEED - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_PACK1",
+    "command": "sim/bleed_air/pack_left_toggle",
+    "label": "PACK 1 - native left-pack toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_PACK2",
+    "command": "sim/bleed_air/pack_right_toggle",
+    "label": "PACK 2 - native right-pack toggle"
+  },
+  {
+    "node": "PUSH_OVHD_AIRCOND_APUBLEED",
+    "command": "sim/bleed_air/apu_toggle",
+    "label": "APU BLEED - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_FUEL_FEEDTK1_MAIN",
+    "command": "sim/fuel/fuel_pump_1_tog",
+    "label": "FEED 1 MAIN PUMP - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_FUEL_FEEDTK2_MAIN",
+    "command": "sim/fuel/fuel_pump_2_tog",
+    "label": "FEED 2 MAIN PUMP - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_FUEL_FEEDTK3_MAIN",
+    "command": "sim/fuel/fuel_pump_3_tog",
+    "label": "FEED 3 MAIN PUMP - native toggle"
+  },
+  {
+    "node": "PUSH_OVHD_FUEL_FEEDTK4_MAIN",
+    "command": "sim/fuel/fuel_pump_4_tog",
+    "label": "FEED 4 MAIN PUMP - native toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_EXTLT_NAVLOGO",
+    "command": "sim/lights/nav_lights_toggle",
+    "label": "NAV - native navigation-lights toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_EXTLT_BEACON",
+    "command": "sim/lights/beacon_lights_toggle",
+    "label": "BEACON - native beacon-lights toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_EXTLT_STROBE",
+    "command": "sim/lights/strobe_lights_toggle",
+    "label": "STROBE - native strobe-lights toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_EXTLT_NOSE",
+    "command": "sim/lights/taxi_lights_toggle",
+    "label": "NOSE - native taxi-lights toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_EXTLT_LANDL",
+    "command": "sim/lights/landing_lights_toggle",
+    "label": "LANDING LIGHTS - native toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_INTLT_SEATBELT",
+    "command": "sim/systems/seatbelt_sign_toggle",
+    "label": "SEAT BELTS - passenger sign toggle"
+  },
+  {
+    "node": "SWITCH_OVHD_INTLT_NOSMOKING",
+    "command": "sim/systems/no_smoking_toggle",
+    "label": "NO SMOKING - passenger sign toggle"
+  },
+  {
+    "node": "SWITCH_ENGINES_ENG1",
+    "command": null,
+    "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[0]",
+    "toggle_values": [
+      0,
+      1
+    ],
+    "cursor": "button",
+    "label": "ENG 1 MASTER - OFF / RUN"
+  },
+  {
+    "node": "SWITCH_ENGINES_ENG2",
+    "command": null,
+    "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[1]",
+    "toggle_values": [
+      0,
+      1
+    ],
+    "cursor": "button",
+    "label": "ENG 2 MASTER - OFF / RUN"
+  },
+  {
+    "node": "SWITCH_ENGINES_ENG3",
+    "command": null,
+    "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[2]",
+    "toggle_values": [
+      0,
+      1
+    ],
+    "cursor": "button",
+    "label": "ENG 3 MASTER - OFF / RUN"
+  },
+  {
+    "node": "SWITCH_ENGINES_ENG4",
+    "command": null,
+    "dataref": "sim/cockpit2/engine/actuators/mixture_ratio[3]",
+    "toggle_values": [
+      0,
+      1
+    ],
+    "cursor": "button",
+    "label": "ENG 4 MASTER - OFF / RUN"
+  },
+  {
+    "node": "LEVER_THROTTLE_1_CLICK",
+    "command": null,
+    "label": "THRUST LEVER 1 - drag idle to TOGA",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_ratio[0]",
+    "axis": [
+      0.0,
+      -0.002,
+      -0.195
+    ],
+    "value_min": 0.0,
+    "value_max": 1.0
+  },
+  {
+    "node": "LEVER_THROTTLE_2_CLICK",
+    "command": null,
+    "label": "THRUST LEVER 2 - drag idle to TOGA",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_ratio[1]",
+    "axis": [
+      0.0,
+      -0.002,
+      -0.195
+    ],
+    "value_min": 0.0,
+    "value_max": 1.0
+  },
+  {
+    "node": "LEVER_THROTTLE_3_CLICK",
+    "command": null,
+    "label": "THRUST LEVER 3 - drag idle to TOGA",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_ratio[2]",
+    "axis": [
+      0.0,
+      -0.002,
+      -0.195
+    ],
+    "value_min": 0.0,
+    "value_max": 1.0
+  },
+  {
+    "node": "LEVER_THROTTLE_4_CLICK",
+    "command": null,
+    "label": "THRUST LEVER 4 - drag idle to TOGA",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_ratio[3]",
+    "axis": [
+      0.0,
+      -0.002,
+      -0.195
+    ],
+    "value_min": 0.0,
+    "value_max": 1.0
+  },
+  {
+    "node": "LEVER_THROTTLE_2_REVERSE",
+    "command": null,
+    "label": "REVERSE 2 - drag to deploy",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_jet_rev_ratio[1]",
+    "axis": [
+      0.0,
+      0.0,
+      0.12
+    ],
+    "value_min": 0.0,
+    "value_max": -1.0
+  },
+  {
+    "node": "LEVER_THROTTLE_3_REVERSE",
+    "command": null,
+    "label": "REVERSE 3 - drag to deploy",
+    "dataref": "sim/cockpit2/engine/actuators/throttle_jet_rev_ratio[2]",
+    "axis": [
+      0.0,
+      0.0,
+      0.12
+    ],
+    "value_min": 0.0,
+    "value_max": -1.0
+  },
+  {
+    "node": "ATHR_DISCONNECT_ENG1",
+    "command": "a380x/xp12/fcu/athr_disconnect",
+    "label": "A/THR DISCONNECT - left thrust lever"
+  },
+  {
+    "node": "ATHR_DISCONNECT_ENG2",
+    "command": "a380x/xp12/fcu/athr_disconnect",
+    "label": "A/THR DISCONNECT - right thrust lever"
+  },
+  {
+    "node": "SWITCH_DOOR_LOCK",
+    "command": null,
+    "command_up": "a380x/xp12/cockpit_door/unlock",
+    "command_down": "a380x/xp12/cockpit_door/lock",
+    "switch_axis": "up_down",
+    "rest_rotation": [
+      0.0039186981,
+      0.0,
+      0.0,
+      0.999992311
+    ],
+    "cursor": "up_down",
+    "label": "CKPT DOOR - UNLOCK / NORM / LOCK"
+  },
+  {
+    "node": "COCKPITDOOR_OPEN_CLICK",
+    "command": "sim/flight_controls/door_toggle_17",
+    "label": "COCKPIT DOOR - open / close"
+  },
+  {
+    "node": "PUSH_EFIS_CS_TAXI",
+    "command": "a380x/xp12/efis/captain/taxi_toggle",
+    "label": "CAPT TAXI - ETACS unavailable"
+  },
+  {
+    "node": "PUSH_EFIS_CS_VV",
+    "command": "a380x/xp12/efis/captain/vv_toggle",
+    "label": "CAPT VV - velocity vector"
+  },
+  {
+    "node": "PUSH_EFIS_CS_VOR",
+    "command": "a380x/xp12/efis/captain/vor1_toggle",
+    "label": "CAPT VOR1 - tuned navigation source"
+  },
+  {
+    "node": "PUSH_EFIS_CS_ADF",
+    "command": "a380x/xp12/efis/captain/vor2_toggle",
+    "label": "CAPT VOR2 - tuned navigation source"
+  },
+  {
+    "node": "KNOB_EFIS_CS_BARO2",
+    "command": "a380x/xp12/efis/captain/baro_unit_toggle",
+    "label": "CAPT BARO outer selector - in Hg / hPa",
+    "command_cursor": "button"
+  },
+  {
+    "node": "PUSH_EFIS_FO_TAXI",
+    "command": "a380x/xp12/efis/first_officer/taxi_toggle",
+    "label": "FO TAXI - ETACS unavailable"
+  },
+  {
+    "node": "PUSH_EFIS_FO_VV",
+    "command": "a380x/xp12/efis/first_officer/vv_toggle",
+    "label": "FO VV - velocity vector"
+  },
+  {
+    "node": "PUSH_EFIS_FO_VOR",
+    "command": "a380x/xp12/efis/first_officer/vor1_toggle",
+    "label": "FO VOR1 - tuned navigation source"
+  },
+  {
+    "node": "PUSH_EFIS_FO_ADF",
+    "command": "a380x/xp12/efis/first_officer/vor2_toggle",
+    "label": "FO VOR2 - tuned navigation source"
+  },
+  {
+    "node": "KNOB_EFIS_FO_BARO2",
+    "command": "a380x/xp12/efis/first_officer/baro_unit_toggle",
+    "label": "FO BARO outer selector - in Hg / hPa",
+    "command_cursor": "button"
+  },
+  {
+    "node": "KNOB_OVHD_ADIRS_1",
+    "command": null,
+    "command_up": "a380x/xp12/adirs/ir1_mode_up",
+    "command_down": "a380x/xp12/adirs/ir1_mode_down",
+    "cursor": "rotate_medium",
+    "label": "IR 1 - OFF / NAV / ATT"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_IR1",
+    "command": "a380x/xp12/adirs/ir1_toggle",
+    "command_cursor": "button",
+    "label": "IR 1 - ON / OFF"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_1",
+    "command": "a380x/xp12/adirs/adr1_toggle",
+    "command_cursor": "button",
+    "label": "ADR 1 - ON / OFF"
+  },
+  {
+    "node": "KNOB_OVHD_ADIRS_2",
+    "command": null,
+    "command_up": "a380x/xp12/adirs/ir2_mode_up",
+    "command_down": "a380x/xp12/adirs/ir2_mode_down",
+    "cursor": "rotate_medium",
+    "label": "IR 2 - OFF / NAV / ATT"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_IR2",
+    "command": "a380x/xp12/adirs/ir2_toggle",
+    "command_cursor": "button",
+    "label": "IR 2 - ON / OFF"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_2",
+    "command": "a380x/xp12/adirs/adr2_toggle",
+    "command_cursor": "button",
+    "label": "ADR 2 - ON / OFF"
+  },
+  {
+    "node": "KNOB_OVHD_ADIRS_3",
+    "command": null,
+    "command_up": "a380x/xp12/adirs/ir3_mode_up",
+    "command_down": "a380x/xp12/adirs/ir3_mode_down",
+    "cursor": "rotate_medium",
+    "label": "IR 3 - OFF / NAV / ATT"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_IR3",
+    "command": "a380x/xp12/adirs/ir3_toggle",
+    "command_cursor": "button",
+    "label": "IR 3 - ON / OFF"
+  },
+  {
+    "node": "PUSH_OVHD_ADIRS_3",
+    "command": "a380x/xp12/adirs/adr3_toggle",
+    "command_cursor": "button",
+    "label": "ADR 3 - ON / OFF"
+  },
+  {
+    "node": "PUSH_KCCUL_0",
+    "command": "a380x/xp12/kccu/captain/0",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 0"
+  },
+  {
+    "node": "PUSH_KCCUL_1",
+    "command": "a380x/xp12/kccu/captain/1",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 1"
+  },
+  {
+    "node": "PUSH_KCCUL_2",
+    "command": "a380x/xp12/kccu/captain/2",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 2"
+  },
+  {
+    "node": "PUSH_KCCUL_3",
+    "command": "a380x/xp12/kccu/captain/3",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 3"
+  },
+  {
+    "node": "PUSH_KCCUL_4",
+    "command": "a380x/xp12/kccu/captain/4",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 4"
+  },
+  {
+    "node": "PUSH_KCCUL_5",
+    "command": "a380x/xp12/kccu/captain/5",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 5"
+  },
+  {
+    "node": "PUSH_KCCUL_6",
+    "command": "a380x/xp12/kccu/captain/6",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 6"
+  },
+  {
+    "node": "PUSH_KCCUL_7",
+    "command": "a380x/xp12/kccu/captain/7",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 7"
+  },
+  {
+    "node": "PUSH_KCCUL_8",
+    "command": "a380x/xp12/kccu/captain/8",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 8"
+  },
+  {
+    "node": "PUSH_KCCUL_9",
+    "command": "a380x/xp12/kccu/captain/9",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - 9"
+  },
+  {
+    "node": "PUSH_KCCUL_A",
+    "command": "a380x/xp12/kccu/captain/a",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - A"
+  },
+  {
+    "node": "PUSH_KCCUL_B",
+    "command": "a380x/xp12/kccu/captain/b",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - B"
+  },
+  {
+    "node": "PUSH_KCCUL_C",
+    "command": "a380x/xp12/kccu/captain/c",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - C"
+  },
+  {
+    "node": "PUSH_KCCUL_D",
+    "command": "a380x/xp12/kccu/captain/d",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - D"
+  },
+  {
+    "node": "PUSH_KCCUL_E",
+    "command": "a380x/xp12/kccu/captain/e",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - E"
+  },
+  {
+    "node": "PUSH_KCCUL_F",
+    "command": "a380x/xp12/kccu/captain/f",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - F"
+  },
+  {
+    "node": "PUSH_KCCUL_G",
+    "command": "a380x/xp12/kccu/captain/g",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - G"
+  },
+  {
+    "node": "PUSH_KCCUL_H",
+    "command": "a380x/xp12/kccu/captain/h",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - H"
+  },
+  {
+    "node": "PUSH_KCCUL_I",
+    "command": "a380x/xp12/kccu/captain/i",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - I"
+  },
+  {
+    "node": "PUSH_KCCUL_J",
+    "command": "a380x/xp12/kccu/captain/j",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - J"
+  },
+  {
+    "node": "PUSH_KCCUL_K",
+    "command": "a380x/xp12/kccu/captain/k",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - K"
+  },
+  {
+    "node": "PUSH_KCCUL_L",
+    "command": "a380x/xp12/kccu/captain/l",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - L"
+  },
+  {
+    "node": "PUSH_KCCUL_M",
+    "command": "a380x/xp12/kccu/captain/m",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - M"
+  },
+  {
+    "node": "PUSH_KCCUL_N",
+    "command": "a380x/xp12/kccu/captain/n",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - N"
+  },
+  {
+    "node": "PUSH_KCCUL_O",
+    "command": "a380x/xp12/kccu/captain/o",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - O"
+  },
+  {
+    "node": "PUSH_KCCUL_P",
+    "command": "a380x/xp12/kccu/captain/p",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - P"
+  },
+  {
+    "node": "PUSH_KCCUL_Q",
+    "command": "a380x/xp12/kccu/captain/q",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - Q"
+  },
+  {
+    "node": "PUSH_KCCUL_R",
+    "command": "a380x/xp12/kccu/captain/r",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - R"
+  },
+  {
+    "node": "PUSH_KCCUL_S",
+    "command": "a380x/xp12/kccu/captain/s",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - S"
+  },
+  {
+    "node": "PUSH_KCCUL_T",
+    "command": "a380x/xp12/kccu/captain/t",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - T"
+  },
+  {
+    "node": "PUSH_KCCUL_U",
+    "command": "a380x/xp12/kccu/captain/u",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - U"
+  },
+  {
+    "node": "PUSH_KCCUL_V",
+    "command": "a380x/xp12/kccu/captain/v",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - V"
+  },
+  {
+    "node": "PUSH_KCCUL_W",
+    "command": "a380x/xp12/kccu/captain/w",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - W"
+  },
+  {
+    "node": "PUSH_KCCUL_X",
+    "command": "a380x/xp12/kccu/captain/x",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - X"
+  },
+  {
+    "node": "PUSH_KCCUL_Y",
+    "command": "a380x/xp12/kccu/captain/y",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - Y"
+  },
+  {
+    "node": "PUSH_KCCUL_Z",
+    "command": "a380x/xp12/kccu/captain/z",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - Z"
+  },
+  {
+    "node": "PUSH_KCCUL_DOT",
+    "command": "a380x/xp12/kccu/captain/dot",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - . (decimal point)"
+  },
+  {
+    "node": "PUSH_KCCUL_PLUSMINUS",
+    "command": "a380x/xp12/kccu/captain/plusminus",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - +/- (sign)"
+  },
+  {
+    "node": "PUSH_KCCUL_ENT",
+    "command": "a380x/xp12/kccu/captain/ent",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - ENT (enter)"
+  },
+  {
+    "node": "PUSH_KCCUL_BACKSPACE",
+    "command": "a380x/xp12/kccu/captain/backspace",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - BACKSPACE"
+  },
+  {
+    "node": "PUSH_KCCUL_SP",
+    "command": "a380x/xp12/kccu/captain/sp",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - SP (space)"
+  },
+  {
+    "node": "PUSH_KCCUL_SLASH",
+    "command": "a380x/xp12/kccu/captain/slash",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - / (slash)"
+  },
+  {
+    "node": "PUSH_KCCUL_ESC",
+    "command": "a380x/xp12/kccu/captain/esc",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - ESC (keyboard escape)"
+  },
+  {
+    "node": "PUSH_KCCUL_ESC2",
+    "command": "a380x/xp12/kccu/captain/esc2",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - ESC (cursor-control escape)"
+  },
+  {
+    "node": "PUSH_KCCUL_UP",
+    "command": "a380x/xp12/kccu/captain/up",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - cursor UP"
+  },
+  {
+    "node": "PUSH_KCCUL_DOWN",
+    "command": "a380x/xp12/kccu/captain/down",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - cursor DOWN"
+  },
+  {
+    "node": "PUSH_KCCUL_LEFT",
+    "command": "a380x/xp12/kccu/captain/left",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - cursor LEFT"
+  },
+  {
+    "node": "PUSH_KCCUL_RIGHT",
+    "command": "a380x/xp12/kccu/captain/right",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - cursor RIGHT"
+  },
+  {
+    "node": "PUSH_KCCUL_DIR",
+    "command": "a380x/xp12/kccu/captain/dir",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - DIR (F-PLN direct to)"
+  },
+  {
+    "node": "PUSH_KCCUL_PERF",
+    "command": "a380x/xp12/kccu/captain/perf",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - PERF"
+  },
+  {
+    "node": "PUSH_KCCUL_INIT",
+    "command": "a380x/xp12/kccu/captain/init",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - INIT"
+  },
+  {
+    "node": "PUSH_KCCUL_NAVAID",
+    "command": "a380x/xp12/kccu/captain/navaid",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - NAVAID (position navaids)"
+  },
+  {
+    "node": "PUSH_KCCUL_MAILBOX",
+    "command": "a380x/xp12/kccu/captain/mailbox",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - MAILBOX (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUL_FPLN",
+    "command": "a380x/xp12/kccu/captain/fpln",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - F-PLN"
+  },
+  {
+    "node": "PUSH_KCCUL_DEST",
+    "command": "a380x/xp12/kccu/captain/dest",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - DEST"
+  },
+  {
+    "node": "PUSH_KCCUL_SECINDEX",
+    "command": "a380x/xp12/kccu/captain/secindex",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - SEC INDEX"
+  },
+  {
+    "node": "PUSH_KCCUL_SURV",
+    "command": "a380x/xp12/kccu/captain/surv",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - SURV"
+  },
+  {
+    "node": "PUSH_KCCUL_ATCCOM",
+    "command": "a380x/xp12/kccu/captain/atccom",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - ATC COM"
+  },
+  {
+    "node": "PUSH_KCCUL_ND",
+    "command": "a380x/xp12/kccu/captain/nd",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - ND (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUL_KBD",
+    "command": "a380x/xp12/kccu/captain/kbd",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - KBD (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUL_CLRINFO",
+    "command": "a380x/xp12/kccu/captain/clrinfo",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - CLR INFO (clear latest message)"
+  },
+  {
+    "node": "PUSH_KCCUL_REWIND",
+    "command": "a380x/xp12/kccu/captain/rewind",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - REWIND (INOP: cursor to left display)"
+  },
+  {
+    "node": "PUSH_KCCUL_FORWARD",
+    "command": "a380x/xp12/kccu/captain/forward",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - FORWARD (INOP: cursor to right display)"
+  },
+  {
+    "node": "PUSH_KCCUL_WHEEL",
+    "command": null,
+    "command_up": "a380x/xp12/kccu/captain/wheel_up",
+    "command_down": "a380x/xp12/kccu/captain/wheel_down",
+    "cursor": "rotate_small",
+    "label": "CAPT KCCU - scroll wheel"
+  },
+  {
+    "node": "PUSH_KCCUL_LBUTTON",
+    "command": "a380x/xp12/kccu/captain/click",
+    "command_cursor": "button",
+    "label": "CAPT KCCU - cursor select (click at MFD cursor)"
+  },
+  {
+    "node": "PUSH_KCCUL_BALL",
+    "command": "a380x/xp12/mfd/captain/popup",
+    "command_cursor": "hand",
+    "label": "CAPT KCCU trackball - MFD pop-up (point at the MFD to move the cursor)"
+  },
+  {
+    "node": "PUSH_KCCUL_KBD_ON_OFF",
+    "command": "a380x/xp12/kccu/captain/kbd_switch_toggle",
+    "command_cursor": "button",
+    "label": "CAPT KCCU KBD switch - ON / OFF"
+  },
+  {
+    "node": "PUSH_KCCUL_CCD_ON_OFF",
+    "command": "a380x/xp12/kccu/captain/ccd_switch_toggle",
+    "command_cursor": "button",
+    "label": "CAPT KCCU CCD switch - ON / OFF"
+  },
+  {
+    "node": "PUSH_KCCUR_0",
+    "command": "a380x/xp12/kccu/first_officer/0",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 0"
+  },
+  {
+    "node": "PUSH_KCCUR_1",
+    "command": "a380x/xp12/kccu/first_officer/1",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 1"
+  },
+  {
+    "node": "PUSH_KCCUR_2",
+    "command": "a380x/xp12/kccu/first_officer/2",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 2"
+  },
+  {
+    "node": "PUSH_KCCUR_3",
+    "command": "a380x/xp12/kccu/first_officer/3",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 3"
+  },
+  {
+    "node": "PUSH_KCCUR_4",
+    "command": "a380x/xp12/kccu/first_officer/4",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 4"
+  },
+  {
+    "node": "PUSH_KCCUR_5",
+    "command": "a380x/xp12/kccu/first_officer/5",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 5"
+  },
+  {
+    "node": "PUSH_KCCUR_6",
+    "command": "a380x/xp12/kccu/first_officer/6",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 6"
+  },
+  {
+    "node": "PUSH_KCCUR_7",
+    "command": "a380x/xp12/kccu/first_officer/7",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 7"
+  },
+  {
+    "node": "PUSH_KCCUR_8",
+    "command": "a380x/xp12/kccu/first_officer/8",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 8"
+  },
+  {
+    "node": "PUSH_KCCUR_9",
+    "command": "a380x/xp12/kccu/first_officer/9",
+    "command_cursor": "button",
+    "label": "F/O KCCU - 9"
+  },
+  {
+    "node": "PUSH_KCCUR_A",
+    "command": "a380x/xp12/kccu/first_officer/a",
+    "command_cursor": "button",
+    "label": "F/O KCCU - A"
+  },
+  {
+    "node": "PUSH_KCCUR_B",
+    "command": "a380x/xp12/kccu/first_officer/b",
+    "command_cursor": "button",
+    "label": "F/O KCCU - B"
+  },
+  {
+    "node": "PUSH_KCCUR_C",
+    "command": "a380x/xp12/kccu/first_officer/c",
+    "command_cursor": "button",
+    "label": "F/O KCCU - C"
+  },
+  {
+    "node": "PUSH_KCCUR_D",
+    "command": "a380x/xp12/kccu/first_officer/d",
+    "command_cursor": "button",
+    "label": "F/O KCCU - D"
+  },
+  {
+    "node": "PUSH_KCCUR_E",
+    "command": "a380x/xp12/kccu/first_officer/e",
+    "command_cursor": "button",
+    "label": "F/O KCCU - E"
+  },
+  {
+    "node": "PUSH_KCCUR_F",
+    "command": "a380x/xp12/kccu/first_officer/f",
+    "command_cursor": "button",
+    "label": "F/O KCCU - F"
+  },
+  {
+    "node": "PUSH_KCCUR_G",
+    "command": "a380x/xp12/kccu/first_officer/g",
+    "command_cursor": "button",
+    "label": "F/O KCCU - G"
+  },
+  {
+    "node": "PUSH_KCCUR_H",
+    "command": "a380x/xp12/kccu/first_officer/h",
+    "command_cursor": "button",
+    "label": "F/O KCCU - H"
+  },
+  {
+    "node": "PUSH_KCCUR_I",
+    "command": "a380x/xp12/kccu/first_officer/i",
+    "command_cursor": "button",
+    "label": "F/O KCCU - I"
+  },
+  {
+    "node": "PUSH_KCCUR_J",
+    "command": "a380x/xp12/kccu/first_officer/j",
+    "command_cursor": "button",
+    "label": "F/O KCCU - J"
+  },
+  {
+    "node": "PUSH_KCCUR_K",
+    "command": "a380x/xp12/kccu/first_officer/k",
+    "command_cursor": "button",
+    "label": "F/O KCCU - K"
+  },
+  {
+    "node": "PUSH_KCCUR_L",
+    "command": "a380x/xp12/kccu/first_officer/l",
+    "command_cursor": "button",
+    "label": "F/O KCCU - L"
+  },
+  {
+    "node": "PUSH_KCCUR_M",
+    "command": "a380x/xp12/kccu/first_officer/m",
+    "command_cursor": "button",
+    "label": "F/O KCCU - M"
+  },
+  {
+    "node": "PUSH_KCCUR_N",
+    "command": "a380x/xp12/kccu/first_officer/n",
+    "command_cursor": "button",
+    "label": "F/O KCCU - N"
+  },
+  {
+    "node": "PUSH_KCCUR_O",
+    "command": "a380x/xp12/kccu/first_officer/o",
+    "command_cursor": "button",
+    "label": "F/O KCCU - O"
+  },
+  {
+    "node": "PUSH_KCCUR_P",
+    "command": "a380x/xp12/kccu/first_officer/p",
+    "command_cursor": "button",
+    "label": "F/O KCCU - P"
+  },
+  {
+    "node": "PUSH_KCCUR_Q",
+    "command": "a380x/xp12/kccu/first_officer/q",
+    "command_cursor": "button",
+    "label": "F/O KCCU - Q"
+  },
+  {
+    "node": "PUSH_KCCUR_R",
+    "command": "a380x/xp12/kccu/first_officer/r",
+    "command_cursor": "button",
+    "label": "F/O KCCU - R"
+  },
+  {
+    "node": "PUSH_KCCUR_S",
+    "command": "a380x/xp12/kccu/first_officer/s",
+    "command_cursor": "button",
+    "label": "F/O KCCU - S"
+  },
+  {
+    "node": "PUSH_KCCUR_T",
+    "command": "a380x/xp12/kccu/first_officer/t",
+    "command_cursor": "button",
+    "label": "F/O KCCU - T"
+  },
+  {
+    "node": "PUSH_KCCUR_U",
+    "command": "a380x/xp12/kccu/first_officer/u",
+    "command_cursor": "button",
+    "label": "F/O KCCU - U"
+  },
+  {
+    "node": "PUSH_KCCUR_V",
+    "command": "a380x/xp12/kccu/first_officer/v",
+    "command_cursor": "button",
+    "label": "F/O KCCU - V"
+  },
+  {
+    "node": "PUSH_KCCUR_W",
+    "command": "a380x/xp12/kccu/first_officer/w",
+    "command_cursor": "button",
+    "label": "F/O KCCU - W"
+  },
+  {
+    "node": "PUSH_KCCUR_X",
+    "command": "a380x/xp12/kccu/first_officer/x",
+    "command_cursor": "button",
+    "label": "F/O KCCU - X"
+  },
+  {
+    "node": "PUSH_KCCUR_Y",
+    "command": "a380x/xp12/kccu/first_officer/y",
+    "command_cursor": "button",
+    "label": "F/O KCCU - Y"
+  },
+  {
+    "node": "PUSH_KCCUR_Z",
+    "command": "a380x/xp12/kccu/first_officer/z",
+    "command_cursor": "button",
+    "label": "F/O KCCU - Z"
+  },
+  {
+    "node": "PUSH_KCCUR_DOT",
+    "command": "a380x/xp12/kccu/first_officer/dot",
+    "command_cursor": "button",
+    "label": "F/O KCCU - . (decimal point)"
+  },
+  {
+    "node": "PUSH_KCCUR_PLUSMINUS",
+    "command": "a380x/xp12/kccu/first_officer/plusminus",
+    "command_cursor": "button",
+    "label": "F/O KCCU - +/- (sign)"
+  },
+  {
+    "node": "PUSH_KCCUR_ENT",
+    "command": "a380x/xp12/kccu/first_officer/ent",
+    "command_cursor": "button",
+    "label": "F/O KCCU - ENT (enter)"
+  },
+  {
+    "node": "PUSH_KCCUR_BACKSPACE",
+    "command": "a380x/xp12/kccu/first_officer/backspace",
+    "command_cursor": "button",
+    "label": "F/O KCCU - BACKSPACE"
+  },
+  {
+    "node": "PUSH_KCCUR_SP",
+    "command": "a380x/xp12/kccu/first_officer/sp",
+    "command_cursor": "button",
+    "label": "F/O KCCU - SP (space)"
+  },
+  {
+    "node": "PUSH_KCCUR_SLASH",
+    "command": "a380x/xp12/kccu/first_officer/slash",
+    "command_cursor": "button",
+    "label": "F/O KCCU - / (slash)"
+  },
+  {
+    "node": "PUSH_KCCUR_ESC",
+    "command": "a380x/xp12/kccu/first_officer/esc",
+    "command_cursor": "button",
+    "label": "F/O KCCU - ESC (keyboard escape)"
+  },
+  {
+    "node": "PUSH_KCCUR_ESC2",
+    "command": "a380x/xp12/kccu/first_officer/esc2",
+    "command_cursor": "button",
+    "label": "F/O KCCU - ESC (cursor-control escape)"
+  },
+  {
+    "node": "PUSH_KCCUR_UP",
+    "command": "a380x/xp12/kccu/first_officer/up",
+    "command_cursor": "button",
+    "label": "F/O KCCU - cursor UP"
+  },
+  {
+    "node": "PUSH_KCCUR_DOWN",
+    "command": "a380x/xp12/kccu/first_officer/down",
+    "command_cursor": "button",
+    "label": "F/O KCCU - cursor DOWN"
+  },
+  {
+    "node": "PUSH_KCCUR_LEFT",
+    "command": "a380x/xp12/kccu/first_officer/left",
+    "command_cursor": "button",
+    "label": "F/O KCCU - cursor LEFT"
+  },
+  {
+    "node": "PUSH_KCCUR_RIGHT",
+    "command": "a380x/xp12/kccu/first_officer/right",
+    "command_cursor": "button",
+    "label": "F/O KCCU - cursor RIGHT"
+  },
+  {
+    "node": "PUSH_KCCUR_DIR",
+    "command": "a380x/xp12/kccu/first_officer/dir",
+    "command_cursor": "button",
+    "label": "F/O KCCU - DIR (F-PLN direct to)"
+  },
+  {
+    "node": "PUSH_KCCUR_PERF",
+    "command": "a380x/xp12/kccu/first_officer/perf",
+    "command_cursor": "button",
+    "label": "F/O KCCU - PERF"
+  },
+  {
+    "node": "PUSH_KCCUR_INIT",
+    "command": "a380x/xp12/kccu/first_officer/init",
+    "command_cursor": "button",
+    "label": "F/O KCCU - INIT"
+  },
+  {
+    "node": "PUSH_KCCUR_NAVAID",
+    "command": "a380x/xp12/kccu/first_officer/navaid",
+    "command_cursor": "button",
+    "label": "F/O KCCU - NAVAID (position navaids)"
+  },
+  {
+    "node": "PUSH_KCCUR_MAILBOX",
+    "command": "a380x/xp12/kccu/first_officer/mailbox",
+    "command_cursor": "button",
+    "label": "F/O KCCU - MAILBOX (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUR_FPLN",
+    "command": "a380x/xp12/kccu/first_officer/fpln",
+    "command_cursor": "button",
+    "label": "F/O KCCU - F-PLN"
+  },
+  {
+    "node": "PUSH_KCCUR_DEST",
+    "command": "a380x/xp12/kccu/first_officer/dest",
+    "command_cursor": "button",
+    "label": "F/O KCCU - DEST"
+  },
+  {
+    "node": "PUSH_KCCUR_SECINDEX",
+    "command": "a380x/xp12/kccu/first_officer/secindex",
+    "command_cursor": "button",
+    "label": "F/O KCCU - SEC INDEX"
+  },
+  {
+    "node": "PUSH_KCCUR_SURV",
+    "command": "a380x/xp12/kccu/first_officer/surv",
+    "command_cursor": "button",
+    "label": "F/O KCCU - SURV"
+  },
+  {
+    "node": "PUSH_KCCUR_ATCCOM",
+    "command": "a380x/xp12/kccu/first_officer/atccom",
+    "command_cursor": "button",
+    "label": "F/O KCCU - ATC COM"
+  },
+  {
+    "node": "PUSH_KCCUR_ND",
+    "command": "a380x/xp12/kccu/first_officer/nd",
+    "command_cursor": "button",
+    "label": "F/O KCCU - ND (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUR_KBD",
+    "command": "a380x/xp12/kccu/first_officer/kbd",
+    "command_cursor": "button",
+    "label": "F/O KCCU - KBD (no MFD function)"
+  },
+  {
+    "node": "PUSH_KCCUR_CLRINFO",
+    "command": "a380x/xp12/kccu/first_officer/clrinfo",
+    "command_cursor": "button",
+    "label": "F/O KCCU - CLR INFO (clear latest message)"
+  },
+  {
+    "node": "PUSH_KCCUR_REWIND",
+    "command": "a380x/xp12/kccu/first_officer/rewind",
+    "command_cursor": "button",
+    "label": "F/O KCCU - REWIND (INOP: cursor to left display)"
+  },
+  {
+    "node": "PUSH_KCCUR_FORWARD",
+    "command": "a380x/xp12/kccu/first_officer/forward",
+    "command_cursor": "button",
+    "label": "F/O KCCU - FORWARD (INOP: cursor to right display)"
+  },
+  {
+    "node": "PUSH_KCCUR_WHEEL",
+    "command": null,
+    "command_up": "a380x/xp12/kccu/first_officer/wheel_up",
+    "command_down": "a380x/xp12/kccu/first_officer/wheel_down",
+    "cursor": "rotate_small",
+    "label": "F/O KCCU - scroll wheel"
+  },
+  {
+    "node": "PUSH_KCCUR_LBUTTON",
+    "command": "a380x/xp12/kccu/first_officer/click",
+    "command_cursor": "button",
+    "label": "F/O KCCU - cursor select (click at MFD cursor)"
+  },
+  {
+    "node": "PUSH_KCCUR_BALL",
+    "command": "a380x/xp12/mfd/first_officer/popup",
+    "command_cursor": "hand",
+    "label": "F/O KCCU trackball - MFD pop-up (point at the MFD to move the cursor)"
+  },
+  {
+    "node": "PUSH_KCCUR_KBD_ON_OFF",
+    "command": "a380x/xp12/kccu/first_officer/kbd_switch_toggle",
+    "command_cursor": "button",
+    "label": "F/O KCCU KBD switch - ON / OFF"
+  },
+  {
+    "node": "PUSH_KCCUR_CCD_ON_OFF",
+    "command": "a380x/xp12/kccu/first_officer/ccd_switch_toggle",
+    "command_cursor": "button",
+    "label": "F/O KCCU CCD switch - ON / OFF"
+  }
+]

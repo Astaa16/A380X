@@ -1,0 +1,32 @@
+[
+  {
+    "node": "PAX_DOOR_U1L_HANDLE",
+    "command": "sim/flight_controls/door_toggle_11",
+    "label": "UPPER DECK 1 LEFT - open / close"
+  },
+  {
+    "node": "PAX_DOOR_U1R_HANDLE",
+    "command": "sim/flight_controls/door_toggle_12",
+    "label": "UPPER DECK 1 RIGHT - open / close"
+  },
+  {
+    "node": "PAX_DOOR_U2L_HANDLE",
+    "command": "sim/flight_controls/door_toggle_13",
+    "label": "UPPER DECK 2 LEFT - open / close"
+  },
+  {
+    "node": "PAX_DOOR_U2R_HANDLE",
+    "command": "sim/flight_controls/door_toggle_14",
+    "label": "UPPER DECK 2 RIGHT - open / close"
+  },
+  {
+    "node": "PAX_DOOR_U3L_HANDLE",
+    "command": "sim/flight_controls/door_toggle_15",
+    "label": "UPPER DECK 3 LEFT - open / close"
+  },
+  {
+    "node": "PAX_DOOR_U3R_HANDLE",
+    "command": "sim/flight_controls/door_toggle_16",
+    "label": "UPPER DECK 3 RIGHT - open / close"
+  }
+]

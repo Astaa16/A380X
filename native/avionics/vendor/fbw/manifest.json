@@ -1,0 +1,53 @@
+{
+  "upstream": "https://github.com/flybywiresim/aircraft",
+  "revision": "2baa2b35eadaf4c78e172ce41bbe6b40b4aeafb2",
+  "license": "GPL-3.0",
+  "purpose": "Unmodified A380 AP/FD outer-loop laws. The FCU command/state adapter and X-Plane actuator bridge are separate port code. Full PRIM/FMS/FADEC network, autoland and certified performance are not imported.",
+  "files": [
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/A380FgOuterLoops.cpp",
+      "filename": "A380FgOuterLoops.cpp",
+      "sha256": "b3744554233f0d9fb23a5b08c3e8a6a39da61e838a15b997fc6c18c286dc3ae6"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/A380FgOuterLoops.h",
+      "filename": "A380FgOuterLoops.h",
+      "sha256": "98140a3e8111885f76a996c1993d8ee604f8738de434fb971834fd7e7247fd9a"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/A380FgOuterLoops_types.h",
+      "filename": "A380FgOuterLoops_types.h",
+      "sha256": "0e8a36b3efdfa696b0c4dca33654915754b85457dc648733101c398959937658"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/A380FgOuterLoops_private.h",
+      "filename": "A380FgOuterLoops_private.h",
+      "sha256": "2ada1d4f86273c7465a94e3e0d52089f6d0b42659c45f760e24f02e6e12f9542"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/rtwtypes.h",
+      "filename": "rtwtypes.h",
+      "sha256": "5c8aba51fff17fd710ff00111e9cae123c207b03860a193e16ad0a93e7a5a35d"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/rt_modd.cpp",
+      "filename": "rt_modd.cpp",
+      "sha256": "5915e4746d0b0653f3c78ef1e041615aceb2718e7b866e044d90c939f9e42b47"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/rt_modd.h",
+      "filename": "rt_modd.h",
+      "sha256": "ba88f69d14ae30c83e78c42e3451b11f27b6606e10f321a50372fdb29dbbbb3c"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/look1_binlxpw.cpp",
+      "filename": "look1_binlxpw.cpp",
+      "sha256": "4130d926f2c0ed02483daabcb3bf4a4069cd82fddbcf7980a21cfae92414d981"
+    },
+    {
+      "path": "fbw-a380x/src/wasm/fbw_a380/src/model/look1_binlxpw.h",
+      "filename": "look1_binlxpw.h",
+      "sha256": "d37f6886407dc0b90974997ed1de89ac6bfc2a07dfdbafdcfc96fedf2b0d5ca1"
+    }
+  ]
+}

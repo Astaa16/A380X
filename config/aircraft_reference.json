@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "purpose": "Reference values for manual X-Plane 12 Plane Maker authoring; this file is not an ACF generator.",
+  "source": {
+    "repository": "flybywiresim/aircraft",
+    "revision": "2baa2b35eadaf4c78e172ce41bbe6b40b4aeafb2",
+    "variant": "A380-842",
+    "icao": "A388",
+    "msn_reference": "MSN 225",
+    "weight_variant": "WV003"
+  },
+  "limits": {
+    "mtow_kg": 510000,
+    "max_landing_weight_kg": 395000,
+    "max_zero_fuel_weight_kg": 373000,
+    "empty_weight_kg": 300007,
+    "max_fuel_kg": 323546,
+    "mmo": 0.89,
+    "range_nm": 8000,
+    "positive_g_clean": 2.5,
+    "negative_g_clean": -1.0,
+    "positive_g_flaps": 2.0,
+    "negative_g_flaps": 0.0
+  },
+  "dimensions": {
+    "length_m": 72.72,
+    "wheelbase_m": 31.9,
+    "wing_area_m2": 845.046052,
+    "wing_span_m": 79.75092,
+    "wing_root_chord_m": 17.940528,
+    "wing_sweep_deg": 33.5,
+    "wing_dihedral_deg": 5.6,
+    "wing_incidence_deg": 2.0,
+    "wing_twist_deg": -5.5,
+    "horizontal_tail_area_m2": 148.923573,
+    "horizontal_tail_span_m": 30.35808,
+    "vertical_tail_area_m2": 260.165673,
+    "vertical_tail_span_m": 14.590776
+  },
+  "mass_properties": {
+    "pitch_moi_kg_m2": 82051447.541473,
+    "roll_moi_kg_m2": 72617473.730835,
+    "yaw_moi_kg_m2": 119622880.711077
+  },
+  "engines": {
+    "count": 4,
+    "model": "Trent 972B-84",
+    "static_thrust_each_kn": 356.8052,
+    "rated_high_pressure_spool_rpm": 12200
+  },
+  "control_limits_deg": {
+    "elevator_up": 30,
+    "elevator_down": 30,
+    "aileron_up": 30,
+    "aileron_down": 30,
+    "rudder": 30,
+    "rudder_trim": 25.5,
+    "stabilizer_nose_up": 10,
+    "stabilizer_nose_down": 2,
+    "spoiler_ground": 50,
+    "spoiler_air": 45
+  },
+  "source_axis_warning": "MSFS positions use (longitudinal z, lateral x, vertical y). Convert and verify all signs/axes visually before entering values in Plane Maker.",
+  "gear_contact_points_source_ft": [
+    {"name": "nose", "longitudinal_z": 99.15, "lateral_x": 0.0, "vertical_y": -15.08, "wheel_radius": 2.239, "steering_deg": 70},
+    {"name": "left_body", "longitudinal_z": -5.7, "lateral_x": -11.5, "vertical_y": -15.75, "wheel_radius": 2.356, "steering_deg": 8},
+    {"name": "right_body", "longitudinal_z": -5.7, "lateral_x": 11.5, "vertical_y": -15.75, "wheel_radius": 2.356, "steering_deg": 8},
+    {"name": "left_wing", "longitudinal_z": 5.7, "lateral_x": -23.0, "vertical_y": -15.63, "wheel_radius": 2.356, "steering_deg": 0},
+    {"name": "right_wing", "longitudinal_z": 5.7, "lateral_x": 23.0, "vertical_y": -15.63, "wheel_radius": 2.356, "steering_deg": 0}
+  ]
+}
