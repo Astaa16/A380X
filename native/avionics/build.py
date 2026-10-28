@@ -213,7 +213,8 @@ def main() -> None:
     pfd_result = run([str(pfd_test_binary), str(output / "pfd-climb.svg"),
                       str(output / "pfd-approach.svg"), str(output / "fcu-selected.svg"),
                       str(output / "fcu-managed.svg"), str(output / "efis-cp.svg"), str(output / "efis-nd.svg")]).strip()
-    for preview in (output / "pfd-climb.svg", output / "pfd-approach.svg"):
+    for preview in (output / "pfd-climb.svg", output / "pfd-approach.svg", output / "nd-fbw-arc.svg",
+                    output / "nd-fbw-rose.svg", output / "nd-fbw-plan.svg"):
         preview.write_text(preview.read_text().replace("PFD_FONT_DATA_URI",font_data_uri))
     efb_test_binary = output / "test_efb_render"
     run([clang, *warnings, "-Wno-deprecated-declarations", "-DAPL=1", "-I", str(headers),

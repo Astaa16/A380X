@@ -21,6 +21,16 @@ static float ewd_font_width(const char *text, float size, float tracking)
     return width > 0.0f ? width - tracking : 0.0f;
 }
 
+/* Optional vertical clip window (y-up, drawing units) for rolling drum digits: glyph quads are
+ * cut at the window edges with matching texture coordinates. Disabled when y0 >= y1. */
+static float ewd_clip_y0 = 0.0f, ewd_clip_y1 = 0.0f;
+
+static void ewd_font_clip_y(float y0, float y1)
+{
+    ewd_clip_y0 = y0;
+    ewd_clip_y1 = y1;
+}
+
 static void ewd_font_draw(float x, float y, const char *text, float size,
                           Color color, float tracking, int anchor)
 {
@@ -56,6 +66,13 @@ static void ewd_font_draw(float x, float y, const char *text, float size,
         float right=left+g->w*scale, bottom=top-g->h*scale;
         float u0=(float)g->x/EWD_FONT_WIDTH,u1=(float)(g->x+g->w)/EWD_FONT_WIDTH;
         float v0=(float)g->y/EWD_FONT_HEIGHT,v1=(float)(g->y+g->h)/EWD_FONT_HEIGHT;
+        if (ewd_clip_y0 < ewd_clip_y1 && top > bottom) {
+            float clipped_top = fminf(top, ewd_clip_y1), clipped_bottom = fmaxf(bottom, ewd_clip_y0);
+            if (clipped_top <= clipped_bottom) { x += g->advance*scale+tracking; continue; }
+            v1 = v0 + (top - clipped_bottom) / (top - bottom) * (v1 - v0);
+            v0 = v0 + (top - clipped_top) / (top - bottom) * ((float)(g->y+g->h)/EWD_FONT_HEIGHT - v0);
+            top = clipped_top; bottom = clipped_bottom;
+        }
         glTexCoord2f(u0,v0);glVertex2f(left,top);
         glTexCoord2f(u1,v0);glVertex2f(right,top);
         glTexCoord2f(u1,v1);glVertex2f(right,bottom);

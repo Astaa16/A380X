@@ -265,6 +265,10 @@ static void read_side(Side *side, int powered)
 #include "a380x_mfd_render.inc"
 #include "a380x_mfd_adapter.inc"
 #include "a380x_fms_adapter.inc"
+#include "a380x_ovhd_state.inc"
+#include "a380x_pb.inc"
+static void pfd_devices_update(void); /* a380x_pfd_device.inc */
+static void nd_devices_update(void);  /* a380x_nd_device.inc */
 
 static float flight_loop(float elapsed_since_last_call, float elapsed_since_last_loop,
                          int counter, void *refcon)
@@ -313,6 +317,9 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
     if(adirs.on_batt && powered) ewd_add_message(ewd.memo,&ewd.memo_count,"ADIRS ON BATT",EWD_COLOR_AMBER);
     cockpit_door_update();
     mfda_update(dt, powered);
+    pfd_devices_update();
+    nd_devices_update();
+    pb_update();
     a380x_efb_update(dt);
     return -1.0f;
 }
@@ -324,21 +331,25 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
 #include "a380x_efis_render.inc"
 #include "a380x_clock_render.inc"
 
-static void du_dim_display(int side, int unit, float x, float y, float width, float height)
+static void pfd_sync_glare(void)
 {
-    float darkness = 1.0f - du_channels[side * DU_CHANNELS_PER_SIDE + unit].level;
-    if (darkness <= 0.0f) return;
-    glColor4f(0.0f, 0.0f, 0.0f, darkness);
-    glBegin(GL_QUADS);
-    glVertex2f(x, y); glVertex2f(x + width, y);
-    glVertex2f(x + width, y + height); glVertex2f(x, y + height);
-    glEnd();
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    int side_index;
+    pfd_glare.land_mode=glare.land_mode;
+    pfd_glare.autoland_warning=glare.autoland_warning;
+    pfd_glare.autoland_mask=glare.autoland_mask;
+    pfd_glare.flash_time=glare.flash_time;
+    for (side_index=0;side_index<2;++side_index) {
+        pfd_glare.chrono_mode[side_index]=glare.chrono_mode[side_index];
+        pfd_glare.chrono_seconds[side_index]=glare.chrono_seconds[side_index];
+        pfd_glare.chrono_frozen[side_index]=glare.chrono_frozen[side_index];
+    }
 }
+
+#include "a380x_pfd_device.inc"
+#include "a380x_nd_device.inc"
 
 static int draw_panel(XPLMDrawingPhase phase, int before, void *refcon)
 {
-    int side_index;
     GLboolean cull_was_enabled;
     (void)phase;
     (void)before;
@@ -349,25 +360,10 @@ static int draw_panel(XPLMDrawingPhase phase, int before, void *refcon)
      * state so filled screens and digit segments survive the panel pass. */
     cull_was_enabled = glIsEnabled(GL_CULL_FACE);
     glDisable(GL_CULL_FACE);
-    pfd_glare.land_mode=glare.land_mode;
-    pfd_glare.autoland_warning=glare.autoland_warning;
-    pfd_glare.autoland_mask=glare.autoland_mask;
-    pfd_glare.flash_time=glare.flash_time;
-    for (side_index=0;side_index<2;++side_index) {
-        pfd_glare.chrono_mode[side_index]=glare.chrono_mode[side_index];
-        pfd_glare.chrono_seconds[side_index]=glare.chrono_seconds[side_index];
-        pfd_glare.chrono_frozen[side_index]=glare.chrono_frozen[side_index];
-    }
     XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
     glLineWidth(1.0f);
-    draw_pfd(&refs.side[0], 0.0f, 32.0f, "CAPT");
-    du_dim_display(0, DU_PFD, 0.0f, 32.0f, 320.0f, 416.0f);
-    draw_pfd(&refs.side[1], 704.0f, 32.0f, "F/O");
-    du_dim_display(1, DU_PFD, 704.0f, 32.0f, 320.0f, 416.0f);
-    draw_nd(&refs.side[0], 328.0f, 230.0f, "CAPT");
-    du_dim_display(0, DU_ND, 328.0f, 230.0f, 180.0f, 234.0f);
-    draw_nd(&refs.side[1], 516.0f, 230.0f, "F/O");
-    du_dim_display(1, DU_ND, 516.0f, 230.0f, 180.0f, 234.0f);
+    /* PFDs and NDs are cockpit devices (a380x_pfd_device.inc, a380x_nd_device.inc), not
+     * panel-texture regions. */
     draw_ewd(&ewd, 1024.0f, 0.0f);
     fcu_integral_level = lighting[1].value;
     fcu_lcd_level = lighting[2].value;
@@ -485,9 +481,16 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
         return 0;
     }
     /* Create the MFD cockpit devices now, before X-Plane loads the aircraft OBJs that
-     * reference them (ATTR_cockpit_device / ATTR_manip_device). */
+     * reference them (ATTR_cockpit_device / ATTR_manip_device). The PFD devices reuse the
+     * device API that mfda_devices_enable() resolves. */
     mfda_devices_enable();
+    pfd_devices_enable();
+    nd_devices_enable();
+    ovhd_state_init();
+    pb_init();
     if (!XPLMRegisterDrawCallback(draw_panel, xplm_Phase_Gauges, 0, NULL)) {
+        ovhd_state_shutdown();
+        pb_shutdown();
         mfda_shutdown(); fmsa_shutdown();
         adirs_window_shutdown(); adirs_shutdown();
         a380x_efb_shutdown();
@@ -514,6 +517,10 @@ PLUGIN_API void XPluginStop(void)
     plugin_enabled = 0;
     XPLMUnregisterFlightLoopCallback(flight_loop, NULL);
     XPLMUnregisterDrawCallback(draw_panel, xplm_Phase_Gauges, 0, NULL);
+    pfd_devices_destroy();
+    nd_devices_destroy();
+    ovhd_state_shutdown();
+    pb_shutdown();
     mfda_shutdown(); fmsa_shutdown();
     adirs_window_shutdown(); adirs_shutdown();
     ewd_font_shutdown();
@@ -537,6 +544,8 @@ PLUGIN_API int XPluginEnable(void)
     plugin_enabled = 1;
     fmsa_enable();
     mfda_devices_enable();
+    pfd_devices_enable();
+    nd_devices_enable();
     return 1;
 }
 

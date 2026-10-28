@@ -1,0 +1,456 @@
+[
+ {
+  "node": "KNOB_ENGINES_MODE",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "sim/cockpit2/engine/actuators/eng_mode_selector",
+  "min": -1,
+  "max": 1,
+  "step": 1,
+  "label": "ENG START - CRANK / NORM / IGN START"
+ },
+ {
+  "node": "PUSH_OVHD_ENGMANSTART_1",
+  "kind": "command",
+  "command": "sim/starters/engage_starter_1",
+  "label": "ENG 1 MAN START - hold to engage starter"
+ },
+ {
+  "node": "PUSH_OVHD_ENGMANSTART_2",
+  "kind": "command",
+  "command": "sim/starters/engage_starter_2",
+  "label": "ENG 2 MAN START - hold to engage starter"
+ },
+ {
+  "node": "PUSH_OVHD_ENGMANSTART_3",
+  "kind": "command",
+  "command": "sim/starters/engage_starter_3",
+  "label": "ENG 3 MAN START - hold to engage starter"
+ },
+ {
+  "node": "PUSH_OVHD_ENGMANSTART_4",
+  "kind": "command",
+  "command": "sim/starters/engage_starter_4",
+  "label": "ENG 4 MAN START - hold to engage starter"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_EXTPWR",
+  "kind": "command",
+  "command": "sim/electrical/GPU_toggle",
+  "label": "EXT PWR 1 - native ground power toggle"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_EXTPWR2",
+  "kind": "command",
+  "command": "sim/electrical/GPU_toggle",
+  "label": "EXT PWR 2 - native ground power toggle"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_EXTPWR3",
+  "kind": "command",
+  "command": "sim/electrical/GPU_toggle",
+  "label": "EXT PWR 3 - native ground power toggle"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_EXTPWR4",
+  "kind": "command",
+  "command": "sim/electrical/GPU_toggle",
+  "label": "EXT PWR 4 - native ground power toggle"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_APUGEN",
+  "kind": "toggle",
+  "dataref": "sim/cockpit2/electrical/APU_generator_on",
+  "values": [
+   1,
+   0
+  ],
+  "label": "APU GEN A - native APU generator on / off"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_APUGEN2",
+  "kind": "toggle",
+  "dataref": "sim/cockpit2/electrical/APU_generator_on",
+  "values": [
+   1,
+   0
+  ],
+  "label": "APU GEN B - native APU generator on / off"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_BUSTIE",
+  "kind": "command",
+  "command": "sim/electrical/cross_tie_toggle",
+  "label": "BUS TIE - native cross-tie toggle"
+ },
+ {
+  "node": "SWITCH_OVHD_EXTLT_LOGO",
+  "kind": "command",
+  "command": "sim/lights/generic_01_light_tog",
+  "label": "LOGO - generic light 1 toggle"
+ },
+ {
+  "node": "SWITCH_OVHD_EXTLT_WING",
+  "kind": "command",
+  "command": "sim/lights/generic_02_light_tog",
+  "label": "WING - generic light 2 toggle"
+ },
+ {
+  "node": "SWITCH_OVHD_EXTLT_RWY",
+  "kind": "command",
+  "command": "sim/lights/generic_03_light_tog",
+  "label": "RWY TURN OFF - generic light 3 toggle"
+ },
+ {
+  "node": "SWITCH_OVHD_INTLT_ANNLT",
+  "kind": "command",
+  "command": "sim/annunciator/test_all_annunciators",
+  "label": "ANN LT TEST - hold"
+ },
+ {
+  "node": "HANDLING_Switch_Wiper_left",
+  "kind": "command_knob",
+  "cursor": "rotate_small",
+  "command_up": "sim/systems/wipers_up",
+  "command_down": "sim/systems/wipers_dn",
+  "label": "CAPT WIPER - OFF / SLOW / FAST"
+ },
+ {
+  "node": "HANDLING_Switch_Wiper_right",
+  "kind": "command_knob",
+  "cursor": "rotate_small",
+  "command_up": "sim/systems/wipers2_up",
+  "command_down": "sim/systems/wipers2_dn",
+  "label": "F/O WIPER - OFF / SLOW / FAST"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_BATESS",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/bat_ess",
+  "values": [
+   1,
+   0
+  ],
+  "label": "ESS BAT - OFF / AUTO"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_BATAPU",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/bat_apu",
+  "values": [
+   1,
+   0
+  ],
+  "label": "APU BAT - OFF / AUTO"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_ELMU",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/elmu",
+  "values": [
+   1,
+   0
+  ],
+  "label": "ELMU - OFF / AUTO"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_ACESSFEED",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/ac_ess_feed",
+  "values": [
+   1,
+   0
+  ],
+  "label": "AC ESS FEED - NORM / ALTN"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_PAX",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/pax_sys",
+  "values": [
+   1,
+   0
+  ],
+  "label": "PAX SYS - AUTO / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_GALYCAB",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/galley",
+  "values": [
+   1,
+   0
+  ],
+  "label": "GALLEY - AUTO / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_COMMERCIAL",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/commercial_1",
+  "values": [
+   1,
+   0
+  ],
+  "label": "COMMERCIAL 1 - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_COMMERCIAL2",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/commercial_2",
+  "values": [
+   1,
+   0
+  ],
+  "label": "COMMERCIAL 2 - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_IDG1",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/idg_1_disc",
+  "values": [
+   1,
+   0
+  ],
+  "label": "DRIVE 1 - disconnect (guarded)"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_IDG2",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/idg_2_disc",
+  "values": [
+   1,
+   0
+  ],
+  "label": "DRIVE 2 - disconnect (guarded)"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_IDG3",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/idg_3_disc",
+  "values": [
+   1,
+   0
+  ],
+  "label": "DRIVE 3 - disconnect (guarded)"
+ },
+ {
+  "node": "PUSH_OVHD_ELEC_IDG4",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/idg_4_disc",
+  "values": [
+   1,
+   0
+  ],
+  "label": "DRIVE 4 - disconnect (guarded)"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_HOTAIR",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/hot_air_1",
+  "values": [
+   1,
+   0
+  ],
+  "label": "HOT AIR 1 - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_HOTAIR2",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/hot_air_2",
+  "values": [
+   1,
+   0
+  ],
+  "label": "HOT AIR 2 - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_RAMAIR",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/ram_air",
+  "values": [
+   1,
+   0
+  ],
+  "label": "RAM AIR - OFF / ON"
+ },
+ {
+  "node": "PUSH_OVHD_CABAIR_EXTRACT",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/cabin_air_extract",
+  "values": [
+   1,
+   0
+  ],
+  "label": "CABIN AIR EXTRACT - AUTO / OVRD"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_BULKCARGO",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/bulk_cargo_isol",
+  "values": [
+   1,
+   0
+  ],
+  "label": "BULK CARGO ISOL - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_FWDCARGO",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/fwd_cargo_isol",
+  "values": [
+   1,
+   0
+  ],
+  "label": "FWD CARGO ISOL - ON / OFF"
+ },
+ {
+  "node": "PUSH_OVHD_AIRCOND_CARGOHOT",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/cargo_hot_air",
+  "values": [
+   1,
+   0
+  ],
+  "label": "CARGO HOT AIR - ON / OFF"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_PACKFLOW",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/air_flow",
+  "min": 0,
+  "max": 3,
+  "step": 1,
+  "label": "AIR FLOW - LO / NORM / HI / MAN"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_XBLEED",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/xbleed",
+  "min": -1,
+  "max": 1,
+  "step": 1,
+  "label": "XBLEED - CLOSE / AUTO / OPEN"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_COCKPIT",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/temp_cockpit",
+  "min": 0,
+  "max": 1,
+  "step": 0.05,
+  "label": "CKPT TEMP - COLD / HOT"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_FWDCABIN",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/temp_cabin",
+  "min": 0,
+  "max": 1,
+  "step": 0.05,
+  "label": "CABIN TEMP - COLD / HOT"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_FWDCARGO",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/temp_fwd_cargo",
+  "min": 0,
+  "max": 1,
+  "step": 0.05,
+  "label": "FWD CARGO TEMP - COLD / HOT"
+ },
+ {
+  "node": "KNOB_OVHD_AIRCOND_BULK",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/temp_bulk_cargo",
+  "min": 0,
+  "max": 1,
+  "step": 0.05,
+  "label": "BULK CARGO TEMP - COLD / HOT"
+ },
+ {
+  "node": "PUSH_OVHD_CABINPRESS_MODESEL",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/press_alt_mode_man",
+  "values": [
+   1,
+   0
+  ],
+  "label": "CABIN ALT MODE - AUTO / MAN"
+ },
+ {
+  "node": "PUSH_OVHD_CABINPRESS_MODESELVS",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/press_vs_mode_man",
+  "values": [
+   1,
+   0
+  ],
+  "label": "CABIN V/S MODE - AUTO / MAN"
+ },
+ {
+  "node": "PUSH_OVHD_CABINPRESS_DITCHING",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/ditching",
+  "values": [
+   1,
+   0
+  ],
+  "label": "DITCHING - OFF / ON (guarded)"
+ },
+ {
+  "node": "KNOB_OVHD_CABINPRESS_LDGELEV",
+  "kind": "axis_knob",
+  "cursor": "rotate_small",
+  "dataref": "a380x/xp12/ovhd/cabin_alt_target",
+  "min": -1,
+  "max": 1,
+  "step": 0.05,
+  "label": "CABIN ALT TRGT - DEC / INC"
+ },
+ {
+  "node": "SWITCH_OVHD_CABINPRESS_MANVSCTL",
+  "kind": "axis_knob",
+  "cursor": "up_down",
+  "dataref": "a380x/xp12/ovhd/cabin_vs_target",
+  "min": -1,
+  "max": 1,
+  "step": 1,
+  "label": "CABIN V/S TRGT - DN / UP"
+ },
+ {
+  "node": "SWITCH_OVHD_INTLT_EMEREXIT",
+  "kind": "axis_knob",
+  "cursor": "up_down",
+  "dataref": "a380x/xp12/ovhd/emer_exit_lt",
+  "min": -1,
+  "max": 1,
+  "step": 1,
+  "label": "EMER EXIT LT - OFF / ARM / ON"
+ },
+ {
+  "node": "SWITCH_OVHD_INTLT_STORM",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/storm_lt",
+  "values": [
+   1,
+   0
+  ],
+  "label": "STORM LT - OFF / ON"
+ },
+ {
+  "node": "SWITCH_OVHD_INTLT_STBYCOMPAS",
+  "kind": "toggle",
+  "dataref": "a380x/xp12/ovhd/stby_compass_lt",
+  "values": [
+   1,
+   0
+  ],
+  "label": "STBY COMPASS LT - OFF / ON"
+ }
+]

@@ -904,6 +904,8 @@ static void fmsa_update(float dt, int powered)
         fms_feed.managed_speed_knots = o->managed_speed_knots;
         fms_feed.managed_speed_is_mach = o->managed_speed_is_mach;
         fms_feed.managed_mach = o->managed_mach;
+        fms_feed.f_speed_knots = o->f_speed_knots;
+        fms_feed.s_speed_knots = o->s_speed_knots;
         /* DH from the FMS (spec 07 section 10.2): radio minimum in range replaces the stock RA bug;
          * NO DH or a BARO (MDA) minimum hides it. Without FMS minimums the RA bug stays in use. */
         if (o->dh_ft > 0.0 || o->dh_ft == 0.0 || o->mda_ft >= 0.0) {
