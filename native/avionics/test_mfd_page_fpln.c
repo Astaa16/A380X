@@ -633,9 +633,21 @@ static void scenario_sec(void)
 
 int main(int argc, char **argv)
 {
-    const char *root = argc > 2 ? argv[2] : "/Users/sava/Library/Application Support/Steam/steamapps/common/X-Plane 12";
+    /* X-Plane root: argv[2], else $A380X_XPLANE_ROOT, else the original developer default. */
+    const char *env_root = getenv("A380X_XPLANE_ROOT");
+    const char *root = argc > 2 ? argv[2] : env_root && *env_root ? env_root
+        : "/Users/sava/Library/Application Support/Steam/steamapps/common/X-Plane 12";
+    /* Fixture navdata lives next to this source file, so the fallback works from any working directory. */
+    char here[1024], fixture_custom[1100], fixture_default[1100];
     struct stat sb;
     A380XNavdataConfig cfg;
+    snprintf(here, sizeof(here), "%s", __FILE__);
+    {
+        char *slash = strrchr(here, '/');
+        if (slash) *slash = '\0'; else snprintf(here, sizeof(here), ".");
+    }
+    snprintf(fixture_custom, sizeof(fixture_custom), "%s/test_data/navdata/custom", here);
+    snprintf(fixture_default, sizeof(fixture_default), "%s/test_data/navdata/default", here);
     g_out = argc > 1 ? argv[1] : ".";
     if (!mfd_font_decode(g_atlas)) {
         fprintf(stderr, "font decode failed\n");
@@ -650,8 +662,8 @@ int main(int argc, char **argv)
     if (g_real) {
         cfg.xplane_root = root;
     } else {
-        cfg.custom_data_dir = "test_data/navdata/custom";
-        cfg.default_data_dir = "test_data/navdata/default";
+        cfg.custom_data_dir = fixture_custom;
+        cfg.default_data_dir = fixture_default;
     }
     g_nav = a380x_nav_create(&cfg, NULL);
     g_fp = a380x_fpln_create(g_nav);
