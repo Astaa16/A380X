@@ -359,7 +359,7 @@ static void test_devices(void)
         CHECK(d != NULL);
         if (!d) continue;
         CHECK(d->p.structSize == (int)sizeof(XPLMCreateAvionics_t));
-        CHECK(d->p.screenWidth == 768 && d->p.screenHeight == 1024 && d->p.drawOnDemand == 1);
+        CHECK(d->p.screenWidth == 768 && d->p.screenHeight == 1024 && d->p.drawOnDemand == 0);
         CHECK(d->p.bezelWidth == 800 && d->p.bezelHeight == 1080 && d->p.screenOffsetX == 16 && d->p.screenOffsetY == 16);
         CHECK(d->p.drawCallback && d->p.bezelDrawCallback && d->p.screenTouchCallback && d->p.screenScrollCallback
               && d->p.screenCursorCallback && d->p.keyboardCallback && d->p.brightnessCallback
@@ -372,7 +372,7 @@ static void test_devices(void)
     mfda_to_canvas(0, 1023, &cx, &cy); CHECK(cx == 0.5f && cy == 0.5f);
     mfda_to_canvas(767, 1023, &cx, &cy); CHECK(cx == 767.5f && cy == 0.5f);
     mfda_to_canvas(-20, 2000, &cx, &cy); CHECK(cx == 0.0f && cy == 0.0f);
-    /* drawOnDemand: redraw only on a list change */
+    /* Redraw requests still follow list changes (the device itself also draws every frame). */
     frame(2);
     {
         MockDevice *d = device(0);

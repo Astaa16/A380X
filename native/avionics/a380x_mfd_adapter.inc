@@ -884,7 +884,10 @@ static void mfda_devices_enable(void)
         p.screenWidth = MFD_W; p.screenHeight = MFD_H;
         p.bezelWidth = MFDA_BEZEL_W; p.bezelHeight = MFDA_BEZEL_H;
         p.screenOffsetX = MFDA_BEZEL_SIDE; p.screenOffsetY = MFDA_BEZEL_SIDE;
-        p.drawOnDemand = 1;
+        /* Draw every frame: with drawOnDemand = 1, X-Plane 12.4.3 kept showing the first MFD frame
+         * although XPLMAvionicsNeedsDrawing was called on every display-list change, so clicks
+         * that opened menus never became visible. */
+        p.drawOnDemand = 0;
         p.bezelDrawCallback = mfda_bezel_draw;
         p.drawCallback = mfda_screen_draw;
         p.bezelClickCallback = mfda_bezel_click;
