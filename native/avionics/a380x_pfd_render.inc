@@ -10,6 +10,7 @@ static const Color MAGENTA = {1.0f, 0.22f, 0.95f};
 /* The same pinned Airbus EIS font used by the EWD is shared by the PFD. */
 static void ewd_font_draw(float x, float y, const char *text, float size,
                           Color color, float tracking, int anchor);
+static void ewd_font_clip_y(float y0, float y1);
 
 typedef struct { int mach_visible, excessive_attitude; } PfdDisplayState;
 static PfdDisplayState pfd_display_state[2];
@@ -46,9 +47,18 @@ static void line(float x1, float y1, float x2, float y2, Color color)
     glEnd();
 }
 
+/* Nonzero while drawing into a scaled cockpit device (a380x_nd_device.inc): XPLMDrawString
+ * ignores the device scale, so text uses the FBW EIS atlas at the X-Plane UI font's height. */
+static int text_use_atlas;
+static float text_atlas_size = 9.0f;
+
 static void text_at(float x, float y, const char *value, Color color)
 {
     float rgb[3] = {color.r, color.g, color.b};
+    if (text_use_atlas) {
+        ewd_font_draw(x, y, value, text_atlas_size, color, 0, 0);
+        return;
+    }
     XPLMDrawString(rgb, (int)lroundf(x), (int)lroundf(y), value, NULL, xplmFont_Proportional);
     /* XPLMDrawString may change OpenGL state.  Restore the documented panel
      * drawing state before a later primitive is emitted in this callback. */
@@ -99,6 +109,12 @@ static void filled_polygon(const Point *points, int count, float ox, float oy, C
 #define FBW_PFD_HEIGHT 211.6f
 #define PFD_PIXEL_WIDTH 320.0f
 #define PFD_PIXEL_HEIGHT 416.0f
+/* Line widths are authored for the 416-texel-high canvas. A cockpit device that scales the PFD
+ * up (a380x_pfd_device.inc) raises this so lines keep their thickness relative to the display;
+ * glLineWidth itself is not affected by the modelview scale. */
+static float pfd_line_scale = 1.0f;
+
+static void pfd_line_width(float width) { glLineWidth(width * pfd_line_scale); }
 
 typedef struct { float left, bottom, scale; } PfdCanvas;
 
@@ -323,11 +339,11 @@ static void draw_fixed_aircraft(const PfdCanvas *p)
     pfd_polygon(p, left, ARRAY_LEN(left), BLACK);
     pfd_polygon(p, right, ARRAY_LEN(right), BLACK);
     pfd_polygon(p, center, ARRAY_LEN(center), BLACK);
-    glLineWidth(2.0f);
+    pfd_line_width(2.0f);
     pfd_polygon_outline(p, left, ARRAY_LEN(left), YELLOW);
     pfd_polygon_outline(p, right, ARRAY_LEN(right), YELLOW);
     pfd_polygon_outline(p, center, ARRAY_LEN(center), YELLOW);
-    glLineWidth(1.0f);
+    pfd_line_width(1.0f);
 }
 
 static int rising_ground_polygon(const Side *side, float scale, Point *clipped, Point *outline)
@@ -365,10 +381,10 @@ static void draw_rising_ground(const PfdCanvas *p,const Side *side)
     filled_polygon(clipped,count,pfd_x(p,68.906f),pfd_y(p,80.823f),EARTH);
     /* The subsequent attitude mask hides fill outside its rounded aperture;
      * borders use the same CPU clipping as the pitch ladder. */
-    glLineWidth(3.0f);
+    pfd_line_width(3.0f);
     for(i=0;i<4;++i) attitude_line(p,outline[i].x,outline[i].y,
                                   outline[(i+1)%4].x,outline[(i+1)%4].y,BLACK);
-    glLineWidth(1.0f);
+    pfd_line_width(1.0f);
     for(i=0;i<4;++i) attitude_line(p,outline[i].x,outline[i].y,
                                   outline[(i+1)%4].x,outline[(i+1)%4].y,WHITE);
 }
@@ -457,6 +473,72 @@ static void draw_speed_tape(const PfdCanvas *p, const Side *side)
     }
 }
 
+/* FBW DigitalAltitudeReadout.tsx drums. Big digits (ten-thousands, thousands, hundreds) roll by
+ * 7 units per digit inside the 117.754..132.254 x 76.337..85.308 window; the hundreds roll only
+ * while the tens pass 80 ft, and higher digits follow when the one below shows 9. The tens drum
+ * rolls continuously in 20 ft steps (4.7 units apart) inside 130.85..139.715 x 73.666..87.979. */
+static void pfd_drum_digit_text(int type, int value, int show_zero, char *out, size_t n)
+{
+    out[0] = '\0';
+    if (type == 0) {                       /* tens: TensDigits */
+        int v = value < 0 ? value + 100 : value >= 100 ? value - 100 : value;
+        snprintf(out, n, "%02d", v);
+        return;
+    }
+    if (type == 1) value = value < 0 ? value + 10 : value >= 10 ? value - 10 : value;  /* hundreds */
+    else value = ((value % 10) + 10) % 10;
+    if (!show_zero && value == 0) return;
+    snprintf(out, n, "%d", value);
+}
+
+static void pfd_big_drum(const PfdCanvas *p, float x, int type, float value, float position, int show_zero, Color color)
+{
+    int i, highest_value = (int)roundf(value + 1.0f), highest_position = (int)roundf(position + 1.0f);
+    if ((float)highest_position > position + 1.0f) --highest_position;
+    if ((float)highest_value > value + 1.0f) --highest_value;
+    for (i = 0; i < 3; ++i) {
+        char text[16];
+        float baseline = 76.3374f + 6.8f + (position - (float)(highest_position - i)) * 7.0f;
+        pfd_drum_digit_text(type, highest_value - i, show_zero, text, sizeof(text));
+        if (text[0]) pfd_text_sized(p, x, baseline, text, color, 6.0f, 1);
+    }
+}
+
+static void pfd_altitude_drums(const PfdCanvas *p, float altitude)
+{
+    const float abs_alt = fabsf(fmaxf(fminf(altitude, 50000.0f), -1500.0f));
+    const float tens = fmodf(abs_alt, 100.0f);
+    const int hundreds = (int)floorf(fmodf(abs_alt / 100.0f, 10.0f));
+    const int thousands = (int)floorf(fmodf(abs_alt / 1000.0f, 10.0f));
+    const int ten_thousands = (int)floorf(fmodf(abs_alt / 10000.0f, 10.0f));
+    const float hundreds_position = tens > 80.0f ? tens / 20.0f - 4.0f : 0.0f;
+    const float thousands_position = hundreds >= 9 ? hundreds_position : 0.0f;
+    const float ten_thousands_position = thousands >= 9 ? thousands_position : 0.0f;
+    int i, highest;
+    /* Big digits, clipped to their window (FBW svg x=117.754 y=76.3374 w=14.5 h=8.9706). */
+    ewd_font_clip_y(pfd_y(p, 85.308f), pfd_y(p, 76.3374f));
+    pfd_big_drum(p, 117.754f + 6.05f, 3, (float)ten_thousands, ten_thousands_position, 0, GREEN);
+    pfd_big_drum(p, 117.754f + 9.7f, 2, (float)thousands, thousands_position, ten_thousands != 0, GREEN);
+    pfd_big_drum(p, 117.754f + 13.2f, 1, (float)hundreds, hundreds_position, 1, GREEN);
+    /* Tens drum (FBW svg x=130.85 y=73.6664 w=8.8647 h=14.313). */
+    ewd_font_clip_y(pfd_y(p, 87.979f), pfd_y(p, 73.6664f));
+    highest = (int)roundf((tens + 40.0f) / 20.0f) * 20;
+    if ((float)highest > tens + 40.0f) highest -= 20;
+    for (i = 0; i < 4; ++i) {
+        char text[16];
+        int value = highest - 20 * i;
+        float baseline = 73.6664f + 8.9133f + (tens - (float)value) * 4.7f / 20.0f;
+        pfd_drum_digit_text(0, value, 1, text, sizeof(text));
+        pfd_text_sized(p, 130.85f + 5.5f, baseline, text, GREEN, 4.5f, 1);
+    }
+    ewd_font_clip_y(0.0f, 0.0f);
+    if (altitude < 0.0f) {                 /* AltNegativeText */
+        pfd_text_sized(p, 121.51714f, 77.956947f, "N", WHITE, 6.5f, 2);
+        pfd_text_sized(p, 121.7f, 83.251389f, "E", WHITE, 6.5f, 2);
+        pfd_text_sized(p, 121.63675f, 88.486031f, "G", WHITE, 6.5f, 2);
+    }
+}
+
 static void draw_altitude_tape(const PfdCanvas *p, const Side *side)
 {
     static const Point readout[] = {
@@ -479,15 +561,15 @@ static void draw_altitude_tape(const PfdCanvas *p, const Side *side)
         float y = 80.819f - ((float)altitude - side->altitude_value) * 0.075f;
         if (altitude < -1500 || altitude > 50000 || y < 38.4f || y > 123.2f) continue;
         pfd_line(p, 128.8353f, y, 130.85f, y, WHITE);
-        if (altitude % 500 == 0) {
+        if (altitude % 500 == 0 && y - 2.4f > 38.09f && y + 2.2f < 123.56f) {
             snprintf(value, sizeof(value), "%03d", abs(altitude / 100));
             pfd_text_center(p, 123.288f, y + 1.82f, value, WHITE);
-            pfd_line(p, 115.79f, y, 117.12f, y - 1.08f, WHITE);
-            pfd_line(p, 115.79f, y, 117.12f, y + 1.08f, WHITE);
+            pfd_line(p, 115.79f, y + 1.0783f, 117.1216f, y, WHITE);
+            pfd_line(p, 117.1216f, y, 115.79f, y - 1.0783f, WHITE);
         }
     }
     pfd_polygon(p, readout, ARRAY_LEN(readout), BLACK);
-    glLineWidth(1.5f);
+    pfd_line_width(1.5f);
     pfd_line(p, 117.75f,76.337f,130.846f,76.337f,YELLOW);
     pfd_line(p,130.846f,76.337f,130.846f,73.666f,YELLOW);
     pfd_line(p,130.846f,73.666f,139.711f,73.666f,YELLOW);
@@ -495,11 +577,8 @@ static void draw_altitude_tape(const PfdCanvas *p, const Side *side)
     pfd_line(p,139.711f,87.979f,130.846f,87.979f,YELLOW);
     pfd_line(p,130.846f,87.979f,130.846f,85.308f,YELLOW);
     pfd_line(p,130.846f,85.308f,117.75f,85.308f,YELLOW);
-    glLineWidth(1.0f);
-    /* Preserve the sign below sea level; native FBW altitude drums resolve 20 ft. */
-    snprintf(value, sizeof(value), side->altitude_value < 0.0f ? "-%04d" : "%05d",
-             (int)(lroundf(fabsf(side->altitude_value) / 20.0f) * 20));
-    pfd_text(p, 118.0f, 83.75f, value, GREEN);
+    pfd_line_width(1.0f);
+    pfd_altitude_drums(p, side->altitude_value);
 }
 
 static float vertical_speed_offset(float fpm)
@@ -546,11 +625,11 @@ static void draw_vertical_speed(const PfdCanvas *p, const Side *side)
               side->vertical_speed_value <= -2000.0f) ||
              (side->radio_altitude_value <= 1000.0f && side->vertical_speed_value <= -1200.0f));
         Color needle = fabsf(side->vertical_speed_value) >= 6000.0f || low_altitude_sink ? AMBER : GREEN;
-        glLineWidth(3.0f);
+        pfd_line_width(3.0f);
         pfd_line(p,157.74f,y1,150.74f,y2,BLACK);
-        glLineWidth(2.0f);
+        pfd_line_width(2.0f);
         pfd_line(p,157.74f,y1,150.74f,y2,needle);
-        glLineWidth(1.0f);
+        pfd_line_width(1.0f);
         if (fabsf(side->vertical_speed_value) >= 200.0f) {
             float shift=y_offset-(side->vertical_speed_value>0.0f ? 2.4f : -2.4f);
             snprintf(value, sizeof(value), "%02d", (int)lroundf(fabsf(side->vertical_speed_value) / 100.0f));
@@ -670,13 +749,13 @@ static void draw_flight_director(const PfdCanvas *p, const Side *side)
     if (pfd_excessive_attitude(side)) return;
     x = 68.903f + pfd_clamp((float)pfd_guidance.fd_roll_error_deg,-45.0f,45.0f)*0.44f;
     y = 80.823f - pfd_clamp((float)pfd_guidance.fd_pitch_error_deg,-22.5f,22.5f)*0.89f;
-    glLineWidth(4.0f);
+    pfd_line_width(4.0f);
     pfd_line(p,x,61.672f,x,99.974f,BLACK);
     pfd_line(p,49.263f,y,88.550f,y,BLACK);
-    glLineWidth(2.0f);
+    pfd_line_width(2.0f);
     pfd_line(p,x,61.672f,x,99.974f,GREEN);
     pfd_line(p,49.263f,y,88.550f,y,GREEN);
-    glLineWidth(1.0f);
+    pfd_line_width(1.0f);
     draw_fixed_aircraft(p);
 }
 
@@ -1004,6 +1083,7 @@ static void draw_pfd(const Side *side, float x, float y, const char *side_name)
         memset(&pfd_display_state[side==&refs.side[1]],0,sizeof(PfdDisplayState));
         return;
     }
+    pfd_line_width(1.0f);
     draw_horizon(&p,side);
     draw_flight_director(&p,side);
     draw_heading_tape(&p,side);
@@ -1039,6 +1119,7 @@ static void draw_pfd(const Side *side, float x, float y, const char *side_name)
         pfd_text_center(&p,78.0f,166.0f,"ETACS NOT AVAILABLE",AMBER);
     if (pfd_glare.autoland_warning && fmodf(pfd_glare.flash_time,1.0f)<0.5f)
         pfd_text_center(&p,113.0f,192.0f,"AUTOLAND",RED);
+    glLineWidth(1.0f);
 }
 
 /* EFIS map rendering is fed only by cached simulator source data. */
@@ -1046,6 +1127,9 @@ typedef struct {
     float x,y,cx,cy,radius,range_nm,heading;
     double lat,lon;
     int arc;
+    /* Map clip box and label limit in drawing units, and the symbol/offset scale (1 for the
+     * 180 x 234 native layout, larger for the FBW 768 x 1024 layout of a380x_nd_fbw.inc). */
+    float clip_l,clip_r,clip_b,clip_t,label_r,sym;
 } EfisNdCanvas;
 
 static int nd_map_point(const EfisNdCanvas *map,double lat,double lon,float *px,float *py)
@@ -1060,8 +1144,8 @@ static int nd_map_point(const EfisNdCanvas *map,double lat,double lon,float *px,
 static int nd_map_visible(const EfisNdCanvas *map,float px,float py,float margin)
 {
     return efis_nd_in_map(px,py,map->radius-margin,map->arc) &&
-        map->cx+px>map->x+5+margin && map->cx+px<map->x+175-margin &&
-        map->cy+py>map->y+32+margin && map->cy+py<map->y+183-margin;
+        map->cx+px>map->clip_l+margin && map->cx+px<map->clip_r-margin &&
+        map->cy+py>map->clip_b+margin && map->cy+py<map->clip_t-margin;
 }
 
 static void nd_map_segment(const EfisNdCanvas *map,float x1,float y1,float x2,float y2,Color color)
@@ -1092,10 +1176,10 @@ static void nd_map_filled_quad(const EfisNdCanvas *map,const Point points[4],Col
     count=clip_half_plane(a,count,b,nx,ny,offset,1); \
     memcpy(a,b,(size_t)count*sizeof(Point)); \
 } while(0)
-    ND_CLIP(1,0,map->cx-map->x-5);
-    ND_CLIP(-1,0,map->x+175-map->cx);
-    ND_CLIP(0,1,map->cy-map->y-32);
-    ND_CLIP(0,-1,map->y+183-map->cy);
+    ND_CLIP(1,0,map->cx-map->clip_l);
+    ND_CLIP(-1,0,map->clip_r-map->cx);
+    ND_CLIP(0,1,map->cy-map->clip_b);
+    ND_CLIP(0,-1,map->clip_t-map->cy);
     for(i=0;i<32 && count>0;++i) {
         float angle=i*(float)M_PI/16;
         ND_CLIP(-cosf(angle),-sinf(angle),map->radius*cosf((float)M_PI/32));
@@ -1161,9 +1245,9 @@ static void nd_draw_airport(const EfisNdCanvas *map)
         quad[2]=(Point){bx-rx,by-ry};quad[3]=(Point){ax-rx,ay-ry};
         nd_map_filled_quad(map,quad,runway_fill);
         nd_map_segment(map,ax,ay,bx,by,WHITE);
-        if(nd_map_visible(map,ax,ay,8)&&map->cx+ax<map->x+146)
+        if(nd_map_visible(map,ax,ay,8)&&map->cx+ax<map->label_r+6*map->sym)
             text_at(map->cx+ax+3,map->cy+ay+3,efis_airport.runways[i].end1,WHITE);
-        if(nd_map_visible(map,bx,by,8)&&map->cx+bx<map->x+146)
+        if(nd_map_visible(map,bx,by,8)&&map->cx+bx<map->label_r+6*map->sym)
             text_at(map->cx+bx+3,map->cy+by+3,efis_airport.runways[i].end2,WHITE);
     }
 }
@@ -1197,11 +1281,135 @@ static void nd_draw_terrain(const EfisNdCanvas *map,int side)
     }
 }
 
+/* ---- Native FMS flight plan on the ND (FBW: ACTIVE solid green, TMPY dashed yellow, missed
+ * approach cyan, TO waypoint white). Geometry comes from a380x_fpln_leg_path(). ---------------- */
+
+static void nd_map_dashed(const EfisNdCanvas *map,float x1,float y1,float x2,float y2,Color color)
+{
+    const float dash=4.0f*map->sym,gap=3.0f*map->sym;
+    float length=hypotf(x2-x1,y2-y1),at=0.0f;
+    if (length<0.01f) return;
+    while (at<length) {
+        float end=fminf(at+dash,length);
+        nd_map_segment(map,x1+(x2-x1)*at/length,y1+(y2-y1)*at/length,
+                       x1+(x2-x1)*end/length,y1+(y2-y1)*end/length,color);
+        at=end+gap;
+    }
+}
+
+static void nd_map_path_segment(const EfisNdCanvas *map,float x1,float y1,float x2,float y2,Color color,int dashed)
+{
+    if (dashed) nd_map_dashed(map,x1,y1,x2,y2,color);
+    else nd_map_segment(map,x1,y1,x2,y2,color);
+}
+
+static void nd_draw_leg_path(const EfisNdCanvas *map,const A380XFplnLegPath *path,Color color,int dashed)
+{
+    float sx,sy,ex,ey;
+    if (!nd_map_point(map,path->start_lat,path->start_lon,&sx,&sy) ||
+        !nd_map_point(map,path->end_lat,path->end_lon,&ex,&ey)) return;
+    if (path->kind==A380X_PATH_ARC) {
+        float cx,cy,a0,a1,sweep,radius;
+        int k,steps=16;
+        if (!nd_map_point(map,path->center_lat,path->center_lon,&cx,&cy)) {
+            nd_map_path_segment(map,sx,sy,ex,ey,color,dashed);
+            return;
+        }
+        radius=hypotf(sx-cx,sy-cy);
+        a0=atan2f(sy-cy,sx-cx); a1=atan2f(ey-cy,ex-cx);
+        sweep=a1-a0;
+        /* Screen angles grow counterclockwise; a right (clockwise) turn sweeps negative. */
+        if (path->clockwise) { while (sweep>0) sweep-=2*(float)M_PI; }
+        else { while (sweep<0) sweep+=2*(float)M_PI; }
+        for (k=0;k<steps;++k) {
+            float t0=a0+sweep*k/steps,t1=a0+sweep*(k+1)/steps;
+            nd_map_path_segment(map,cx+radius*cosf(t0),cy+radius*sinf(t0),
+                                cx+radius*cosf(t1),cy+radius*sinf(t1),color,dashed);
+        }
+        return;
+    }
+    /* LINE, and HOLD drawn as its inbound course to the fix until racetracks are ported. */
+    nd_map_path_segment(map,sx,sy,ex,ey,color,dashed);
+}
+
+static int nd_fpln_plan_drawable(int plan_index)
+{
+    const A380XFplnPlan *p=fmsa_fpln?a380x_fpln_plan(fmsa_fpln,plan_index):NULL;
+    return p && p->exists && p->pri.count>0;
+}
+
+/* Draws one plan's primary route from its FROM waypoint onwards. */
+static void nd_draw_fpln_plan(const EfisNdCanvas *map,int side,int plan_index)
+{
+    const A380XFplnPlan *p=a380x_fpln_plan(fmsa_fpln,plan_index);
+    const A380XFplnRoute *r=&p->pri;
+    const int tmpy=plan_index==A380X_PLAN_TEMPORARY;
+    const int from=a380x_fpln_from_leg_index(p);
+    int i,labels=0,start=from>0?from:0;
+    for (i=start+1;i<r->count;++i) {
+        A380XFplnLegPath path;
+        if (!a380x_fpln_leg_path(fmsa_fpln,plan_index,0,i,&path)) continue;
+        nd_draw_leg_path(map,&path,tmpy?YELLOW:path.is_missed?CYAN:GREEN,tmpy);
+    }
+    for (i=start;i<r->count;++i) {
+        const A380XFplnLeg *leg=&r->el[i];
+        float px,py;
+        Color color;
+        if (a380x_fpln_is_disco(leg) || !isfinite(leg->term_lat) || !isfinite(leg->term_lon)) continue;
+        if (!nd_map_point(map,leg->term_lat,leg->term_lon,&px,&py) || !nd_map_visible(map,px,py,6)) continue;
+        color=tmpy?YELLOW:i==p->active_leg_index?WHITE:i>=r->first_missed_appr_index?CYAN:GREEN;
+        nd_diamond(map->cx+px,map->cy+py,3*map->sym,color);
+        if (labels<10 &&  px<map->label_r-map->cx) {
+            char label[24];
+            A380XFplnAltCstr alt=a380x_fpln_eff_alt(leg);
+            snprintf(label,sizeof(label),"%.7s",leg->ident[0]?leg->ident:"LATLON");
+            text_at(map->cx+px+4*map->sym,map->cy+py+3*map->sym,label,color);
+            if (efis[side].cstr && !tmpy && alt.desc && isfinite(alt.alt1_ft) && alt.alt1_ft>0) {
+                snprintf(label,sizeof(label),"%.0f",alt.alt1_ft);
+                text_at(map->cx+px+4*map->sym,map->cy+py-8*map->sym,label,MAGENTA);
+            }
+            ++labels;
+        }
+    }
+}
+
+/* Returns 1 when the native FMS has a route to show (the stock X-Plane FMS route is then ignored). */
+static int nd_draw_fms_route(const EfisNdCanvas *map,int side)
+{
+    int drew=0;
+    if (nd_fpln_plan_drawable(A380X_PLAN_ACTIVE)) { nd_draw_fpln_plan(map,side,A380X_PLAN_ACTIVE); drew=1; }
+    if (nd_fpln_plan_drawable(A380X_PLAN_TEMPORARY)) { nd_draw_fpln_plan(map,side,A380X_PLAN_TEMPORARY); drew=1; }
+    return drew;
+}
+
+/* PLAN mode centre: the TO waypoint of the plan shown on the F-PLN page (TMPY first), else its
+ * first located waypoint. Returns 0 when the native FMS has no located waypoint. */
+static int nd_fms_plan_centre(double *lat,double *lon)
+{
+    const int order[2]={A380X_PLAN_TEMPORARY,A380X_PLAN_ACTIVE};
+    int k,i;
+    for (k=0;k<2;++k) {
+        const A380XFplnPlan *p;
+        if (!nd_fpln_plan_drawable(order[k])) continue;
+        p=a380x_fpln_plan(fmsa_fpln,order[k]);
+        i=p->active_leg_index>=0?p->active_leg_index:0;
+        for (;i<p->pri.count;++i) {
+            const A380XFplnLeg *leg=&p->pri.el[i];
+            if (!a380x_fpln_is_disco(leg) && isfinite(leg->term_lat) && isfinite(leg->term_lon)) {
+                *lat=leg->term_lat; *lon=leg->term_lon;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 static void nd_draw_route(const EfisNdCanvas *map,int side)
 {
     int i,labels=0;
     float previous_x=0,previous_y=0;
     int previous_valid=0;
+    if (nd_draw_fms_route(map,side)) return; /* the stock X-Plane route is only a fallback */
     for (i=0;i<nd_data.route_count;++i) {
         const EfisNdRoutePoint *point=&nd_data.route[i];
         float px=0,py=0;
@@ -1210,13 +1418,13 @@ static void nd_draw_route(const EfisNdCanvas *map,int side)
         if (valid && previous_valid) nd_map_segment(map,previous_x,previous_y,px,py,GREEN);
         if (valid && nd_map_visible(map,px,py,6)) {
             char label[24];
-            nd_diamond(map->cx+px,map->cy+py,3,color);
-            if (labels<6 && px<map->x+135-map->cx) {
+            nd_diamond(map->cx+px,map->cy+py,3*map->sym,color);
+            if (labels<6 &&  px<map->label_r-map->cx) {
                 snprintf(label,sizeof(label),"%.6s",point->id[0]?point->id:"LATLON");
-                text_at(map->cx+px+4,map->cy+py+3,label,color);
+                text_at(map->cx+px+4*map->sym,map->cy+py+3*map->sym,label,color);
                 if (efis[side].cstr && point->altitude_ft>0) {
                     snprintf(label,sizeof(label),"%d",point->altitude_ft);
-                    text_at(map->cx+px+4,map->cy+py-8,label,MAGENTA);
+                    text_at(map->cx+px+4*map->sym,map->cy+py-8*map->sym,label,MAGENTA);
                 }
                 ++labels;
             }
@@ -1241,17 +1449,18 @@ static void nd_draw_nav_layers(const EfisNdCanvas *map,int side)
             if (kind==0) { /* Airport: circular position symbol. */
                 int k;
                 set_color(MAGENTA); glBegin(GL_LINE_STRIP);
-                for (k=0;k<=8;++k) glVertex2f(sx+3*cosf(k*(float)M_PI/4),sy+3*sinf(k*(float)M_PI/4));
+                for (k=0;k<=8;++k) glVertex2f(sx+3*map->sym*cosf(k*(float)M_PI/4),sy+3*map->sym*sinf(k*(float)M_PI/4));
                 glEnd();
             } else if (kind==1) {
-                line(sx-3,sy-2,sx+3,sy-2,CYAN); line(sx+3,sy-2,sx,sy+3,CYAN);
-                line(sx,sy+3,sx-3,sy-2,CYAN);
+                const float k=map->sym;
+                line(sx-3*k,sy-2*k,sx+3*k,sy-2*k,CYAN); line(sx+3*k,sy-2*k,sx,sy+3*k,CYAN);
+                line(sx,sy+3*k,sx-3*k,sy-2*k,CYAN);
             } else if (kind==2) {
-                nd_diamond(sx,sy,3,CYAN); rectangle(sx-1,sy-1,sx+1,sy+1,CYAN);
-            } else nd_diamond(sx,sy,2,MAGENTA);
-            if (labels<4 && sx<map->x+136) {
+                nd_diamond(sx,sy,3*map->sym,CYAN); rectangle(sx-map->sym,sy-map->sym,sx+map->sym,sy+map->sym,CYAN);
+            } else nd_diamond(sx,sy,2*map->sym,MAGENTA);
+            if (labels<4 && sx<map->label_r) {
                 snprintf(id,sizeof(id),"%.6s",point->id);
-                text_at(sx+4,sy+3,id,kind==0||kind==3?MAGENTA:CYAN); ++labels;
+                text_at(sx+4*map->sym,sy+3*map->sym,id,kind==0||kind==3?MAGENTA:CYAN); ++labels;
             }
         }
     }
@@ -1281,9 +1490,9 @@ static void nd_draw_traffic(const EfisNdCanvas *map,int side)
             py=own_y+cosf(angle)*distance*map->radius/map->range_nm;
         }
         if (!nd_map_visible(map,px,py,6)) continue;
-        nd_diamond(map->cx+px,map->cy+py,3,CYAN);
+        nd_diamond(map->cx+px,map->cy+py,3*map->sym,CYAN);
         snprintf(label,sizeof(label),"%+03d",(int)lroundf(relative/100));
-        if (map->cx+px<map->x+150) text_at(map->cx+px+4,map->cy+py+3,label,CYAN);
+        if (map->cx+px<map->label_r+10*map->sym) text_at(map->cx+px+4*map->sym,map->cy+py+3*map->sym,label,CYAN);
     }
 }
 
@@ -1335,11 +1544,14 @@ static void draw_nd(const Side *side, float x, float y, const char *side_name)
     EfisNdCanvas map;
     float own_x=0,own_y=0;
     map.x=x; map.y=y; map.arc=mode==3;
+    map.clip_l=x+5; map.clip_r=x+175; map.clip_b=y+32; map.clip_t=y+183; map.label_r=x+140; map.sym=1;
     map.cx=x+90; map.cy=y+(map.arc?75:104); map.radius=map.arc?96:76;
     map.range_nm=isfinite(side->nd_range_nm)&&side->nd_range_nm>0?side->nd_range_nm:80;
     map.heading=mode==4?0:nd_data.true_heading;
     map.lat=nd_data.lat; map.lon=nd_data.lon;
-    if (mode==4 && !efis[index].zoom && nd_data.route_displayed>=0 && nd_data.route_displayed<nd_data.route_count &&
+    if (mode==4 && !efis[index].zoom && nd_fms_plan_centre(&map.lat,&map.lon)) {
+        /* PLAN centred on the native F-PLN */
+    } else if (mode==4 && !efis[index].zoom && nd_data.route_displayed>=0 && nd_data.route_displayed<nd_data.route_count &&
         isfinite(nd_data.route[nd_data.route_displayed].lat) && isfinite(nd_data.route[nd_data.route_displayed].lon)) {
         map.lat=nd_data.route[nd_data.route_displayed].lat;
         map.lon=nd_data.route[nd_data.route_displayed].lon;
@@ -1407,7 +1619,8 @@ static void draw_nd(const Side *side, float x, float y, const char *side_name)
         else text_at(x+25,y+113,efis_airport.loading?"AIRPORT MAP LOAD":"AIRPORT MAP N/A",AMBER);
     }
     else if(!position_valid) text_at(x+49,y+113,"MAP NO DATA",AMBER);
-    else if(nd_data.route_count==0&&mode>=2) text_at(x+8,y+183,"NO F-PLN",GREY);
+    else if(nd_data.route_count==0&&mode>=2&&!nd_fpln_plan_drawable(A380X_PLAN_ACTIVE)&&
+            !nd_fpln_plan_drawable(A380X_PLAN_TEMPORARY)) text_at(x+8,y+183,"NO F-PLN",GREY);
     if(efis[index].wx_requested) text_at(x+116,y+183,"WX INOP",AMBER);
     else if(efis[index].terr && !efis[index].zoom) text_at(x+98,y+183,nd_data.terrain[index].valid_count?"TERR LOCAL":"TERR N/A",nd_data.terrain[index].valid_count?GREEN:AMBER);
     else if(efis[index].traf) text_at(x+129,y+183,nd_data.traffic_available?"TRAF":"TCAS N/A",CYAN);
@@ -1420,3 +1633,7 @@ static void draw_nd(const Side *side, float x, float y, const char *side_name)
         text_at(x+5,y+4,"PREV",CYAN);text_at(x+149,y+4,"NEXT",CYAN);
     } else if(!efis[index].vor1&&!efis[index].vor2) text_at(x+7,y+2,side_name,GREY);
 }
+/* FlyByWire-layout native ND for the native cockpit devices (a380x_native_displays.inc). */
+#if !defined(A380X_XPKIT)
+#include "a380x_nd_fbw.inc"
+#endif

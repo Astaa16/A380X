@@ -60,12 +60,27 @@ static float line_width=1.0f,clock_seconds=1.0f;
 static FILE *svg;
 static float svg_y_origin=448;
 
+/* Translate/rotate stack for the FBW ND compass labels (no scaling is used in these tests). */
+static float xf_tx,xf_ty,xf_rot,xf_stack[8][3];
+static int xf_depth;
+static void glPushMatrix(void) { assert(xf_depth<8); xf_stack[xf_depth][0]=xf_tx;xf_stack[xf_depth][1]=xf_ty;xf_stack[xf_depth++][2]=xf_rot; }
+static void glPopMatrix(void) { assert(xf_depth>0); --xf_depth; xf_tx=xf_stack[xf_depth][0];xf_ty=xf_stack[xf_depth][1];xf_rot=xf_stack[xf_depth][2]; }
+static void glTranslatef(float x,float y,float z) {
+    float a=xf_rot*(float)M_PI/180; (void)z;
+    xf_tx+=x*cosf(a)-y*sinf(a); xf_ty+=x*sinf(a)+y*cosf(a);
+}
+static void glRotatef(float deg,float x,float y,float z) { (void)x;(void)y;assert(z==1.0f); xf_rot+=deg; }
+static void xf_apply(float *x,float *y) {
+    float a=xf_rot*(float)M_PI/180,px=*x,py=*y;
+    *x=xf_tx+px*cosf(a)-py*sinf(a); *y=xf_ty+px*sinf(a)+py*cosf(a);
+}
 static void glColor3f(float r,float g,float b) { current_color=(Color){r,g,b}; }
 static void glLineWidth(float width) { line_width=width; }
 static void glBegin(int kind) { primitive=kind; primitive_start=vertex_count; }
 static void glVertex2f(float x,float y) {
     assert(isfinite(x) && isfinite(y));
     assert(vertex_count<ARRAY_LEN(vertices));
+    xf_apply(&x,&y);
     vertices[vertex_count++]=(CapturedVertex){x,y,current_color};
 }
 static void svg_color(Color c) { fprintf(svg,"rgb(%d,%d,%d)",(int)(255*c.r),(int)(255*c.g),(int)(255*c.b)); }
@@ -97,15 +112,20 @@ static void XPLMDrawString(float *rgb,int x,int y,const char *text,void *wrap,in
         svg_color(c);fprintf(svg,"\">%s</text>\n",text);
     }
 }
+/* Vertical clip window of the real atlas font: text entirely outside it is not drawn. */
+static float clip_y0,clip_y1;
+static void ewd_font_clip_y(float y0,float y1) { clip_y0=y0; clip_y1=y1; }
 static void ewd_font_draw(float x,float y,const char *text,float size,Color color,float tracking,int anchor) {
     float width=(float)strlen(text)*(size*.6f+tracking);
+    if (clip_y0<clip_y1 && (y+size*.72f<=clip_y0 || y>=clip_y1)) return;
     assert(label_count<ARRAY_LEN(labels));
+    xf_apply(&x,&y);
     labels[label_count].x=x-width*(anchor==2 ? 1.0f : anchor==1 ? .5f : 0);
     labels[label_count].y=y;labels[label_count].color=color;
     snprintf(labels[label_count++].value,80,"%s",text);
     if(svg) {
-        fprintf(svg,"<text x=\"%.3f\" y=\"%.3f\" font-family=\"EIS\" font-size=\"%.3f\" text-anchor=\"%s\" fill=\"",
-                x,svg_y_origin-y,size,anchor==2 ? "end" : anchor==1 ? "middle" : "start");
+        fprintf(svg,"<text x=\"%.3f\" y=\"%.3f\" transform=\"rotate(%.2f %.3f %.3f)\" font-family=\"EIS\" font-size=\"%.3f\" text-anchor=\"%s\" fill=\"",
+                x,svg_y_origin-y,-xf_rot,x,svg_y_origin-y,size,anchor==2 ? "end" : anchor==1 ? "middle" : "start");
         svg_color(color);fprintf(svg,"\">%s</text>\n",text);
     }
 }
@@ -114,6 +134,38 @@ static struct {
     int autobrake_armed, autobrake_active;
     int gear_not_locked_down_warning, gear_not_locked_up_warning;
 } center_right;
+/* Minimal native flight-plan store for the ND route tests: plan 0 ACTIVE, 1 TMPY, straight legs
+ * between consecutive termination points, the same rules as a380x_fms_fpln.c for disco/missed. */
+#include "a380x_fms_fpln.h"
+static A380XFlightPlans *fmsa_fpln;
+static A380XFplnPlan test_plans[2];
+const A380XFplnPlan *a380x_fpln_plan(const A380XFlightPlans *fp, int plan_index)
+{
+    (void)fp;
+    return plan_index == 0 || plan_index == 1 ? &test_plans[plan_index] : NULL;
+}
+int a380x_fpln_is_disco(const A380XFplnLeg *l) { return (l->flags & A380X_LEGF_DISCONTINUITY) != 0; }
+int a380x_fpln_from_leg_index(const A380XFplnPlan *p)
+{
+    int i;
+    for (i = p->active_leg_index - 1; i >= 0; --i) if (!a380x_fpln_is_disco(&p->pri.el[i])) return i;
+    return -1;
+}
+A380XFplnAltCstr a380x_fpln_eff_alt(const A380XFplnLeg *l) { return l->alt_pilot.desc ? l->alt_pilot : l->alt_db; }
+int a380x_fpln_leg_path(const A380XFlightPlans *fp, int plan, int altn, int idx, A380XFplnLegPath *out)
+{
+    const A380XFplnRoute *r = &test_plans[plan].pri;
+    const A380XFplnLeg *l = &r->el[idx], *prev = idx > 0 ? &r->el[idx - 1] : NULL;
+    (void)fp; (void)altn;
+    if (a380x_fpln_is_disco(l) || !prev || a380x_fpln_is_disco(prev)) return 0;
+    memset(out, 0, sizeof(*out));
+    out->kind = A380X_PATH_LINE;
+    out->start_lat = prev->term_lat; out->start_lon = prev->term_lon;
+    out->end_lat = l->term_lat; out->end_lon = l->term_lon;
+    out->is_missed = idx >= r->first_missed_appr_index;
+    out->is_tmpy = plan == 1;
+    return 1;
+}
 #include "a380x_pfd_render.inc"
 /* FCU LCD text: capture each string (the GL atlas path is a380x_fcu_font.inc,
  * covered pixel-for-pixel by test_fcu_render.c). */
@@ -174,11 +226,12 @@ static void normal_state(void) {
     clear_capture();
 }
 static void export_svg(const char *path) {
-    svg=fopen(path,"w");assert(svg);
-    fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"640\" height=\"832\" viewBox=\"0 0 320 416\">\n");
+    svg=fopen(path,"w");assert(svg);svg_y_origin=32.0f+PFD_PIXEL_HEIGHT;
+    fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.0f\" height=\"%.0f\" viewBox=\"0 0 %.0f %.0f\">\n",
+            2*PFD_PIXEL_WIDTH,2*PFD_PIXEL_HEIGHT,PFD_PIXEL_WIDTH,PFD_PIXEL_HEIGHT);
     fprintf(svg,"<style>@font-face{font-family:EIS;src:url('PFD_FONT_DATA_URI')}</style>\n");
     draw_pfd(&refs.side[0],0,32,"CAPT");
-    fprintf(svg,"</svg>\n");fclose(svg);svg=NULL;
+    fprintf(svg,"</svg>\n");fclose(svg);svg=NULL;svg_y_origin=448;
 }
 static void export_fcu_svg(const char *path) {
     svg=fopen(path,"w");assert(svg);svg_y_origin=FCU_GLASS_Y+FCU_GLASS_H;
@@ -425,6 +478,202 @@ static int convex_contains(const Point *polygon,int count,float x,float y) {
     }
     return 1;
 }
+static int color_is(Color a, Color b) { return a.r == b.r && a.g == b.g && a.b == b.b; }
+static int vertices_in(Color c) {
+    int i, n = 0;
+    for (i = 0; i < vertex_count; ++i) if (color_is(vertices[i].color, c)) ++n;
+    return n;
+}
+static void fms_leg(A380XFplnRoute *r, int i, const char *id, double lat, double lon) {
+    memset(&r->el[i], 0, sizeof(r->el[i]));
+    snprintf(r->el[i].ident, sizeof(r->el[i].ident), "%s", id);
+    r->el[i].term_lat = lat; r->el[i].term_lon = lon;
+    r->el[i].alt_db.alt1_ft = r->el[i].alt_pilot.alt1_ft = NAN;
+}
+static void test_nd_fms_route(void) {
+    A380XFplnRoute *r = &test_plans[0].pri;
+    int base_green, base_yellow;
+    memset(test_plans, 0, sizeof(test_plans));
+    fmsa_fpln = (A380XFlightPlans *)test_plans; /* any non-NULL store */
+    nd_test_state();
+    /* Baseline: the ND without any route (own-ship symbol etc. share these colours). */
+    nd_data.route_count = 0;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    base_green = vertices_in(GREEN); base_yellow = vertices_in(YELLOW);
+    /* The stock X-Plane route must not be drawn while the native FMS has a plan. */
+    nd_data.route_count = 1; nd_data.route_active = 0;
+    nd_data.route[0] = (EfisNdRoutePoint){.35, -.1, 0, "STOCK"};
+    /* ORIG - WPA (TO) - WPB - disco - WPC (missed approach) */
+    test_plans[0].exists = 1; test_plans[0].active_leg_index = 1;
+    fms_leg(r, 0, "ORIG", 0, 0); fms_leg(r, 1, "WPA", .1, .05); fms_leg(r, 2, "WPB", .2, .1);
+    fms_leg(r, 3, "", NAN, NAN); r->el[3].flags = A380X_LEGF_DISCONTINUITY;
+    fms_leg(r, 4, "WPC", .3, .1);
+    r->count = 5; r->first_missed_appr_index = 4;
+    r->el[2].alt_db.desc = '+'; r->el[2].alt_db.alt1_ft = 7000;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    assert(!has_label("STOCK") && !has_label("NO F-PLN"));
+    assert(find_label("WPA") && color_is(find_label("WPA")->color, WHITE));   /* TO waypoint */
+    assert(find_label("WPB") && color_is(find_label("WPB")->color, GREEN));
+    assert(find_label("WPC") && color_is(find_label("WPC")->color, CYAN));    /* missed approach */
+    assert(vertices_in(GREEN) > base_green && vertices_in(YELLOW) == base_yellow);
+    assert(!has_label("7000"));                                                /* CSTR off */
+    efis[0].cstr = 1;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    assert(has_label("7000"));
+    efis[0].cstr = 0;
+    /* A temporary plan is drawn yellow next to the active one. */
+    test_plans[1] = test_plans[0];
+    snprintf(test_plans[1].pri.el[2].ident, sizeof(test_plans[1].pri.el[2].ident), "TMPB");
+    test_plans[1].pri.el[2].term_lat = .2; test_plans[1].pri.el[2].term_lon = -.1;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    assert(find_label("TMPB") && color_is(find_label("TMPB")->color, YELLOW));
+    assert(vertices_in(YELLOW) > base_yellow && find_label("WPB"));
+    /* Without native plans the stock route is the fallback; with neither, NO F-PLN. */
+    test_plans[0].exists = test_plans[1].exists = 0;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    assert(has_label("STOCK"));
+    nd_data.route_count = 0;
+    clear_capture(); draw_nd(&refs.side[0], 0, 0, "CAPT");
+    assert(has_label("NO F-PLN"));
+    fmsa_fpln = NULL;
+}
+/* FBW-layout ARC page: cruise state with an active leg to SABAR (~30 NM north). */
+static void nd_fbw_arc_state(void) {
+    A380XFplnRoute *r = &test_plans[0].pri;
+    memset(test_plans, 0, sizeof(test_plans));
+    fmsa_fpln = (A380XFlightPlans *)test_plans;
+    nd_test_state();
+    refs.side[0].nd_mode = 3; refs.side[0].nd_range_nm = 40;
+    ground_speed_knots = 300; ground_track_degrees = 4;
+    nd_data.tas_knots = 250; nd_data.wind_dir_true = 270; nd_data.wind_speed_kt = 30;
+    nd_data.magnetic_variation = 0; nd_data.zulu_seconds = 3600; nd_data.altitude_ft = 12000;
+    nd_data.route_count = 0;
+    efis[0].vor1 = 1;
+    snprintf(nd_data.vor[0].id, sizeof(nd_data.vor[0].id), "KUE");
+    nd_data.vor[0].distance_nm = 25;
+    test_plans[0].exists = 1; test_plans[0].active_leg_index = 1;
+    fms_leg(r, 0, "ORIG", -.05, 0); fms_leg(r, 1, "SABAR", .5, 0); fms_leg(r, 2, "AILEY", .8, .05);
+    r->count = 3; r->first_missed_appr_index = 3;
+    /* VD terrain: sea for the first third, a ridge rising to 8000 ft, then unloaded scenery. */
+    {
+        int i;
+        EfisVdTerrain *vd = &nd_data.vd[0];
+        memset(vd, 0, sizeof(*vd));
+        vd->range_nm = 40;
+        for (i = 0; i < EFIS_VD_COLUMNS * 2 / 3; ++i) {
+            vd->valid[i] = 1;
+            vd->water[i] = i < EFIS_VD_COLUMNS / 3;
+            vd->elevation_ft[i] = vd->water[i] ? 0.0f : 8000.0f * (float)(i - EFIS_VD_COLUMNS / 3) / (EFIS_VD_COLUMNS / 3 - 1);
+        }
+    }
+}
+static void test_vd_terrain(void) {
+    static const Color VD_TERRAIN = {0.48f, 0.24f, 0.09f};
+    nd_fbw_arc_state();
+    clear_capture(); draw_nd_fbw_arc(&refs.side[0], 0);
+    assert(vertices_in(VD_TERRAIN) > 0);                    /* brown ridge */
+    assert(has_label("100") && has_label("MORA"));          /* 8000 + 2000 ft = 100 */
+    {   /* water quads sit on the sea-level line of the VD altitude scale (y 960 FBW) */
+        int i, water = 0;
+        for (i = 0; i < vertex_count; ++i)
+            if (color_is(vertices[i].color, CYAN) && fabsf(vertices[i].y - NDY(960)) < .5f && vertices[i].x < 330) ++water;
+        assert(water > 0);
+    }
+    /* A profile sampled for another range is not shown. */
+    nd_data.vd[0].range_nm = 80;
+    clear_capture(); draw_nd_fbw_arc(&refs.side[0], 0);
+    assert(vertices_in(VD_TERRAIN) == 0 && !has_label("MORA"));
+    /* ROSE NAV shows the VD too; PLAN does not. */
+    nd_data.vd[0].range_nm = 40; refs.side[0].nd_mode = 2;
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    assert(has_label("MORA"));
+    refs.side[0].nd_mode = 4;
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    assert(!has_label("MORA"));
+    fmsa_fpln = NULL;
+}
+static void test_nd_fbw_arc(void) {
+    nd_fbw_arc_state();
+    clear_capture(); draw_nd_fbw_arc(&refs.side[0], 0);
+    /* Header: GS/TAS, wind, TO waypoint with bearing, distance and ETA (01:00 + 30 NM at 300 kt). */
+    assert(has_label("GS") && has_label("TAS") && has_label("300") && has_label("250"));
+    assert(has_label("270") && has_label("/"));
+    assert(find_label("SABAR") && color_is(find_label("SABAR")->color, WHITE));
+    assert(has_label("000") && has_label("NM") && has_label("01:06"));
+    /* Range rings at 3/4 and 1/2 of 40 NM; VD distance scale 0..40. */
+    assert(has_label("30") && has_label("20") && has_label("10") && has_label("40"));
+    /* Compass: heading 0 shows 0 (large) through +-50 degrees, nothing at 90. */
+    assert(has_label("0") && has_label("5") && has_label("31") && !has_label("9"));
+    assert(has_label("VOR1") && has_label("KUE"));
+    /* Aircraft symbol wing line at the FBW reference (384,620). */
+    {
+        int i, found = 0;
+        for (i = 0; i < vertex_count; ++i)
+            if (color_is(vertices[i].color, YELLOW) && fabsf(vertices[i].x - 343) < .5f &&
+                fabsf(vertices[i].y - NDY(620)) < .5f) found = 1;
+        assert(found);
+    }
+    /* No display: nothing but the background. */
+    refs.side[0].display_valid = 0;
+    clear_capture(); draw_nd_fbw_arc(&refs.side[0], 0);
+    assert(label_count == 0);
+    refs.side[0].display_valid = 1;
+    fmsa_fpln = NULL;
+}
+static void test_nd_fbw_rose_plan(void) {
+    /* ROSE NAV: full heading ring (180 visible behind), range/2 and range/4 labels, VD present. */
+    nd_fbw_arc_state(); refs.side[0].nd_mode = 2;
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    assert(has_label("GS") && has_label("SABAR") && has_label("0") && has_label("18") && has_label("9"));
+    assert(!has_label("1") && !has_label("35"));                           /* ROSE labels every 30 degrees */
+    assert(has_label("20") && has_label("10") && has_label("40"));     /* 40 = VD scale end */
+    assert(find_label("SABAR")->color.g == WHITE.g);
+    /* ROSE VOR: no route, no VD. */
+    refs.side[0].nd_mode = 1;
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    assert(has_label("SABAR") && !has_label("AILEY") && !has_label("40"));
+    /* PLAN: N/E/S/W, range and range/2, route labels, no compass numbers. */
+    refs.side[0].nd_mode = 4;
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    assert(has_label("N") && has_label("E") && has_label("S") && has_label("W"));
+    assert(has_label("40") && has_label("20") && !has_label("18"));
+    fmsa_fpln = NULL;
+}
+static void export_nd_fbw_one(const char *nd_path, const char *name, int mode) {
+    char path[1024];
+    const char *slash = strrchr(nd_path, '/');
+    snprintf(path, sizeof(path), "%.*s%s", slash ? (int)(slash - nd_path + 1) : 0, nd_path, name);
+    nd_fbw_arc_state(); refs.side[0].nd_mode = mode;
+    svg = fopen(path, "w"); assert(svg); svg_y_origin = 1024;
+    fprintf(svg, "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"768\" height=\"1024\" viewBox=\"0 0 768 1024\">\n");
+    fprintf(svg, "<style>@font-face{font-family:EIS;src:url('PFD_FONT_DATA_URI')}</style>\n");
+    clear_capture(); draw_nd_fbw(&refs.side[0], 0);
+    fprintf(svg, "</svg>\n"); fclose(svg); svg = NULL; svg_y_origin = 448;
+    fmsa_fpln = NULL;
+}
+static void export_nd_fbw_svg(const char *nd_path) {
+    export_nd_fbw_one(nd_path, "nd-fbw-arc.svg", 3);
+    export_nd_fbw_one(nd_path, "nd-fbw-rose.svg", 2);
+    export_nd_fbw_one(nd_path, "nd-fbw-plan.svg", 4);
+}
+static int only_labels(const char *const *wanted,int n) {
+    int i,j;
+    if (label_count!=n) return 0;
+    for (i=0;i<n;++i) { for (j=0;j<label_count&&strcmp(labels[j].value,wanted[i]);++j) {} if (j==label_count) return 0; }
+    return 1;
+}
+static void test_altitude_drums(void) {
+    static const char *steady[]={"1","2","4","60","40","20"};
+    static const char *rolling[]={"1","2","5","4","20","00","80","60"}; /* 20 and 60 partly in view */
+    static const char *low[]={"8","60","40","20"};
+    PfdCanvas canvas=pfd_canvas(0,32);
+    clear_capture(); pfd_altitude_drums(&canvas,12440); assert(only_labels(steady,6));
+    /* Tens past 80: the hundreds roll between 4 and 5 and the tens wrap through 00. */
+    clear_capture(); pfd_altitude_drums(&canvas,12490); assert(only_labels(rolling,8));
+    /* Below 1000 ft no leading zeros. */
+    clear_capture(); pfd_altitude_drums(&canvas,840); assert(only_labels(low,4));
+    assert(clip_y0==0 && clip_y1==0);  /* clip released */
+}
 static void test_rising_ground(void) {
     PfdCanvas p=pfd_canvas(0,32);
     Point polygon[12],outline[4];
@@ -595,10 +844,21 @@ static void test_fms_flap_speeds(void) {
     feed.valid=0;memset(&p,0,sizeof(p));p.flap_config=3;p.f_speed_knots=175;
     a380x_pfd_apply_fms_flap_speeds(&p,&feed);
     assert(p.f_speed_knots==175);
+    /* Lines keep their authored thickness relative to the canvas a device scales the PFD to. */
+    pfd_line_scale=1024.0f/PFD_PIXEL_HEIGHT;
+    pfd_line_width(2.0f);
+    assert(fabsf(line_width-2.0f*1024.0f/416.0f)<1e-4f);
+    pfd_line_scale=1.0f;
+    glLineWidth(1.0f);
 }
 int main(int argc,char **argv) {
     PfdCanvas canvas=pfd_canvas(0,32);
     test_fms_flap_speeds();
+    test_nd_fms_route();
+    test_nd_fbw_arc();
+    test_nd_fbw_rose_plan();
+    test_vd_terrain();
+    test_altitude_drums();
     test_rising_ground();
     test_pfd_bank_direction();
     test_pfd_boundaries();
@@ -634,7 +894,9 @@ int main(int argc,char **argv) {
     clear_capture();draw_flight_director(&canvas,&refs.side[0]);assert(!has_label("FD"));
     pfd_guidance.guidance_fault=1;clear_capture();draw_flight_director(&canvas,&refs.side[0]);assert(has_label("FD"));
     pfd_guidance.guidance_valid=1;pfd_guidance.guidance_fault=0;pfd_guidance.athr_active=1;
-    refs.side[0].altitude_value=-20;clear_capture();draw_altitude_tape(&canvas,&refs.side[0]);assert(has_label("-0020"));
+    /* Below sea level FBW keeps the absolute drums and stacks N/E/G beside them. */
+    refs.side[0].altitude_value=-20;clear_capture();draw_altitude_tape(&canvas,&refs.side[0]);
+    assert(has_label("N")&&has_label("E")&&has_label("G")&&has_label("0")&&has_label("20"));
     refs.side[0].radio_altitude_value=54;clear_capture();draw_pfd(&refs.side[0],0,32,"CAPT");assert(has_label("50"));
     refs.side[0].ls_visible=1;refs.side[0].loc_valid=refs.side[0].gs_valid=0;
     clear_capture();draw_landing_system(&canvas,&refs.side[0]);assert(count_color(MAGENTA)==0);
@@ -704,7 +966,7 @@ int main(int argc,char **argv) {
         fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height=\"504\" viewBox=\"0 0 1024 504\">\n");
         clear_capture();draw_efis_cp();fprintf(svg,"</svg>\n");fclose(svg);svg=NULL;svg_y_origin=448;
     }
-    if(argc>6) export_nd_svg(argv[6]);
+    if(argc>6) { export_nd_svg(argv[6]); export_nd_fbw_svg(argv[6]); }
     test_fcu();
     if(argc>3) export_fcu_svg(argv[3]);
     if(argc>4) {

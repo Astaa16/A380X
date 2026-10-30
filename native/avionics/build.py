@@ -381,7 +381,8 @@ def main() -> None:
     fcu_render_binary = output / "test_fcu_render"
     run([clang, *warnings, str(FCU_RENDER_TEST), "-lm", "-o", str(fcu_render_binary)])
     fcu_render_result = run([str(fcu_render_binary), str(output)]).strip()
-    for preview in (output / "pfd-climb.svg", output / "pfd-approach.svg"):
+    for preview in (output / "pfd-climb.svg", output / "pfd-approach.svg", output / "nd-fbw-arc.svg",
+                    output / "nd-fbw-rose.svg", output / "nd-fbw-plan.svg"):
         preview.write_text(preview.read_text().replace("PFD_FONT_DATA_URI",font_data_uri))
     isis_binary = output / "test_isis"
     isis_preview_dir = output / "isis-previews"

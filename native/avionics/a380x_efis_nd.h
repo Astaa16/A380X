@@ -7,6 +7,9 @@
 #define EFIS_ND_ROUTE_MAX 100
 #define EFIS_ND_TERRAIN_DIM 9
 #define EFIS_ND_TERRAIN_COUNT (EFIS_ND_TERRAIN_DIM * EFIS_ND_TERRAIN_DIM)
+/* Vertical display terrain: highest terrain in a corridor along the VD axis, per column. */
+#define EFIS_VD_COLUMNS 96
+#define EFIS_VD_CORRIDOR_NM 0.5f
 
 typedef struct {
     double lat, lon;
@@ -30,6 +33,12 @@ typedef struct {
     EfisNdTerrainPoint points[EFIS_ND_TERRAIN_COUNT];
 } EfisNdTerrain;
 typedef struct {
+    float elevation_ft[EFIS_VD_COLUMNS];  /* highest corridor terrain, valid where valid[] */
+    unsigned char valid[EFIS_VD_COLUMNS], water[EFIS_VD_COLUMNS];
+    float range_nm, axis_true;            /* profile geometry the columns were sampled for */
+    int next_column;
+} EfisVdTerrain;
+typedef struct {
     char id[16];
     float frequency_mhz, bearing_mag, distance_nm, deviation_dots, course_mag;
     int valid, dme_valid;
@@ -46,6 +55,9 @@ typedef struct {
     int traffic_available;
     EfisNdVor vor[2];
     EfisNdTerrain terrain[2];
+    /* FBW ND header inputs: NAN when unavailable. Wind direction is true, "from". */
+    float tas_knots, wind_dir_true, wind_speed_kt, zulu_seconds, magnetic_variation;
+    EfisVdTerrain vd[2];
 } EfisNdData;
 
 /* Great-circle distance/bearing avoids longitude wrapping and polar-map errors.
