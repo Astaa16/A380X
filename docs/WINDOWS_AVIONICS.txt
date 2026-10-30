@@ -1,0 +1,89 @@
+A380X-XP12 - Windows x64 avionics package
+=======================================
+Target: Windows 10/11 x64, X-Plane 12.4 or newer.
+
+IMPORTANT STATUS
+The Windows binaries are cross-compiled and inspected on macOS. Native systems
+tests and shared-memory/payload tests run here; Windows X-Plane and WebView2
+runtime operation are NOT yet confirmed. Do not describe this as a completed
+Windows flight test. Use the checklist below on a Windows PC before flying.
+
+WHAT IS INCLUDED
+- A380XAvionics.xpl: the existing aircraft's ADIRS, FCU/EFIS/guidance, FMS,
+  MFD/KCCU/keyboard, EWD, flyPad, clocks, brightness and ECAM state.
+- A380XDisplayHost.exe: seven independent WebView2 views for captain/FO PFD,
+  captain/FO ND/OANS, captain/FO MFD and ECAM SD. Existing display HTML/fonts
+  are reused; no website, server, Web API or external demo feed drives avionics.
+- Official x64 WebView2Loader.dll and an isolated official Python 3.14.8 runtime
+  for reading the same X-Plane airport scenery as the Mac host.
+- A380XAileronDatarefs.xpl and the required aileron/hydraulic Lua drivers.
+- Build reports, hashes and corresponding project sources.
+
+REQUIRED EXTERNAL RUNTIMES
+1. Microsoft Edge WebView2 Evergreen Runtime (x64). Usually present on Windows
+   11; the installer checks the actual loader API, not just a registry guess.
+   https://developer.microsoft.com/microsoft-edge/webview2/
+2. FlyWithLua NG for X-Plane 12, installed under Resources/plugins/FlyWithLua.
+   https://github.com/X-Friese/FlyWithLua/releases
+   The package does not silently install or upgrade a global third-party plugin.
+No separate Python or MinGW/C++ runtime installation is needed.
+These are unsigned developer builds, not a signed commercial release.
+Old A380X_XP12_Avionics.lua, A380X_XP12_Autopilot.lua and A380X_XP12_EFB.lua
+controllers must not run alongside the native plugin. The installer refuses
+those duplicates; move them out of FlyWithLua/Scripts before installing.
+
+INSTALL
+1. Copy the CURRENT complete output/A380X-XP12 aircraft to the Windows PC,
+   keeping its folder name A380X-XP12. This is a plugin update kit, not the
+   aircraft model/textures/liveries. Its installer checks the authored cockpit
+   and ACF hashes and refuses an older/different aircraft package.
+2. Quit X-Plane. Extract the whole Windows plugin ZIP; do not run from the ZIP.
+3. In PowerShell in the extracted kit directory:
+   .\Install-WindowsAvionics.ps1 -AircraftDirectory 'D:\X-Plane 12\Aircraft\A380X-XP12' -XPlaneDirectory 'D:\X-Plane 12'
+   Optional preflight: append -CheckOnly. This verifies package/aircraft hashes;
+   it is NOT a runtime check. If local script policy blocks execution, review
+   the scripts and use an appropriate process-local policy; no policy is changed
+   automatically by this package.
+4. The installer backs up every replaced file into the selected aircraft's
+   .windows-avionics-backups directory and rolls back file updates on failure.
+   Existing unrelated Lua scripts, aircraft preferences, liveries and Mac plugins
+   are not replaced. Restore the backup's aircraft/ and xplane/ files to their
+   corresponding roots if you need to undo a successful installation.
+
+WINDOWS ACCEPTANCE CHECKLIST - STILL TO BE RUN
+1. Load A380X-XP12 with electrical power and usable display brightness.
+   Confirm A380XAvionics and A380XAileronDatarefs load without errors in Log.txt.
+   Inspect plugins/A380XAvionics/win_x64/display-host.log if the renderer fails.
+2. Confirm BOTH PFDs and NDs, both MFDs, EWD, all ECAM SD pages, FCU/EFIS,
+   both tablets, clocks and independent brightness/power work in the 3D cockpit.
+3. Click each MFD's editable fields, type and commit airports/waypoints/data;
+   verify captain/FO isolation, KCCU input, screen edges and keyboard release.
+4. Test ND airport geometry, cursor, map actions, zoom, range/mode selectors,
+   and real local scenery lookup. Confirm lost/invalid data is not demo-filled.
+5. Check ADIRS modes/alignment, raw-source/failure routing, FCU detents and
+   push/pull, FD/AP/A-THR behavior within the existing port's supported modes.
+   Verify priority audio, controls, gear/brakes and surface/hydraulic animation.
+6. Test power loss/recovery, pauses, aircraft reloads, switching aircraft and
+   simulator exit. A380XDisplayHost/WebView2/Python children must not remain.
+7. With the simulator Web API enabled, run .\Check-WindowsAvionics.ps1 from the
+   kit directory. This is READ-ONLY; it checks all seven live display channels,
+   not flight-control correctness or click-region alignment.
+8. Repeat at Windows display scales 100%, 125% and 150%. Check no clipped,
+   flipped, stale or black textures, and inspect Log.txt for new plugin errors.
+
+EXISTING AIRCRAFT LIMITS - NOT REMOVED BY A WINDOWS PORT
+This ports the CURRENT aircraft implementation, not every system of the full
+FlyByWire/MSFS A380. Complete FWS procedures/checklists, complete PRIM/FMGC/
+FADEC integration, full VNAV/lateral turn transitions, certified AMDB/BTV,
+weather/terrain imagery and some traffic/communications functions remain
+partial or unavailable where the existing native aircraft says so. Do not
+invent values, hide INOP messages or claim complete A380 system parity.
+
+BUILD SOURCES / DEPENDENCIES
+Native source: source/native/avionics and source/native/aileron_datarefs.
+Use native/avionics/build.py --xpkit --xpkit-windows with the official X-Plane
+SDK. The current combined orchestrator runs on macOS and cross-builds Windows.
+tools/build_windows_display_host.py also builds the renderer independently.
+WebView2 SDK: Microsoft.Web.WebView2 NuGet 1.0.3537.50; json.hpp: nlohmann/json
+v3.12.0. Build reports record exact input/output hashes. Original runtime
+licenses and the project's GPL license accompany the package.

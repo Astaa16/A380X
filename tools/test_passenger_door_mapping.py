@@ -56,8 +56,8 @@ class PassengerDoorMappingTests(unittest.TestCase):
             "sim/flightmodel2/misc/door_open_ratio[16]",
         )
 
-    def test_unimplemented_cargo_doors_remain_closed(self):
-        for clip in ("fwd_door_cargo", "aft_door_cargo", "door_cargo"):
+    def test_legacy_meshless_cargo_animation_remains_at_rest(self):
+        for clip in ("door_cargo",):
             with self.subTest(clip=clip):
                 matches = self.matching_rules(clip)
                 self.assertEqual(len(matches), 1)

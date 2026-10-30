@@ -2,6 +2,10 @@
  * Native rendering translated from pinned FlyByWire A380 PFD components.
  * Included by the X-Plane adapter after its shared display/guidance state.
  */
+#include "a380x_elec_power.h"
+#ifndef SIDE_ND_VALID
+#define SIDE_ND_VALID(side) ((side)->display_valid)
+#endif
 static const Color MAGENTA = {1.0f, 0.22f, 0.95f};
 /* The same pinned Airbus EIS font used by the EWD is shared by the PFD. */
 static void ewd_font_draw(float x, float y, const char *text, float size,
@@ -1341,7 +1345,8 @@ static void draw_nd(const Side *side, float x, float y, const char *side_name)
         map.lon=nd_data.route[nd_data.route_displayed].lon;
     }
     rectangle(x,y,x+180,y+234,(Color){.006f,.012f,.020f});
-    if (!side->display_valid) { text_at(x+55,y+116,"ND OFF",AMBER); return; }
+    /* An unpowered ND display unit is dark (A380 network); without it the legacy marker stays. */
+    if (!SIDE_ND_VALID(side)) { if (!a380x_power.available) text_at(x+55,y+116,"ND OFF",AMBER); return; }
     if (position_valid && efis[index].zoom) nd_draw_airport(&map);
     if (position_valid && !efis[index].zoom) {
         nd_draw_terrain(&map,index);

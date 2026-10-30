@@ -1,0 +1,620 @@
+{
+  "pressed": {
+    "isis/ls_pressed": {
+      "draws": 2,
+      "triangles": 252,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis/menu_pressed": {
+      "draws": 2,
+      "triangles": 260,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis/minus_pressed": {
+      "draws": 2,
+      "triangles": 248,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis/mode_pressed": {
+      "draws": 2,
+      "triangles": 260,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis/plus_pressed": {
+      "draws": 2,
+      "triangles": 248,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "isis2/ls_pressed": {
+      "draws": 2,
+      "triangles": 252,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis2/menu_pressed": {
+      "draws": 2,
+      "triangles": 260,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis2/minus_pressed": {
+      "draws": 2,
+      "triangles": 248,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "isis2/mode_pressed": {
+      "draws": 2,
+      "triangles": 260,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "isis2/plus_pressed": {
+      "draws": 2,
+      "triangles": 248,
+      "normal_mm": [
+        -1.0
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "isis/set_sel_rotation": {
+      "draws": 1,
+      "triangles": 1054,
+      "normal_mm": [
+        -0.0
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "isis/set_sel_axial + isis/set_sel_rotation": {
+      "draws": 1,
+      "triangles": 956,
+      "normal_mm": [
+        -1.5
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "isis2/set_sel_rotation": {
+      "draws": 1,
+      "triangles": 1054,
+      "normal_mm": [
+        -0.0
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "isis2/set_sel_axial + isis2/set_sel_rotation": {
+      "draws": 1,
+      "triangles": 956,
+      "normal_mm": [
+        -1.5
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "efis/captain/vor2_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/arpt_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/cstr_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/ls_pressed": {
+      "draws": 2,
+      "triangles": 324,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/ndb_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/taxi_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/terr_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.62,
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/traf_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.62,
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/vor1_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.62,
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/vord_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/captain/vv_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/wpt_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/wx_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.62,
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/vor2_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/arpt_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/cstr_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/ls_pressed": {
+      "draws": 2,
+      "triangles": 324,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/ndb_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/taxi_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/terr_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/traf_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/vor1_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/vord_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/vv_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/wpt_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/first_officer/wx_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -0.61
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/alt_button_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/ap1_pressed": {
+      "draws": 2,
+      "triangles": 272,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/ap2_pressed": {
+      "draws": 2,
+      "triangles": 272,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "fcu/approach_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/athr_pressed": {
+      "draws": 2,
+      "triangles": 276,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "fcu/fd_pressed": {
+      "draws": 2,
+      "triangles": 272,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/trk_fpa_pressed": {
+      "draws": 2,
+      "triangles": 224,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "fcu/loc_pressed": {
+      "draws": 2,
+      "triangles": 322,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "fcu/metric_pressed": {
+      "draws": 2,
+      "triangles": 224,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/speed_mach_pressed": {
+      "draws": 2,
+      "triangles": 224,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/true_mag_pressed": {
+      "draws": 2,
+      "triangles": 224,
+      "normal_mm": [
+        -1.35
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "efis/captain/baro_knob_axial + efis/captain/baro_preset_hpa": {
+      "draws": 1,
+      "triangles": 1470,
+      "normal_mm": [
+        -1.29
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/baro_knob_axial + efis/first_officer/baro_preset_hpa": {
+      "draws": 1,
+      "triangles": 1470,
+      "normal_mm": [
+        -0.86
+      ],
+      "clockwise_deg": [
+        0.0
+      ]
+    },
+    "fcu/altitude_knob_axial + fcu/altitude_knob_rotation": {
+      "draws": 1,
+      "triangles": 1470,
+      "normal_mm": [
+        -1.09
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "fcu/heading_knob_axial + fcu/heading_knob_rotation": {
+      "draws": 1,
+      "triangles": 3758,
+      "normal_mm": [
+        -0.81
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "fcu/speed_knob_axial + fcu/speed_knob_rotation": {
+      "draws": 1,
+      "triangles": 3262,
+      "normal_mm": [
+        -1.4
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "fcu/vertical_speed_knob_axial + fcu/vertical_speed_knob_rotation": {
+      "draws": 1,
+      "triangles": 3758,
+      "normal_mm": [
+        -1.1
+      ],
+      "clockwise_deg": [
+        90.0
+      ]
+    },
+    "ecam/sd/ewd_brightness": {
+      "draws": 1,
+      "triangles": 6524,
+      "normal_mm": [
+        0.02
+      ],
+      "clockwise_deg": [
+        -32.3
+      ]
+    },
+    "ecam/sd/brightness": {
+      "draws": 1,
+      "triangles": 6524,
+      "normal_mm": [
+        0.02
+      ],
+      "clockwise_deg": [
+        -32.3
+      ]
+    }
+  },
+  "pulled": {
+    "efis/captain/baro_knob_axial + efis/captain/baro_preset_hpa": {
+      "draws": 1,
+      "triangles": 1470,
+      "normal_mm": [
+        1.29
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    },
+    "efis/first_officer/baro_knob_axial + efis/first_officer/baro_preset_hpa": {
+      "draws": 1,
+      "triangles": 1470,
+      "normal_mm": [
+        0.86
+      ],
+      "clockwise_deg": [
+        -0.0
+      ]
+    }
+  }
+}

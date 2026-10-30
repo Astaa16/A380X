@@ -151,6 +151,12 @@ def parse_obj8(lines: Iterable[str], values: Mapping[str, float] | None = None,
         words = line.split()
         command, arguments = words[0], words[1:]
         try:
+            if command == 'ANIM_keyframe_loop' and block is not None:
+                # XPlane2Blender writes the loop as the last line of the key table.
+                if len(arguments) != 1 or float(arguments[0]) <= 0:
+                    raise ValueError('ANIM_keyframe_loop requires a positive period')
+                block = (*block[:4], float(arguments[0]))
+                continue
             if command == 'ANIM_keyframe_loop':
                 if pending is None or len(arguments) != 1 or float(arguments[0]) <= 0:
                     raise ValueError('ANIM_keyframe_loop requires a preceding completed animation and positive period')

@@ -8,6 +8,15 @@
  * OperatingSpeeds.tsx (systems/shared/src), GPL-3.0.
  */
 #include <stddef.h>
+#include "a380x_flaps.h"
+/* FLAPS lever / FBW SFCC feed, filled by a380x_flaps.inc every frame (ready = 0: the legacy X-Plane
+ * handle interpretation below applies). Also read by the FWS adapter and the xp-kit SFCC words. */
+static A380XFlapsFeed flaps_feed;
+#include "a380x_speedbrake.h"
+/* SPEED BRAKE lever / FBW ground spoiler feed, filled by a380x_speedbrake.inc every frame (ready = 0: X-Plane's
+ * speedbrake handle is read as the lever below). X-Plane's handle then carries the FBW surface order, not the
+ * lever. Also read by the FWS adapter and the xp-kit PFD variables. */
+static A380XSpeedbrakeFeed speedbrake_feed;
 enum {
     PI_FLAP_HANDLE, PI_FLAP_ACTUAL, PI_SLAT_ACTUAL, PI_SPOILER_ACTUAL,
     PI_SPOILER_HANDLE, PI_GEAR, PI_FLAP_FAILURE, PI_SLAT_FAILURE, PI_STALL,
@@ -216,6 +225,32 @@ static void read_pfd_aircraft(void)
         p->vmax_knots=fmin(p->vmax_knots,vfe[limit_config]);
         p->vfe_next_knots=next[p->flap_config];
     }
+    if(flaps_feed.ready){
+        /* FBW SFCC (a380x_flaps.inc): lever, configuration text, FPPU surfaces and VFE; X-Plane's handle
+         * carries the SFCC configuration, so the lever replaces it for the clean-performance gate. */
+        handle=flaps_feed.handle_index/4.0;
+        p->flap_valid=p->slat_valid=p->sfcc_valid=1;
+        p->flap_handle_index=flaps_feed.handle_index;
+        p->flap_config=flaps_feed.display_config;
+        p->flap_ratio=flaps_feed.flap_deg/A380X_FLAPS_MAX_DEG;
+        p->slat_ratio=flaps_feed.slat_deg/A380X_SLATS_MAX_DEG;
+        p->flap_target_ratio=flaps_feed.flap_demand_deg/A380X_FLAPS_MAX_DEG;
+        p->slat_target_ratio=flaps_feed.slat_demand_deg/A380X_SLATS_MAX_DEG;
+        p->flap_fppu=flaps_feed.flap_fppu;p->slat_fppu=flaps_feed.slat_fppu;
+        p->flap_relief=flaps_feed.relief;p->alpha_lock=flaps_feed.alpha_lock;
+        p->flap_target_index=flaps_feed.flap_target;p->slat_target_index=flaps_feed.slat_target;
+        p->vmax_knots=guidance_inputs.vmax_knots;
+        if(flaps_feed.vfe_knots>0)p->vmax_knots=fmin(p->vmax_knots,flaps_feed.vfe_knots);
+        p->vfe_next_knots=flaps_feed.vfe_next_knots;
+    }
+    if(speedbrake_feed.ready){
+        /* SPEED BRAKE lever + FBW ground spoilers (a380x_speedbrake.inc): armed from the lever, the extension
+         * as a fraction of its maximum (VLS increment, PFD symbol); X-Plane's handle carries the surface order. */
+        p->speedbrake_valid=1;
+        p->spoilers_armed=speedbrake_feed.armed;
+        p->spoiler_ratio=speedbrake_feed.extension_ratio;
+        spoiler_handle=speedbrake_feed.lever_pos;
+    }
     if(pfd_input_refs[PI_GEAR])gear_count=XPLMGetDatavf(pfd_input_refs[PI_GEAR],gear,0,5);
     p->gear_down=gear_count==5;
     for(i=0;i<gear_count&&i<5;++i){
@@ -273,6 +308,8 @@ static void publish_pfd_aircraft(void)
     PFD_COPY(alpha_prot_knots);PFD_COPY(alpha_limit_knots);PFD_COPY(stall_warning_knots);
     PFD_COPY(f_speed_knots);PFD_COPY(s_speed_knots);PFD_COPY(green_dot_knots);
     PFD_COPY(v1_knots);PFD_COPY(vr_knots);PFD_COPY(v2_knots);
+    PFD_COPY(sfcc_valid);PFD_COPY(flap_relief);PFD_COPY(alpha_lock);
+    PFD_COPY(slat_target_index);PFD_COPY(flap_target_index);PFD_COPY(flap_fppu);PFD_COPY(slat_fppu);
 #undef PFD_COPY
 }
 static void pfd_outputs_shutdown(void)

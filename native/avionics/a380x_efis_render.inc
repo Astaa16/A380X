@@ -1,106 +1,100 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * EFIS control-panel LCD cells. Rectangles match avionics_panel_layout.py.
- * Vector dot glyphs remain legible through the narrow physical screen UVs.
+ * EFIS CP LCDs, translated from the pinned FlyByWire A380X FCU display
+ * (FCU/Components/NdDataDisplay.tsx and BaroRefDisplay.tsx):
+ *  - ND-filter legends are FBW's own dot-matrix artwork (a380x_efis_legends.h,
+ *    extracted from html_ui/Images/fbw-a380x/fcu), redrawn dot-for-dot: lit dots
+ *    white, unlit dots faint grey. VOR1/VOR2 show the VOR or pointer legend.
+ *    As in FBW the legends do not change with the filter state; the selection is
+ *    shown on the ND.
+ *  - Baro window: FBW "Digital" value (QNH value, "Std"), Poppins QNH legend with
+ *    the inactive QFE legend ghosted, and the small STD preselection (top right)
+ *    once the knob has been turned in STD.
+ * Rectangles are panel-atlas texels and must match tools/avionics_panel_layout.py
+ * (EFIS_UPPER/LOWER_PANEL_RECTS, EFIS_BARO_PANEL_RECTS).
  */
-static const unsigned char *efis_glyph(char c)
-{
-    static const unsigned char letters[26][7] = {
-        {14,17,17,31,17,17,17},{30,17,17,30,17,17,30},{14,17,16,16,16,17,14},
-        {30,17,17,17,17,17,30},{31,16,16,30,16,16,31},{31,16,16,30,16,16,16},
-        {14,17,16,23,17,17,15},{17,17,17,31,17,17,17},{14,4,4,4,4,4,14},
-        {7,2,2,2,18,18,12},{17,18,20,24,20,18,17},{16,16,16,16,16,16,31},
-        {17,27,21,21,17,17,17},{17,25,21,19,17,17,17},{14,17,17,17,17,17,14},
-        {30,17,17,30,16,16,16},{14,17,17,17,21,18,13},{30,17,17,30,20,18,17},
-        {15,16,16,14,1,1,30},{31,4,4,4,4,4,4},{17,17,17,17,17,17,14},
-        {17,17,17,17,17,10,4},{17,17,17,21,21,21,10},{17,17,10,4,10,17,17},
-        {17,17,10,4,4,4,4},{31,1,2,4,8,16,31}
-    };
-    static const unsigned char digits[10][7] = {
-        {14,17,19,21,25,17,14},{4,12,4,4,4,4,14},{14,17,1,2,4,8,31},
-        {30,1,1,14,1,1,30},{2,6,10,18,31,2,2},{31,16,16,30,1,1,30},
-        {14,16,16,30,17,17,14},{31,1,2,4,8,8,8},{14,17,17,14,17,17,14},
-        {14,17,17,15,1,1,14}
-    };
-    static const unsigned char blank[7]={0}, dash[7]={0,0,0,31,0,0,0}, dot[7]={0,0,0,0,0,6,6};
-    if (c>='A' && c<='Z') return letters[c-'A'];
-    if (c>='0' && c<='9') return digits[c-'0'];
-    return c=='-' ? dash : c=='.' ? dot : blank;
-}
+#include "a380x_efis_legends.h"
+static const float efis_upper_cells[2][5][4]={
+    {{0,1500,307,1604},{307,1500,614,1604},{614,1500,922,1604},{922,1500,1229,1604},{1229,1500,1536,1604}},
+    {{0,1724,307,1828},{307,1724,614,1828},{614,1724,922,1828},{922,1724,1229,1828},{1229,1724,1536,1828}}};
+static const float efis_lower_cells[2][5][4]={
+    {{0,1612,262,1716},{321,1612,624,1716},{624,1612,923,1716},{923,1612,1210,1716},{1274,1612,1536,1716}},
+    {{0,1836,262,1940},{326,1836,613,1940},{613,1836,912,1940},{912,1836,1215,1940},{1274,1836,1536,1940}}};
+static const float efis_upper_rows[2][4]={{0,1500,1536,1604},{0,1724,1536,1828}};
+static const float efis_baro_rects[2][4]={{1544,1500,1928,1744},{1544,1752,1928,1996}};
 
-static void efis_dot_text(float cx,float y,const char *text,float sx,float sy,Color color)
-{
-    int i,row,col;
-    float x=cx-((float)strlen(text)*6.0f-1.0f)*sx*.5f;
-    for(i=0;text[i];++i) {
-        const unsigned char *bits=efis_glyph(text[i]);
-        for(row=0;row<7;++row) for(col=0;col<5;++col)
-            if(bits[row]&(1<<(4-col)))
-                rectangle(x+col*sx,y+(6-row)*sy,x+col*sx+sx*.82f,y+(7-row)*sy-sy*.18f,color);
-        x+=6*sx;
+static Color efis_mix(Color a,Color b,float t) {
+    return (Color){a.r+(b.r-a.r)*t,a.g+(b.g-a.g)*t,a.b+(b.b-a.b)*t};
+}
+/* One FBW legend centred in its cell: 24 x 7 square dots on a 52-unit pitch. */
+static void efis_draw_legend(const float cell[4],int legend,Color lit,Color unlit) {
+    /* Reference capture: a legend is 54 % of its LCD row tall; never wider than 92 % of its cell. */
+    float w=cell[2]-cell[0],h=cell[3]-cell[1];
+    float span=(EFIS_LEGEND_ROWS-1)+(float)EFIS_LEGEND_DOT/(float)EFIS_LEGEND_PITCH;
+    float pitch=fminf(.54f*h/span,.92f*w/((EFIS_LEGEND_COLS-1)+(float)EFIS_LEGEND_DOT/(float)EFIS_LEGEND_PITCH));
+    float dot=pitch*(float)EFIS_LEGEND_DOT/(float)EFIS_LEGEND_PITCH;
+    float x0=cell[0]+(w-(EFIS_LEGEND_COLS-1)*pitch-dot)*.5f;
+    float top=cell[3]-(h-(EFIS_LEGEND_ROWS-1)*pitch-dot)*.5f;
+    for(int row=0;row<EFIS_LEGEND_ROWS;++row) for(int col=0;col<EFIS_LEGEND_COLS;++col) {
+        int state=efis_legends[legend][row][col];
+        if(!state)continue;
+        float x=x0+col*pitch,y=top-row*pitch-dot;
+        rectangle(x,y,x+dot,y+dot,state==2?lit:unlit);
     }
 }
-
-static void efis_baro_number(float cx,float y,const char *text,Color color)
-{
-    static const unsigned char segments[10]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
-    int i; float width=0,x;
-    for(i=0;text[i];++i) width+=text[i]=='.'?8:28;
-    x=cx-(width-4)*.5f;
-    for(i=0;text[i];++i) {
-        const float w=23,h=39,t=3.5f;
-        unsigned b=(text[i]>='0'&&text[i]<='9')?segments[text[i]-'0']:0;
-        if(text[i]=='.') {rectangle(x,y,x+5,y+5,color);x+=8;continue;}
-        if(b&1) rectangle(x+t,y+h-t,x+w-t,y+h,color);
-        if(b&2) rectangle(x+w-t,y+h/2+t/2,x+w,y+h-t,color);
-        if(b&4) rectangle(x+w-t,y+t,x+w,y+h/2-t/2,color);
-        if(b&8) rectangle(x+t,y,x+w-t,y+t,color);
-        if(b&16) rectangle(x,y+t,x+t,y+h/2-t/2,color);
-        if(b&32) rectangle(x,y+h/2+t/2,x+t,y+h-t,color);
-        if(b&64) rectangle(x+t,y+h/2-t/2,x+w-t,y+h/2+t/2,color);
-        x+=28;
-    }
+/* Baro text at FBW BaroRefDisplay positions (fractions of the window, y down). */
+static void efis_baro_text(const float r[4],int face,float fx,float fy,int right,const char *text,Color color) {
+    float w=r[2]-r[0],h=r[3]-r[1],x=r[0]+fx*w;
+    if(right)x-=fcu_text_width(face,text);
+    fcu_text_draw(face,x,r[3]-fy*h,text,color);
+}
+static void efis_baro_value(char *out,size_t n,float hpa,int inhg) {
+    if(inhg)snprintf(out,n,"%.2f",fminf(99.99f,fmaxf(0,hpa/33.8638867f)));
+    else snprintf(out,n,"%04d",(int)lroundf(fminf(9999,fmaxf(0,hpa))));
 }
 
 static void draw_efis_cp(void)
 {
-    static const char *upper[5]={"CSTR","WPT","VORD","NDB","ARPT"};
-    static const char *lower[5]={"VOR1","WX","TERR","TRAF","VOR2"};
-    int side,i,row;
+    static const int upper[5]={EFIS_LEGEND_CSTR,EFIS_LEGEND_WPT,EFIS_LEGEND_VORD,EFIS_LEGEND_NDB,EFIS_LEGEND_ARPT};
     float level=fcu_lcd_level;
-    Color blue=fcu_tint((Color){.16f,.07f,.92f},level),white=fcu_tint(WHITE,level);
-    Color subdued=fcu_tint(WHITE,level*.65f),selected=fcu_tint(GREEN,level);
-    for(side=0;side<2;++side) {
+    Color blue=fcu_tint(FCU_LCD_BACKGROUND,level),white=fcu_tint(FCU_LCD_INK,level);
+    Color ghost=fcu_tint(FCU_LCD_GHOST,level);
+    /* FBW unlit dot: rgba(195,195,195,38/255) over the LCD background. */
+    Color unlit=efis_mix(blue,fcu_tint((Color){195.f/255,195.f/255,195.f/255},level),38.f/255);
+    for(int side=0;side<2;++side) {
         const EfisSide *s=&efis[side];
-        float x=side?876:4;
-        int flags[2][5]={{s->cstr,s->wpt,s->vord,s->ndb,s->arpt},
-                         {s->vor1,0,s->terr,s->traf,s->vor2}};
-        char value[24];
-        rectangle(x,520,x+144,612,s->powered?blue:BLACK);
-        for(row=0;row<2;++row) for(i=0;i<5;++i) {
-            float y=(row?812:624)+36*i;
-            rectangle(x,y,x+144,y+32,s->powered?blue:BLACK);
-            if(!s->powered) continue;
-            efis_dot_text(x+72,y+5,row?lower[i]:upper[i],4.0f,3.1f,
-                flags[row][i]?white:subdued);
-            if(flags[row][i]) {
-                rectangle(x+3,y+3,x+6,y+29,selected);
-                rectangle(x+138,y+3,x+141,y+29,selected);
-            }
-            if(row==1&&i==1&&s->wx_requested)
-                efis_dot_text(x+72,y+1,"INOP",1.5f,1.0f,fcu_tint(AMBER,level));
+        int lower[5]={s->vor1?EFIS_LEGEND_VOR1:EFIS_LEGEND_POINTER1,
+                      EFIS_LEGEND_WX,EFIS_LEGEND_TERR,EFIS_LEGEND_TRAF,
+                      s->vor2?EFIS_LEGEND_VOR2:EFIS_LEGEND_POINTER2};
+        Color bed=s->powered?blue:BLACK;
+        const float *u=efis_upper_rows[side],*b=efis_baro_rects[side];
+        rectangle(u[0],u[1],u[2],u[3],bed);
+        for(int i=0;i<5;++i) {
+            const float *c=efis_lower_cells[side][i];
+            rectangle(c[0],c[1],c[2],c[3],bed);
         }
-        if(!s->powered) continue;
-        if(s->baro_std) {
-            efis_dot_text(x+30,592,"PRE",1.3f,1.6f,white);
-            if(s->baro_inhg) snprintf(value,sizeof(value),"%.2f",s->baro_preset_hpa/33.8638867f);
-            else snprintf(value,sizeof(value),"%.0f",s->baro_preset_hpa);
-            efis_dot_text(x+105,592,value,1.4f,1.6f,white);
-            efis_dot_text(x+72,543,"STD",5.0f,5.0f,white);
-        } else {
-            efis_dot_text(x+32,587,"QNH",2.4f,2.5f,white);
-            if(s->baro_inhg) snprintf(value,sizeof(value),"%.2f",s->qnh_hpa/33.8638867f);
-            else snprintf(value,sizeof(value),"%.0f",s->qnh_hpa);
-            efis_baro_number(x+72,532,value,white);
+        rectangle(b[0],b[1],b[2],b[3],bed);
+        if(!s->powered)continue;
+        for(int i=0;i<5;++i) {
+            efis_draw_legend(efis_upper_cells[side][i],upper[i],white,unlit);
+            efis_draw_legend(efis_lower_cells[side][i],lower[i],white,unlit);
+        }
+        /* Baro: QNH legend lit in QNH mode, ghosted with the inactive QFE otherwise. */
+        {
+            char value[24];
+            float qnh_end=.06f+fcu_text_width(FCU_FACE_BARO_LABEL,"QNH")/(b[2]-b[0]);
+            efis_baro_text(b,FCU_FACE_BARO_LABEL,.06f,.23f,0,"QNH",s->baro_std?ghost:white);
+            if(!(s->baro_std&&s->baro_preset_visible)) /* the STD preset occupies that corner */
+                efis_baro_text(b,FCU_FACE_BARO_LABEL,qnh_end+.02f,.23f,0,"QFE",ghost);
+            if(s->baro_std) {
+                efis_baro_text(b,FCU_FACE_BARO_VALUE,.04f,.95f,0,"Std",white);
+                if(s->baro_preset_visible) {
+                    efis_baro_value(value,sizeof(value),s->baro_preset_hpa,s->baro_inhg);
+                    efis_baro_text(b,FCU_FACE_BARO_PRESET,.97f,.30f,1,value,white);
+                }
+            } else {
+                efis_baro_value(value,sizeof(value),s->qnh_hpa,s->baro_inhg);
+                efis_baro_text(b,FCU_FACE_BARO_VALUE,.04f,.95f,0,value,white);
+            }
         }
     }
 }

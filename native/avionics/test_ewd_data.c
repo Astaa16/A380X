@@ -9,6 +9,8 @@
 #include "XPLMDataAccess.h"
 
 static struct { int flight_phase; } published;
+#include "a380x_guidance.h"
+static A380XGuidanceInputs guidance_inputs;
 #include "a380x_ewd_data.inc"
 
 typedef struct {
@@ -86,8 +88,38 @@ static int has_line(EwdLine *lines,int count,const char *text,int color)
     return 0;
 }
 
+/* FBW A380FadecComputer thrust_limit_type selection (engine 1 FADEC). */
+static void test_thrust_limit_type_selection(void)
+{
+    int latch=0;
+    /* Lever ratio to TLA: calibrated detents snap, ranges interpolate, reverse is negative. */
+    assert(ewd_lever_tla(.10,.10,.40,.70,1.0,.02,0)==0.0);
+    assert(ewd_lever_tla(.41,.10,.40,.70,1.0,.02,0)==25.0);
+    assert(ewd_lever_tla(.69,.10,.40,.70,1.0,.02,0)==35.0);
+    assert(ewd_lever_tla(.99,.10,.40,.70,1.0,.02,0)==45.0);
+    assert(fabs(ewd_lever_tla(.55,.10,.40,.70,1.0,.02,0)-30.0)<1e-9);
+    assert(ewd_lever_tla(.10,.10,.40,.70,1.0,.02,1)<0.0);
+    /* On ground with the engine running: TOGA unless FLEX; reverse = MREV. */
+    assert(ewd_thrust_limit_type(0,1,1,0,0,&latch)==4);
+    assert(ewd_thrust_limit_type(0,1,1,1,0,&latch)==3 && !latch);
+    assert(ewd_thrust_limit_type(45,1,1,1,0,&latch)==4);
+    assert(ewd_thrust_limit_type(-20,1,1,0,0,&latch)==5);
+    /* FLX/MCT detent with FLEX on the ground latches; airborne it stays FLX until CL or TOGA. */
+    assert(ewd_thrust_limit_type(35,1,1,1,0,&latch)==3 && latch);
+    assert(ewd_thrust_limit_type(35,0,1,1,0,&latch)==3 && latch);
+    assert(ewd_thrust_limit_type(25,0,1,1,0,&latch)==1 && !latch);
+    assert(ewd_thrust_limit_type(35,0,1,1,0,&latch)==2);
+    assert(ewd_thrust_limit_type(45,0,1,0,0,&latch)==4);
+    /* Airborne the reverse range is clamped to CLB; A/THR TOGA request forces TOGA. */
+    assert(ewd_thrust_limit_type(-20,0,1,0,0,&latch)==1);
+    assert(ewd_thrust_limit_type(10,0,1,0,1,&latch)==4);
+    /* Engine not operative on the ground uses the in-flight table. */
+    assert(ewd_thrust_limit_type(25,1,0,0,0,&latch)==1);
+}
+
 int main(void)
 {
+    test_thrust_limit_type_selection();
     A380xEwdFadecLimits limits;
     float expected;
     int i;

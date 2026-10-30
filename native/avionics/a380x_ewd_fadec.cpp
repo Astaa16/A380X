@@ -83,3 +83,34 @@ extern "C" int a380x_ewd_fadec_limits(double temp_c,
   out->mct_n1 = mct;
   return 1;
 }
+
+extern "C" int a380x_ewd_fadec_flex_n1(double temp_c,
+                                       double pressure_hpa,
+                                       double pressure_altitude_ft,
+                                       double mach,
+                                       int pack_count,
+                                       int engine_anti_ice,
+                                       int wing_anti_ice,
+                                       double flex_temp_c,
+                                       double *out) {
+  if (!out) return 0;
+  *out = 0.0;
+  if (!std::isfinite(temp_c) || !std::isfinite(pressure_hpa) || !std::isfinite(pressure_altitude_ft) ||
+      !std::isfinite(mach) || !std::isfinite(flex_temp_c) || temp_c <= -273.15 || pressure_hpa <= 0.0 ||
+      mach < 0.0 || pack_count < 0 || pack_count > 2 || engine_anti_ice < 0 || engine_anti_ice > 1 ||
+      wing_anti_ice < 0 || wing_anti_ice > 1 || flex_temp_c <= 0.0 || flex_temp_c > 99.0) return 0;
+  // Same domain guard as a380x_ewd_fadec_limits (the FADEC is not run outside the idle table).
+  const double idle_cn3 = Table1502_A380X::iCN3(pressure_altitude_ft, mach);
+  if (!std::isfinite(idle_cn3) || idle_cn3 < 16.012 || idle_cn3 >= 118.0) return 0;
+  const int packs = pack_count > 0 ? 1 : 0;
+  const double altitude = std::min(16600.0, pressure_altitude_ft);
+  const double flex_to = ThrustLimits_A380X::limitN1(0, altitude, temp_c, pressure_hpa, flex_temp_c,
+                                                     packs, engine_anti_ice, wing_anti_ice);
+  const double flex_ga = ThrustLimits_A380X::limitN1(1, altitude, temp_c, pressure_hpa, flex_temp_c,
+                                                     packs, engine_anti_ice, wing_anti_ice);
+  const double mach_factor_low = std::max(0.0, std::min(1.0, (mach - 0.04) / 0.04));
+  const double flex = flex_to + (flex_ga - flex_to) * mach_factor_low;
+  if (!std::isfinite(flex) || flex <= 0.0) return 0;
+  *out = flex;
+  return 1;
+}

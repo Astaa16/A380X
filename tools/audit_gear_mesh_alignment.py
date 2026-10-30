@@ -15,6 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "blender"))
 from obj8_preview import parse_obj8
+from ground_gear_diagnostics import extended_gear_contact
 
 
 FEET_TO_METRES = 0.3048
@@ -61,14 +62,7 @@ def audit(package: Path) -> dict[str, object]:
         visual_bottom_m = min(vertex[2] for vertex in vertices) + (
             float(values[f"{attachment}/_v10_att_y_acf_prt_ref"]) * FEET_TO_METRES
         )
-        gear = f"_gear/{index}"
-        if float(values[f"{gear}/_latE"]) or float(values[f"{gear}/_lonE"]):
-            raise ValueError(f"{gear} is tilted; extend contact geometry calculation")
-        contact_m = (
-            float(values[f"{gear}/_gear_y"])
-            - float(values[f"{gear}/_leg_len"])
-            - float(values[f"{gear}/_tire_radius"])
-        ) * FEET_TO_METRES
+        contact_m = extended_gear_contact(values, index)[1] * FEET_TO_METRES
         rows.append({
             "gear": group,
             "visual_bottom_m": round(visual_bottom_m, 5),

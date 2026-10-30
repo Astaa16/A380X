@@ -26,9 +26,12 @@ NATIVE = tuple(PREFIX + name for name in (
     'spoiler2_deg[4]', 'spoiler2_deg[5]'))
 RIGHT_ROLL = (NATIVE[3], NATIVE[5], NATIVE[7])
 FLAP = 'sim/flightmodel2/controls/flap1_deploy_ratio'
+# The exterior flap/slat clips are bound to the FLAPS module's FBW FPPU ratios since docs/FLAPS_LEVER.md;
+# both bindings are sampled together so the audit works before and after that install.
+FLAP_FPPU = 'a380x/xp12/flaps/flap_anim_ratio'
 BASE = {ref: 0. for ref in NATIVE} | {
-    'sim/flightmodel2/controls/roll_ratio': 0., FLAP: 0.,
-    'sim/flightmodel2/controls/slat1_deploy_ratio': 0.,
+    'sim/flightmodel2/controls/roll_ratio': 0., FLAP: 0., FLAP_FPPU: 0.,
+    'sim/flightmodel2/controls/slat1_deploy_ratio': 0., 'a380x/xp12/flaps/slat_anim_ratio': 0.,
     'sim/flightmodel2/gear/deploy_ratio[1]': 1.,
     'sim/flightmodel2/gear/deploy_ratio[2]': 1.,
 }
@@ -109,7 +112,7 @@ def audit_object(path):
             'isolated_to_linked_draws': all(not v['unlinked_changed_draws'] for v in entries)})
     right = sample(BASE | {ref: 50. for ref in RIGHT_ROLL})
     right_moved = changed(neutral, right)
-    combined = sample(full_values | {FLAP: 1.})
+    combined = sample(full_values | {FLAP: 1., FLAP_FPPU: 1.})
     mixed = [i for i in native_draws if len(refs[i].intersection(NATIVE)) > 1]
     wrong_side = [i for i in right_moved if not refs[i].intersection(RIGHT_ROLL)]
     flap_changed = [i for i in native_draws if not same({i: all_full[i]}, {i: combined[i]})]

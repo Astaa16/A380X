@@ -2,6 +2,11 @@
  * Aircraft-local glareshield side-panel controls and alert indications.
  * LAND/ATC/stick-motion inputs are explicit until their FBW producers exist.
  */
+#include "a380x_elec_power.h"
+/* Native FWS master lights (a380x_fws_adapter.inc, included later in the unity build). */
+static int fwsa_available(void);
+static int fwsa_master_warning(void);
+static int fwsa_master_caution(void);
 typedef struct {
     int chrono_mode[2], chrono_seconds[2], chrono_frozen[2];
     float chrono_fraction[2], flash_time, atc_age;
@@ -229,16 +234,18 @@ static void glare_update(float dt)
     if (glare.takeover_held && glare.stick_motion[2-glare.takeover_held]
         && glare.priority!=glare.takeover_held)
         glare_take_priority(glare.takeover_held-1);
-    i=XPLMGetDatai(glare.master_warning)!=0;
+    /* With the native FWS the lights are its masterWarningOutput / masterCautionOutput: the pbs
+     * reach the FWS (pass-through tap) which keeps non-cancellable warnings lit, so no local ack. */
+    i=fwsa_available() ? fwsa_master_warning() : XPLMGetDatai(glare.master_warning)!=0;
     if (i && !glare.warning_source) { glare.warning_ack=0; glare_play_tone(640,3,-1); }
     if (!i) glare.warning_ack=0;
     glare.warning_source=i;
-    glare.warning=i && !glare.warning_ack;
-    i=XPLMGetDatai(glare.master_caution)!=0;
+    glare.warning=i && (fwsa_available() || !glare.warning_ack);
+    i=fwsa_available() ? fwsa_master_caution() : XPLMGetDatai(glare.master_caution)!=0;
     if (i && !glare.caution_source) { glare.caution_ack=0; glare_play_tone(520,2,-1); }
     if (!i) glare.caution_ack=0;
     glare.caution_source=i;
-    glare.caution=i && !glare.caution_ack;
+    glare.caution=i && (fwsa_available() || !glare.caution_ack);
     if (glare.land_mode && refs.side[0].radio_altitude_valid && ra<200.0f) {
         if (!guidance.ap1 && !guidance.ap2) mask|=1;
         if (ra>15.0f && (!refs.side[0].loc_valid || fabsf(refs.side[0].loc_dots)>0.25f)) mask|=2;
@@ -259,16 +266,22 @@ static void glare_update(float dt)
         }
     }
     i=fmodf(glare.flash_time,1.0f)<0.5f;
-    glare.warning_lit=glare.warning && i;
-    glare.caution_lit=glare.caution;
-    glare.autoland_lit=glare.autoland_warning && i;
-    glare.atc_lit=glare.atc_pending && !suppressed && i;
-    glare.arrow[0]=glare.priority==2;
-    glare.arrow[1]=glare.priority==1;
-    glare.green[0]=glare.priority==1 ? glare.stick_motion[1] :
-        glare.priority==0 && glare.stick_motion[0] && glare.stick_motion[1] && i;
-    glare.green[1]=glare.priority==2 ? glare.stick_motion[0] :
-        glare.priority==0 && glare.stick_motion[0] && glare.stick_motion[1] && i;
+    {
+        /* A380 network: FWS 1/2 on DC ESS / DC 2 light the attention getters; sidestick
+         * priority lamps on AC 1 (CAPT) / AC 2 (F/O) (spec 6.4). Always lit without it. */
+        int fws=a380x_power_any(A380X_ELN_BIT(A380X_ELN_DC_ESS)|A380X_ELN_BIT(A380X_ELN_DC2),1);
+        int left=a380x_power_bus(A380X_ELN_AC1,1), right=a380x_power_bus(A380X_ELN_AC2,1);
+        glare.warning_lit=fws && glare.warning && i;
+        glare.caution_lit=fws && glare.caution;
+        glare.autoland_lit=fws && glare.autoland_warning && i;
+        glare.atc_lit=fws && glare.atc_pending && !suppressed && i;
+        glare.arrow[0]=left && glare.priority==2;
+        glare.arrow[1]=right && glare.priority==1;
+        glare.green[0]=left && (glare.priority==1 ? glare.stick_motion[1] :
+            glare.priority==0 && glare.stick_motion[0] && glare.stick_motion[1] && i);
+        glare.green[1]=right && (glare.priority==2 ? glare.stick_motion[0] :
+            glare.priority==0 && glare.stick_motion[0] && glare.stick_motion[1] && i);
+    }
 }
 static void glare_shutdown(void)
 {

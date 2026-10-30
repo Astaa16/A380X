@@ -217,10 +217,53 @@ static int engines_off(void)
     return 1;
 }
 
+/* Native A380 network (a380x_elec_adapter.inc, other translation unit): looked up lazily
+ * because it registers after the flyPad. */
+static XPLMDataRef native_lookup(XPLMDataRef *cache, const char *name)
+{
+    if (*cache == NULL) *cache = XPLMFindDataRef(name);
+    return *cache;
+}
+static int elec_network_active(void)
+{
+    static XPLMDataRef ref;
+    XPLMDataRef handle = native_lookup(&ref, "a380x/xp12/elec/network_active");
+    return handle != NULL && XPLMGetDatai(handle) != 0;
+}
+static int elec_native_int(const char *name, int fallback)
+{
+    static struct { const char *name; XPLMDataRef ref; } cache[8];
+    int i;
+    for (i = 0; i < 8; ++i) {
+        if (cache[i].name == NULL) cache[i].name = name;
+        if (cache[i].name == name || strcmp(cache[i].name, name) == 0) {
+            XPLMDataRef handle = native_lookup(&cache[i].ref, name);
+            return handle != NULL ? XPLMGetDatai(handle) : fallback;
+        }
+    }
+    return fallback;
+}
+static int gpu_connected(void)
+{
+    return elec_network_active() ? elec_native_int("a380x/xp12/elec/ext/connected", 0) : get_int(refs.gpu);
+}
+static void gpu_toggle(void)
+{
+    if (elec_network_active() && XPLMFindCommand("a380x/xp12/elec/gpu_connect_toggle") != NULL)
+        XPLMCommandOnce(XPLMFindCommand("a380x/xp12/elec/gpu_connect_toggle"));
+    else {
+        XPLMCommandRef command = XPLMFindCommand("sim/ground_ops/toggle_gpu_request");
+        if (command != NULL) XPLMCommandOnce(command);
+    }
+}
+
+/* Tablet charging: aircraft power = any AC main bus of the A380 network (stock switches
+ * without it). */
 static int electrical_power_available(void)
 {
     int values[4] = {0};
     int i;
+    if (elec_network_active()) return elec_native_int("a380x/xp12/elec/ac_main_powered", 0) != 0;
     if (refs.batteries != NULL) {
         XPLMGetDatavi(refs.batteries, values, 0, 2);
         if (values[0] || values[1]) return 1;
@@ -293,8 +336,28 @@ static void set_page(int page)
     if (page >= 0 && page < PAGE_COUNT) active_page = (EfbPage)page;
 }
 
+/* FBW flyPad aircraft-state presets 1-5 run natively in the A380 network
+ * (a380x_elec_presets.c, a380x/xp12/elec/preset/<n>). The stock fallbacks below remain
+ * only for a plugin without the network. */
+static int native_preset(int preset)
+{
+    char name[48];
+    XPLMCommandRef command;
+    if (!elec_network_active()) return 0;
+    snprintf(name, sizeof(name), "a380x/xp12/elec/preset/%d", preset);
+    command = XPLMFindCommand(name);
+    if (command == NULL) return 0;
+    XPLMCommandOnce(command);
+    if (elec_native_int("a380x/xp12/elec/preset/active", 0) == preset)
+        set_status("%s preset running", preset == 1 ? "Cold & Dark" : preset == 2 ? "Turnaround" :
+                   preset == 3 ? "Ready for Pushback" : preset == 4 ? "Ready for Taxi" : "Ready for Takeoff");
+    else set_status("Preset stopped or not available (ground only; engines off for 1-2)");
+    return 1;
+}
+
 static void preset_cold_dark(void)
 {
+    if (native_preset(1)) return;
     if (!on_ground()) { set_status("Aircraft presets are ground-only"); return; }
     run_command("sim/autopilot/servos_off_any");
     run_command("sim/systems/avionics_off");
@@ -308,6 +371,7 @@ static void preset_cold_dark(void)
 
 static void preset_turnaround(void)
 {
+    if (native_preset(2)) return;
     if (!on_ground()) { set_status("Aircraft presets are ground-only"); return; }
     run_command("sim/electrical/battery_1_on");
     run_command("sim/electrical/battery_2_on");
@@ -318,6 +382,7 @@ static void preset_turnaround(void)
 
 static void preset_ready(void)
 {
+    if (native_preset(4)) return;
     if (!on_ground()) { set_status("Aircraft presets are ground-only"); return; }
     run_command("sim/operation/quick_start");
     run_command("sim/systems/avionics_on");
@@ -327,20 +392,20 @@ static void preset_ready(void)
 
 static void toggle_all_doors(void)
 {
-    float doors[17] = {0};
+    float doors[20] = {0};
     int i, open_all = 0;
     if (refs.doors != NULL) {
-        XPLMGetDatavf(refs.doors, doors, 0, 17);
-        for (i = 0; i < 17; ++i) if (doors[i] < 0.5f) open_all = 1;
+        XPLMGetDatavf(refs.doors, doors, 0, 20);
+        for (i = 0; i < 20; ++i) if (doors[i] < 0.5f) open_all = 1;
     }
-    for (i = 0; i < 17; ++i) {
+    for (i = 0; i < 20; ++i) {
         char name[64];
         if ((open_all && doors[i] < 0.5f) || (!open_all && doors[i] >= 0.5f)) {
             snprintf(name, sizeof(name), "sim/flight_controls/door_toggle_%d", i + 1);
             run_command(name);
         }
     }
-    set_status("All 17 doors commanded %s", open_all ? "open" : "closed");
+    set_status("All 20 doors commanded %s", open_all ? "open" : "closed");
 }
 
 static void action_dashboard(int action)
@@ -368,7 +433,7 @@ static void action_ground(int action)
     switch (action) {
     case 0: run_command("sim/ground_ops/jetway"); break;
     case 1: run_command("sim/ground_ops/service_plane"); break;
-    case 2: run_command("sim/ground_ops/toggle_gpu_request"); break;
+    case 2: gpu_toggle(); break;
     case 3: run_command("sim/flight_controls/door_toggle_1"); break;
     case 4: toggle_all_doors(); break;
     case 5: run_command("sim/ground_ops/pushback_straight"); break;
@@ -442,9 +507,19 @@ static int checklist_condition_met(CheckCondition condition)
         if (!refs.gear || XPLMGetDatavf(refs.gear, gear, 0, 5) < 5) return 0;
         for (i = 0; i < 5; ++i) if (gear[i] < 0.99f) return 0;
         return 1;
-    case CHECK_SPOILERS_ARMED: return refs.speedbrake && get_float(refs.speedbrake) < -0.1f;
+    case CHECK_SPOILERS_ARMED: {
+        /* SPEED BRAKE module (other translation unit, registers after the flyPad): the lever's ARM; X-Plane's
+         * handle carries the surface order there (docs/SPEED_BRAKE.md). */
+        static XPLMDataRef armed;
+        XPLMDataRef handle = native_lookup(&armed, "a380x/xp12/speedbrake/ground_spoilers_armed");
+        if (handle != NULL) return XPLMGetDatai(handle) != 0;
+        return refs.speedbrake && get_float(refs.speedbrake) < -0.1f;
+    }
     case CHECK_ENGINES_OFF: return engines_off();
     case CHECK_BATTERIES_OFF:
+        if (elec_network_active())
+            return !elec_native_int("a380x/xp12/elec/pb/bat1", 1) && !elec_native_int("a380x/xp12/elec/pb/bat2", 1) &&
+                   !elec_native_int("a380x/xp12/elec/pb/bat_ess", 1) && !elec_native_int("a380x/xp12/elec/pb/bat_apu", 1);
         if (!refs.batteries || XPLMGetDatavi(refs.batteries, batteries, 0, 2) < 2) return 0;
         return !batteries[0] && !batteries[1];
     default: return 0;
@@ -482,6 +557,16 @@ static void action_checklists(int action)
 
 static void action_presets(int action)
 {
+    if (elec_network_active()) {
+        /* FBW flyPad: 1 Cold & Dark, 2 Turnaround, 3 Pushback, 4 Taxi, 5 Takeoff; 6th: expedite. */
+        if (action < 5) native_preset(action + 1);
+        else {
+            XPLMCommandRef command = XPLMFindCommand("a380x/xp12/elec/preset/expedite_toggle");
+            if (command != NULL) XPLMCommandOnce(command);
+            set_status("Expedited presets %s", elec_native_int("a380x/xp12/elec/preset/expedited", 0) ? "on" : "off");
+        }
+        return;
+    }
     if (action == 0) preset_cold_dark();
     else if (action == 1) preset_turnaround();
     else if (action == 2) preset_ready();
@@ -843,11 +928,11 @@ static void draw_dispatch(void)
 
 static void draw_ground(void)
 {
-    float doors[17] = {0};
+    float doors[20] = {0};
     char text[160];
     int i, open = 0;
-    if (refs.doors != NULL) XPLMGetDatavf(refs.doors, doors, 0, 17);
-    for (i = 0; i < 17; ++i) if (doors[i] > 0.5f) ++open;
+    if (refs.doors != NULL) XPLMGetDatavf(refs.doors, doors, 0, 20);
+    for (i = 0; i < 20; ++i) if (doors[i] > 0.5f) ++open;
     draw_tabs("Services", "Fuel", "Payload", "Pushback");
     draw_card(238, 688, 860, 925, "Ground Services");
     /* Compact top view in the same central-aircraft style as FBW's A380 service page. */
@@ -856,8 +941,8 @@ static void draw_ground(void)
     efb_line(505, 854, 580, 784, EFB_UNSELECTED, 2);
     efb_line(505, 768, 476, 738, EFB_UNSELECTED, 2);
     efb_line(505, 768, 534, 738, EFB_UNSELECTED, 2);
-    snprintf(text, sizeof(text), "GPU  %s", get_int(refs.gpu) ? "Connected" : "Disconnected");
-    efb_text(264, 864, text, get_int(refs.gpu) ? EFB_GREEN : EFB_UNSELECTED);
+    snprintf(text, sizeof(text), "GPU  %s", gpu_connected() ? "Connected" : "Disconnected");
+    efb_text(264, 864, text, gpu_connected() ? EFB_GREEN : EFB_UNSELECTED);
     snprintf(text, sizeof(text), "Doors open  %d / 17", open);
     efb_text(264, 830, text, open ? EFB_HIGHLIGHT : EFB_UNSELECTED);
     snprintf(text, sizeof(text), "Fuel  %.0f kg", get_float(refs.fuel_total));

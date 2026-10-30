@@ -1,18 +1,15 @@
 param(
-    [Parameter(Mandatory = $true)][string]$XPlaneDir
+    [Parameter(Mandatory=$true)][string]$XPlaneDir,
+    [Parameter(Mandatory=$true)][string]$WindowsPackage,
+    [string]$AircraftDir,
+    [switch]$CheckOnly
 )
-
 $ErrorActionPreference = "Stop"
-$ProjectDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$SourceDir = Join-Path $ProjectDir "FlyWithLua\Scripts"
-$ScriptsDir = Join-Path $XPlaneDir "Resources\plugins\FlyWithLua\Scripts"
-
-if (-not (Test-Path $ScriptsDir)) {
-    throw "FlyWithLua Scripts was not found under $XPlaneDir"
+if (-not $AircraftDir) { $AircraftDir = Join-Path $XPlaneDir "Aircraft\A380X-XP12" }
+$Installer = Join-Path $WindowsPackage "Install-WindowsAvionics.ps1"
+if (-not (Test-Path -LiteralPath $Installer)) {
+    throw "Extract the complete Windows plugin kit and pass its directory with -WindowsPackage. No files were changed."
 }
-
-foreach ($Filename in @("A380X_XP12_FBW.lua")) {
-    Copy-Item -Force (Join-Path $SourceDir $Filename) (Join-Path $ScriptsDir $Filename)
-    Write-Host "Installed $Filename"
-}
-Write-Host "PFD/ND/flyPad avionics are aircraft-local native plugins; legacy Lua display/FCU adapters are not installed."
+& $Installer -AircraftDirectory $AircraftDir -XPlaneDirectory $XPlaneDir -CheckOnly:$CheckOnly
+# Required aileron/hydraulic Lua drivers are installed by that validated kit.
+# Never silently copy legacy FBW/avionics/FCU controllers over the native systems.

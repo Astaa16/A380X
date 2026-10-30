@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>A380X · MFD review</title><link rel="stylesheet" href="/trial.css">
+  <script src="/trial.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="mark">A380X</span><div><h1>Multi-function display</h1><p>Interactive review · Flight plan & performance</p></div></div>
+    <nav aria-label="Preview navigation"><a href="http://127.0.0.1:8382/">ND / OANS ↗</a><span class="badge">PREVIEW ONLY</span></nav>
+  </header>
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow">COCKPIT AVIONICS / MFD</p><h2>Try the actual interactions.</h2><p>Click the arrows on the display to open a menu. Select a page, edit a cyan field, then press Enter.</p></div>
+      <div class="scenario"><label for="scenario">Test data</label><select id="scenario"><option value="example">EGLL → LFPG example</option><option value="blank">Empty flight plan</option></select><button id="reset" type="button">Reset preview</button></div>
+    </section>
+    <p id="error" role="alert" hidden></p>
+    <section class="displays" aria-label="MFD preview screens">
+      <article data-side="0">
+        <div class="display-title"><div><small>CAPTAIN</small><h3>Left MFD</h3></div><span class="state" aria-live="polite">Connecting…</span></div>
+        <div class="quickkeys" aria-label="Captain KCCU page keys"><button data-key="init">INIT</button><button data-key="fpln">F-PLN</button><button data-key="perf">PERF</button><button data-key="dir">DIR</button><button data-key="secindex">SEC INDEX</button><button data-key="surv">SURV</button><button data-key="atccom">ATCCOM</button></div>
+        <div class="screen-wrap"><iframe src="/view/mfd.html?index=1" title="Interactive captain MFD"></iframe></div>
+        <div class="under-screen"><code class="page-name">fms/data/status</code><label><input type="checkbox" class="power" checked> Display on</label></div>
+      </article>
+      <article data-side="1">
+        <div class="display-title"><div><small>FIRST OFFICER</small><h3>Right MFD</h3></div><span class="state" aria-live="polite">Connecting…</span></div>
+        <div class="quickkeys" aria-label="First officer KCCU page keys"><button data-key="init">INIT</button><button data-key="fpln">F-PLN</button><button data-key="perf">PERF</button><button data-key="dir">DIR</button><button data-key="secindex">SEC INDEX</button><button data-key="surv">SURV</button><button data-key="atccom">ATCCOM</button></div>
+        <div class="screen-wrap"><iframe src="/view/mfd.html?index=2" title="Interactive first officer MFD"></iframe></div>
+        <div class="under-screen"><code class="page-name">fms/active/perf</code><label><input type="checkbox" class="power" checked> Display on</label></div>
+      </article>
+    </section>
+    <section class="notes"><div><h3>Start with the dropdowns</h3><p>The FMS 1 / FMS 2 arrow selects a system. ACTIVE, POSITION, SEC INDEX and DATA open their own page menus. Menus should open on one click, stay visible, and close when you select an item or click outside.</p></div><div><h3>Entries shared, pages independent</h3><p>Both seats share one isolated preview flight plan. Change INIT or PERF values on either side to check the other. Your simulator aircraft, settings and live flight plan are not connected or modified.</p></div></section>
+  </main>
+  <footer><span>LOCAL REVIEW · NOT FLIGHT DATA</span><span>Native FBW-derived page controller + xp-kit display · simulator implementation waits for your review</span></footer>
+</body></html>

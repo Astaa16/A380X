@@ -9,6 +9,10 @@
  * conversion and its fault/alpha-lock/flap-relief logic cannot be inferred from
  * these inputs. The cyan destination follows the native physical target, even
  * when that target differs from a real A380 detent. No trim/CG is synthesized.
+ *
+ * With the FLAPS module (pfd_guidance.sfcc_valid, docs/FLAPS_LEVER.md) the slat/flap part is the FBW
+ * SlatsFlapsDisplay itself: SFCC handle bits and bit 26 for "1" / "1+F", FPPU synchro angles through the
+ * LowerArea.tsx pointer laws, cyan target markers, F RELIEF and A LOCK.
  */
 
 static int pfd_configuration_ratio_valid(int available, double value)
@@ -33,6 +37,77 @@ static void pfd_configuration_flap_marker(const PfdCanvas *p, Point position, Co
                       {position.x+3.9f,position.y+2.6f}};
     if (filled) pfd_polygon(p,marker,3,color);
     else pfd_polygon_outline(p,marker,3,color);
+}
+
+/* LowerArea.tsx slatPositionWord / flapPositionWord pointer laws (FPPU degrees). */
+static Point pfd_sfcc_slat_point(double slats)
+{
+    double offset = 0.0, factor = 0.0, position = 0.0, value;
+    if (slats >= 0.0 && slats < 286.584) { factor = 0.491985; }
+    else if (slats >= 286.584 && slats < 355.0) { offset = 13.22; factor = 3.41585; position = -22.69; }
+    value = (slats * 0.081 - offset) * factor + position;
+    return (Point){(float)(-0.43 * value + 15.2), (float)(0.09 * value + 195.3)};
+}
+
+static Point pfd_sfcc_flap_point(double flaps)
+{
+    double offset = 0.0, factor = 0.0, position = 0.0, value;
+    if (flaps >= 0.0 && flaps < 214.927) { factor = 0.18575; position = 2.8942; }
+    else if (flaps >= 214.927 && flaps < 259.019) { offset = 7.92; factor = 0.90853; position = -12.768; }
+    else if (flaps >= 259.019 && flaps < 297.523) { offset = 18.11; factor = 1.0295; position = -6.2983; }
+    else if (flaps >= 297.523 && flaps < 355.0) { offset = 26.8; factor = 0.9315; position = 4.8816; }
+    value = fmax((flaps * 0.22 - 15.88 - offset) * factor + position, 0.0);
+    return (Point){(float)(0.87 * value + 31.8), (float)(0.365 * value + 193.1)};
+}
+
+static void draw_pfd_sfcc(const PfdCanvas *p)
+{
+    static const char *config_text[] = {"0","1","1+F","2","3","FULL"};
+    static const Point slat_marks[] = {{14.1f,194.5f},{9.6f,195.4f},{5.0f,196.4f}};
+    static const Point flap_marks[] = {
+        {32.3f,193.7f},{39.9f,196.8f},{47.3f,199.9f},{54.7f,203.0f},{62.1f,206.1f}
+    };
+    const A380XPfdGuidance *g = &pfd_guidance;
+    int slats_out = g->slat_fppu > 6.1, flaps_out = g->flap_fppu > 5.0, clean = g->flap_handle_index == 0;
+    int visible = slats_out || flaps_out || !clean;
+    int moving = g->flap_target_index >= 0 || g->slat_target_index >= 0;
+    Color index_color = g->slat_fault ? AMBER : visible ? GREEN : WHITE;
+    Color flap_index_color = g->flap_fault ? AMBER : visible ? GREEN : WHITE;
+    Point slat = pfd_sfcc_slat_point(g->slat_fppu), flap = pfd_sfcc_flap_point(g->flap_fppu);
+    int i;
+    if (visible) {
+        if (g->flap_config >= 0 && g->flap_config < ARRAY_LEN(config_text))
+            pfd_text_center(p,23.7f,202.3f,config_text[g->flap_config],moving ? CYAN : GREEN);
+        if (moving) pfd_box(p,15.4f,196.8f,31.6f,203.0f,CYAN);
+        for (i = 0; i < ARRAY_LEN(slat_marks); ++i) {
+            if (g->slat_target_index == i) {
+                pfd_circle(p,slat_marks[i].x,slat_marks[i].y,0.8f,CYAN);
+                pfd_circle(p,slat_marks[i].x,slat_marks[i].y,0.4f,CYAN);
+            } else if (i) {
+                pfd_circle(p,slat_marks[i].x,slat_marks[i].y,0.8f,WHITE);
+            }
+        }
+        if (!g->alpha_lock) pfd_text(p,3.8f,191.1f,"S",g->slat_fault ? AMBER : WHITE);
+        for (i = 0; i < ARRAY_LEN(flap_marks); ++i) {
+            Point marker[] = {{flap_marks[i].x,flap_marks[i].y},{flap_marks[i].x,flap_marks[i].y+1.7f},
+                              {flap_marks[i].x+1.9f,flap_marks[i].y+1.7f}};
+            if (g->flap_target_index == i) pfd_polygon(p,marker,3,CYAN);
+            else if (i) pfd_polygon(p,marker,3,WHITE);
+        }
+        if (!g->flap_relief) pfd_text(p,47.2f,210.8f,"F",g->flap_fault ? AMBER : WHITE);
+    }
+    if (g->alpha_lock) pfd_text_sized(p,0.0f,190.0f,"A LOCK",GREEN,4.5f,0);
+    if (g->flap_relief) pfd_text_sized(p,32.5f,210.8f,"F RELIEF",GREEN,4.5f,0);
+    {
+        Point index[] = {{slat.x,slat.y},{slat.x-1.3f,slat.y-1.9f},{slat.x+0.1f,slat.y-2.6f}};
+        pfd_polygon_outline(p,index,3,index_color);
+        pfd_line(p,15.2f,195.4f,slat.x,slat.y,index_color);
+    }
+    {
+        Point index[] = {{flap.x,flap.y},{flap.x,flap.y+2.6f},{flap.x+3.9f,flap.y+2.6f}};
+        pfd_polygon_outline(p,index,3,flap_index_color);
+        pfd_line(p,31.8f,193.1f,flap.x,flap.y,flap_index_color);
+    }
 }
 
 static void draw_pfd_configuration(const PfdCanvas *p)
@@ -62,7 +137,8 @@ static void draw_pfd_configuration(const PfdCanvas *p)
     int i;
 
     pfd_polygon_outline(p,wing,ARRAY_LEN(wing),WHITE);
-    if (configuration_visible) {
+    if (pfd_guidance.sfcc_valid) draw_pfd_sfcc(p);
+    else if (configuration_visible) {
         int config = pfd_guidance.flap_config;
         int target_known = flap_target_ok && slat_target_ok && config >= 0 && config < ARRAY_LEN(config_text);
         Color target_color = !flap_ok || !slat_ok || !target_known ? AMBER : moving ? CYAN : GREEN;

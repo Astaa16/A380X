@@ -88,6 +88,30 @@ static void mfd_gl_segment(const MfdGlXform *t, float x1, float y1, float x2, fl
     glVertex2f(bx - nx, by - ny); glVertex2f(ax - nx, ay - ny);
 }
 
+/* Tiny native overlay over the cached WebKit page. No font setup, allocations,
+ * snapshots, IPC or texture uploads on the pointer-motion path. The geometry
+ * comes from the same display list as the mockup, including the FO rotation. */
+static void mfd_gl_cursor(const MfdDrawList *dl,float ox,float oy,float scale)
+{
+    if(!dl)return;
+    MfdGlXform t={ox,oy,scale};
+    XPLMSetGraphicsState(0,0,0,0,1,0,0);
+    mfd_gl_color(MFD_COL_YELLOW);
+    glBegin(GL_QUADS);
+    for(uint32_t i=0;i<dl->cmd_count;++i) {
+        const MfdCmd *cmd=&dl->cmds[i];
+        if(cmd->layer!=MFD_LAYER_CURSOR)continue;
+        if(cmd->kind==MFD_CMD_LINE)
+            mfd_gl_segment(&t,cmd->a[0],cmd->a[1],cmd->a[2],cmd->a[3],cmd->width);
+        else if(cmd->kind==MFD_CMD_POLYLINE) {
+            const MfdPoint *p=dl->points+cmd->first;
+            for(uint32_t n=1;n<cmd->count;++n)
+                mfd_gl_segment(&t,p[n-1].x,p[n-1].y,p[n].x,p[n].y,cmd->width);
+        }
+    }
+    glEnd();
+}
+
 static void mfd_gl_text(const MfdGlXform *t, const MfdDrawList *dl, const MfdCmd *cmd)
 {
     const char *p = &dl->text[cmd->first], *end = p + cmd->count;

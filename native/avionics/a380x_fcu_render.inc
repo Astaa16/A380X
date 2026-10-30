@@ -1,82 +1,110 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
- * Native FCU glass. Windows follow the authored 4x256 by 40 pixel atlas.
- * State/dashes come from the same controller used by PFD/FD and AP servos.
+ * AFS CP LCDs, translated from the pinned FlyByWire A380X FCU display
+ * (systems/instruments/src/FCU/Components/{Spd,Hdg,Alt,Vs}Display.tsx): the FBW
+ * "Digital" value font (A380X_FCU.ttf) and Poppins-SemiBold labels, rasterised at
+ * their exact texel size into a380x_fcu_font.h. Each physical LCD owns a
+ * 1024 x 212 texel atlas slice, which matches the authored glass aspect (4.8:1).
+ *
+ * The includer provides fcu_text_draw(face, x, baseline_y, text, color): the GL
+ * atlas implementation is a380x_fcu_font.inc; the offline tests capture/raster it.
  */
-static float fcu_integral_level = 1.0f, fcu_lcd_level = 1.0f;
-static Color fcu_tint(Color color, float level)
-{
-    Color result = {color.r * level, color.g * level, color.b * level};
-    return result;
+#include "a380x_fcu_font.h"
+static float fcu_lcd_level=1.0f;
+/* Reference capture of the FBW A380X AFS CP in MSFS: background #3F23F3,
+ * inactive (ghosted) mode legends slightly darker. Shared with the EFIS LCDs. */
+static const Color FCU_LCD_BACKGROUND={63.f/255,35.f/255,243.f/255};
+static const Color FCU_LCD_GHOST={54.f/255,32.f/255,214.f/255};
+static const Color FCU_LCD_INK={1,1,1};
+enum {FCU_GLASS_X=0,FCU_GLASS_Y=1280,FCU_GLASS_W=2048,FCU_GLASS_H=212,FCU_GLASS_SCREEN_COUNT=2,
+      FCU_LCD_W=FCU_GLASS_W/FCU_GLASS_SCREEN_COUNT};
+static void fcu_text_draw(int face,float x,float baseline_y,const char *text,Color color);
+
+typedef struct {
+    char value[4][24];           /* FBW strings: Digital font, '~' = blank cell, 'o' = small zero */
+    const char *title[4];        /* active legends */
+    const char *ghost[4];        /* paired inactive legends, NULL when none */
+    int knots,degrees,true_reference;
+} FcuGlass;
+
+static Color fcu_tint(Color c,float level) {
+    float v=fminf(1,fmaxf(0,isfinite(level)?level:0));
+    return (Color){c.r*v,c.g*v,c.b*v};
 }
-static void fcu_digit(float x,float y,char digit,Color color)
-{
-    static const unsigned char segments[10]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};
-    unsigned bits=(digit>='0'&&digit<='9') ? segments[digit-'0'] : digit=='-' ? 0x40 : 0;
-    /* Each atlas quarter maps to half of an AFS window. Compensate for its
-     * horizontal UV compression so seven-segment glyphs retain their shape. */
-    const float w=32,h=24,t=3;
-    if (bits&1) rectangle(x+t,y+h-t,x+w-t,y+h,color);
-    if (bits&2) rectangle(x+w-t,y+h/2+t/2,x+w,y+h-t,color);
-    if (bits&4) rectangle(x+w-t,y+t,x+w,y+h/2-t/2,color);
-    if (bits&8) rectangle(x+t,y,x+w-t,y+t,color);
-    if (bits&16) rectangle(x,y+t,x+t,y+h/2-t/2,color);
-    if (bits&32) rectangle(x,y+h/2+t/2,x+t,y+h-t,color);
-    if (bits&64) rectangle(x+t,y+h/2-t/2,x+w-t,y+h/2+t/2,color);
-    if (digit=='+') {
-        rectangle(x+4,y+11,x+28,y+13,color); rectangle(x+15,y+5,x+18,y+19,color);
+
+/* Display strings exactly as the FBW components build them (lights test omitted:
+ * the port has no annunciator-test input for the AFS CP). */
+static FcuGlass fcu_glass_values(const A380XGuidanceState *s) {
+    FcuGlass v;memset(&v,0,sizeof(v));
+    int spd_dashes=s->speed_dashes||!isfinite(s->selected_speed_knots)||!isfinite(s->selected_mach);
+    int hdg_dashes=s->heading_dashes||!isfinite(s->selected_heading_deg);
+    int vs_dashes=s->vs_dashes||!isfinite(s->selected_vs_fpm)||!isfinite(s->selected_fpa_deg);
+    v.title[0]=s->mach_mode?"MACH":"SPD";  v.ghost[0]=s->mach_mode?"SPD":"MACH";
+    v.title[1]=s->trk_fpa_mode?"TRK":"HDG"; v.ghost[1]=s->trk_fpa_mode?"HDG":"TRK";
+    v.title[2]="ALT";                      v.ghost[2]=NULL;
+    v.title[3]=s->trk_fpa_mode?"FPA":"V/S"; v.ghost[3]=s->trk_fpa_mode?"V/S":"FPA";
+    if(spd_dashes)snprintf(v.value[0],sizeof(v.value[0]),"---");
+    else if(s->mach_mode)snprintf(v.value[0],sizeof(v.value[0]),"%.2f",fmin(.99,fmax(0,s->selected_mach)));
+    else snprintf(v.value[0],sizeof(v.value[0]),"%03d",(int)lround(fmin(999,fmax(0,s->selected_speed_knots))));
+    if(hdg_dashes)snprintf(v.value[1],sizeof(v.value[1]),"---");
+    else snprintf(v.value[1],sizeof(v.value[1]),"%03d",((int)lround(s->selected_heading_deg)%360+360)%360);
+    if(isfinite(s->selected_altitude_ft))
+        snprintf(v.value[2],sizeof(v.value[2]),"%05d",(int)lround(fmin(99999,fmax(0,s->selected_altitude_ft))));
+    else snprintf(v.value[2],sizeof(v.value[2]),"00000");          /* the ALT window never shows dashes */
+    if(vs_dashes)snprintf(v.value[3],sizeof(v.value[3]),"~----");
+    else if(s->trk_fpa_mode) {
+        double a=round(fabs(s->selected_fpa_deg)*10)/10;
+        snprintf(v.value[3],sizeof(v.value[3]),"~%c%.1f",s->selected_fpa_deg<0&&a>0?'-':'+',fmin(9.9,a));
+    } else {
+        int hundreds=(int)floor(fabs(s->selected_vs_fpm)*.01+1e-9);
+        snprintf(v.value[3],sizeof(v.value[3]),"%c%02doo",s->selected_vs_fpm<0?'-':'+',hundreds>99?99:hundreds);
     }
-    if (digit=='.') rectangle(x+3,y,x+6,y+3,color);
+    v.knots=!s->mach_mode&&!spd_dashes;
+    v.degrees=!hdg_dashes;
+    v.true_reference=s->true_heading;
+    return v;
 }
 
-static void fcu_number(float center,const char *digits,Color color)
-{
-    size_t i; float width=0,x;
-    for (i=0;i<strlen(digits);++i) width+=digits[i]=='.'?14:40;
-    x=center-width/2;
-    for (i=0;i<strlen(digits);++i) { fcu_digit(x,475,digits[i],color); x+=digits[i]=='.'?14:40; }
+/* Layout in texels from each LCD's top-left (y down), measured from the reference
+ * capture and scaled to the 1024 x 212 slice: labels sit on a common baseline,
+ * values on the lower baseline. Mode legends have fixed positions; the inactive
+ * one of each pair stays faintly visible, as on the physical LCD. */
+enum { FCU_LABEL_BASELINE=55, FCU_VALUE_BASELINE=193, FCU_LEGEND_GAP=6 };
+static void fcu_lcd_text(int screen,int face,float x,float y_down,const char *text,Color color) {
+    fcu_text_draw(face,FCU_GLASS_X+screen*FCU_LCD_W+x,FCU_GLASS_Y+FCU_GLASS_H-y_down,text,color);
 }
-
-static void fcu_label(float center,const char *label,Color color)
-{
-    float width=XPLMMeasureString(xplmFont_Proportional,label,(int)strlen(label));
-    text_at(center-width/2,501,label,color);
-}
-
-static void fcu_managed_dot(float x,int lit,Color color)
-{
-    int i;
-    if (!lit) return;
-    set_color(color); glBegin(GL_TRIANGLE_FAN); glVertex2f(x,487);
-    for(i=0;i<=24;++i) { float a=i*(float)(2*M_PI/24); glVertex2f(x+3*cosf(a),487+3*sinf(a)); }
-    glEnd();
-}
-
-static void draw_fcu(void)
-{
-    char speed[12],heading[12],altitude[12],vertical[12];
-    const Color screen_blue = {0.16f, 0.07f, 0.92f};
-    Color integral = fcu_tint(WHITE, fcu_integral_level);
-    Color lcd = fcu_tint(WHITE, fcu_lcd_level);
-    rectangle(0,472,1024,512,BLACK);
-    if (!guidance_inputs.powered) return;
-    /* Adjacent quarters meet inside each physical window without a black seam. */
-    rectangle(0,472,1024,512,fcu_tint(screen_blue,fcu_lcd_level));
-    if (guidance.speed_dashes) snprintf(speed,sizeof(speed),"---");
-    else if (guidance.mach_mode) snprintf(speed,sizeof(speed),"%.2f",guidance.selected_mach);
-    else snprintf(speed,sizeof(speed),"%03d",(int)lround(guidance.selected_speed_knots));
-    if (guidance.heading_dashes) snprintf(heading,sizeof(heading),"---");
-    else snprintf(heading,sizeof(heading),"%03d",(int)lround(guidance.selected_heading_deg)%360);
-    snprintf(altitude,sizeof(altitude),"%05d",(int)lround(guidance.selected_altitude_ft));
-    if (guidance.vs_dashes) snprintf(vertical,sizeof(vertical),"-----");
-    else if (guidance.trk_fpa_mode) snprintf(vertical,sizeof(vertical),"%+.1f",guidance.selected_fpa_deg);
-    else snprintf(vertical,sizeof(vertical),"%+05d",(int)lround(guidance.selected_vs_fpm));
-    fcu_label(128,guidance.mach_mode?"MACH":"SPD",integral);
-    fcu_label(384,guidance.trk_fpa_mode?"TRK":"HDG",integral);
-    fcu_label(640,"ALT",integral); fcu_label(896,guidance.trk_fpa_mode?"FPA":"V/S",integral);
-    fcu_number(128,speed,lcd); fcu_number(384,heading,lcd);
-    fcu_number(640,altitude,lcd); fcu_number(896,vertical,lcd);
-    fcu_managed_dot(205,guidance.speed_managed,lcd); fcu_managed_dot(461,guidance.heading_managed,lcd);
-    fcu_managed_dot(751,guidance.altitude_managed,lcd);
-    if (!guidance.mach_mode && !guidance.speed_dashes) text_at(205,475,"KT",lcd);
-    if (guidance.true_heading) text_at(267,501,"TRUE",integral);
+static void draw_fcu(void) {
+    int lit=guidance_inputs.powered&&isfinite(fcu_lcd_level)&&fcu_lcd_level>0;
+    Color background=lit?fcu_tint(FCU_LCD_BACKGROUND,fcu_lcd_level):BLACK;
+    for(int screen=0;screen<FCU_GLASS_SCREEN_COUNT;++screen) {
+        float left=FCU_GLASS_X+screen*FCU_LCD_W;
+        rectangle(left,FCU_GLASS_Y,left+FCU_LCD_W,FCU_GLASS_Y+FCU_GLASS_H,background);
+    }
+    if(!lit)return;
+    FcuGlass v=fcu_glass_values(&guidance);
+    Color ink=fcu_tint(FCU_LCD_INK,fcu_lcd_level),ghost=fcu_tint(FCU_LCD_GHOST,fcu_lcd_level);
+    /* Left LCD: MACH ends just left of SPD; TRK starts just right of HDG. */
+    {
+        float spd=237,mach=spd-FCU_LEGEND_GAP-fcu_text_width(FCU_FACE_LABEL,"MACH");
+        float hdg=673,trk=hdg+fcu_text_width(FCU_FACE_LABEL,"HDG")+FCU_LEGEND_GAP;
+        fcu_lcd_text(0,FCU_FACE_LABEL,mach,FCU_LABEL_BASELINE,"MACH",guidance.mach_mode?ink:ghost);
+        fcu_lcd_text(0,FCU_FACE_LABEL,spd,FCU_LABEL_BASELINE,"SPD",guidance.mach_mode?ghost:ink);
+        fcu_lcd_text(0,FCU_FACE_LABEL,hdg,FCU_LABEL_BASELINE,"HDG",guidance.trk_fpa_mode?ghost:ink);
+        fcu_lcd_text(0,FCU_FACE_LABEL,trk,FCU_LABEL_BASELINE,"TRK",guidance.trk_fpa_mode?ink:ghost);
+        if(v.true_reference)
+            fcu_lcd_text(0,FCU_FACE_LABEL,hdg-3*FCU_LEGEND_GAP-fcu_text_width(FCU_FACE_LABEL,"TRUE"),
+                         FCU_LABEL_BASELINE,"TRUE",ink);
+    }
+    fcu_lcd_text(0,FCU_FACE_VALUE,77,FCU_VALUE_BASELINE,v.value[0],ink);
+    if(v.knots)fcu_lcd_text(0,FCU_FACE_LABEL,356,FCU_VALUE_BASELINE,"KT",ink);
+    fcu_lcd_text(0,FCU_FACE_VALUE,659,FCU_VALUE_BASELINE,v.value[1],ink);
+    if(v.degrees)fcu_lcd_text(0,FCU_FACE_VALUE,940,FCU_VALUE_BASELINE,"\xb0",ink);
+    /* Right LCD: ALT, then V/S with FPA just to its right. */
+    fcu_lcd_text(1,FCU_FACE_LABEL,226,FCU_LABEL_BASELINE,"ALT",ink);
+    fcu_lcd_text(1,FCU_FACE_VALUE,53,FCU_VALUE_BASELINE,v.value[2],ink);
+    {
+        float vs=739,fpa=vs+fcu_text_width(FCU_FACE_LABEL,"V/S")+FCU_LEGEND_GAP;
+        fcu_lcd_text(1,FCU_FACE_LABEL,vs,FCU_LABEL_BASELINE,"V/S",guidance.trk_fpa_mode?ghost:ink);
+        fcu_lcd_text(1,FCU_FACE_LABEL,fpa,FCU_LABEL_BASELINE,"FPA",guidance.trk_fpa_mode?ink:ghost);
+    }
+    fcu_lcd_text(1,FCU_FACE_VS,573,FCU_VALUE_BASELINE,v.value[3],ink);
 }

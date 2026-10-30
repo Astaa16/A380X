@@ -53,6 +53,11 @@ stowed speedbrakes, valid airdata, 250–600 tonnes and pressure altitude within
 0–43,000 ft. It disappears outside those conditions. It is a steady-state
 performance lookup, not a functioning stall-protection law.
 
+With the FLAPS module ([FLAPS_LEVER.md](FLAPS_LEVER.md)) the slat/flap part of the configuration
+area and the flap VMAX / VFE next come from the FBW SFCC and FPPU drives instead (`sfcc_valid`): the
+LowerArea.tsx text, pointer laws, targets, F RELIEF and A LOCK; the paragraphs below describe the
+legacy path used when that module is unavailable.
+
 The current ACF has six generic flap detents. Its surface schedule, spoiler
 logic, aerodynamic model and CG data are not a full A380 implementation.
 The schematic maps native normalized deployment; it does not reproduce SFCC

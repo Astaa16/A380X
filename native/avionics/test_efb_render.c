@@ -60,6 +60,7 @@ XPLMDataRef XPLMFindDataRef(const char *name)
 float XPLMGetDataf(XPLMDataRef ref) { return (float)((MockData *)ref)->value; }
 double XPLMGetDatad(XPLMDataRef ref) { return ((MockData *)ref)->value; }
 int XPLMGetDatai(XPLMDataRef ref) { return (int)((MockData *)ref)->value; }
+int XPLMGetDatab(XPLMDataRef ref, void *values, int offset, int max) { (void)ref; (void)values; (void)offset; (void)max; return 0; }
 void XPLMSetDataf(XPLMDataRef ref, float value) { ((MockData *)ref)->value = value; }
 void XPLMSetDatai(XPLMDataRef ref, int value) { ((MockData *)ref)->value = value; }
 int XPLMGetDatavi(XPLMDataRef ref, int *out, int offset, int count)
@@ -134,7 +135,7 @@ void XPLMCommandOnce(XPLMCommandRef ref)
     ++command_calls;
     if (sscanf(entry->name, "sim/flight_controls/door_toggle_%d", &door) == 1) {
         MockData *doors = refs.doors;
-        assert(door >= 1 && door <= 17);
+        assert(door >= 1 && door <= 20);
         doors->floats[door - 1] = 1 - doors->floats[door - 1];
     }
 }
@@ -317,12 +318,12 @@ static void test_clicks(void)
         assert(command_calls == before + 1 && expected->calls == previous_calls + 1);
     }
     active_page = PAGE_GROUND;
-    for (i = 0; i < 17; ++i) ((MockData *)refs.doors)->floats[i] = 0;
+    for (i = 0; i < 20; ++i) ((MockData *)refs.doors)->floats[i] = 0;
     before = command_calls;
-    a380x_efb_click(510, 560); assert(command_calls == before + 17);
-    for (i = 0; i < 17; ++i) assert(((MockData *)refs.doors)->floats[i] == 1);
-    a380x_efb_click(510, 560); assert(command_calls == before + 34);
-    for (i = 0; i < 17; ++i) assert(((MockData *)refs.doors)->floats[i] == 0);
+    a380x_efb_click(510, 560); assert(command_calls == before + 20);
+    for (i = 0; i < 20; ++i) assert(((MockData *)refs.doors)->floats[i] == 1);
+    a380x_efb_click(510, 560); assert(command_calls == before + 40);
+    for (i = 0; i < 20; ++i) assert(((MockData *)refs.doors)->floats[i] == 0);
 }
 static void test_checklists_and_units(void)
 {
@@ -418,14 +419,29 @@ static void test_iscs_aircraft_controls(void)
     float total = 0.0f;
     int i, before;
     realistic_state();
-    for (i = 0; i < 17; ++i) doors->floats[i] = 0.0f;
+    for (i = 0; i < 20; ++i) doors->floats[i] = 0.0f;
     iscs_tab = 3; clear_capture(); a380x_iscs_draw_window(152, 516, 872, 1016);
     assert(has_label("AIRCRAFT DOORS"));
     before = command_calls;
     a380x_iscs_click(600, 845);
     assert(doors->floats[0] == 1.0f && command_calls == before + 1);
-    a380x_iscs_click(600, 558);
+    a380x_iscs_click(600, 592);
     assert(doors->floats[16] == 1.0f);
+    for (i = 0; i < 3; ++i) {
+        int d, count = command_calls;
+        a380x_iscs_click(580 + i * 105, 551);
+        assert(doors->floats[17 + i] == 1.0f && command_calls == count + 1);
+        for (d = 0; d < 3; ++d) assert(doors->floats[17 + d] == (d <= i ? 1.0f : 0.0f));
+        a380x_iscs_click(580 + i * 105, 551);
+        assert(doors->floats[17 + i] == 0.0f && command_calls == count + 2);
+        /* Restore for the independence assertions on the next door. */
+        a380x_iscs_click(580 + i * 105, 551);
+    }
+    ((MockData *)refs.on_ground)->value = 0;
+    before = command_calls;
+    a380x_iscs_click(580, 551);
+    assert(command_calls == before);
+    ((MockData *)refs.on_ground)->value = 1;
     iscs_tab = 2; clear_capture(); a380x_iscs_draw_window(152, 516, 872, 1016);
     assert(has_label("MTOW 510000 KG  /  MLW 395000 KG"));
     assert(has_label("LIVE ZFW 335000 / 373000 KG"));

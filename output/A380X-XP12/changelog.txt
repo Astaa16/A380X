@@ -1,0 +1,5 @@
+0.1.0-alpha.20261029
+- Added a SkunkCrafts Updater 4-compatible development feed and repair manifests.
+- Protected preferences, FCU calibration, camera profiles, and custom liveries during repairs.
+- Restore the macOS display helper's executable permission before it is launched.
+- Added the optional FBW control-law startup safety guard.

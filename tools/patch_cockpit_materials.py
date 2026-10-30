@@ -46,7 +46,7 @@ TARGETS = (
     ("panel_a380_cockpit_mip02_4k.obj", "A380_COCKPIT_MIP02_4k", "mip"),
     ("panel_a380_cockpit_mip04_4k.obj", "A380_COCKPIT_MIP04_4k", "mip"),
     ("panel_a380_cockpit_glareshield_4k.obj", "A380_COCKPIT_GLARESHIELD_4k", "matte"),
-    ("panel_a380_cockpit_fcu_4k.obj", "A380_COCKPIT_FCU_4k", "matte"),
+    ("panel_a380_cockpit_fcu_4k.obj", "A380_COCKPIT_FCU_4k", "fcu"),
 )
 
 
@@ -240,6 +240,10 @@ def make_materials(source: SourceTextures, material: dict, kind: str) -> dict[st
         # XP12 material_gloss: R=F0/metalness (zero deliberately suppresses
         # specularity here), G=gloss. Preserve source normals separately.
         result["material_gloss"] = Image.new("RGBA", (4, 4), (0, 20, 0, 255))
+    elif kind == "fcu":
+        from prepare_fcu_materials import convert_comp
+        result["material_gloss"] = convert_comp(source.load(pbr["metallicRoughnessTexture"]),
+            pbr.get("metallicFactor", 1), pbr.get("roughnessFactor", 1))
     elif pbr.get("metallicRoughnessTexture"):
         comp = source.load(pbr["metallicRoughnessTexture"])
         _, rough, metal, _ = comp.split()

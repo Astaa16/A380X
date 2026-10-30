@@ -1,0 +1,15 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * Original FBW geometry, EIS fonts and avionics palette at native texel scale.
+ * No sharpening/blur filters or supersampled map textures.
+ */
+a380x-nd, #ND_CONTENT { font-synthesis: none; text-rendering: geometricPrecision; }
+a380x-nd svg { shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
+a380x-nd text, a380x-nd tspan, .oanc-label {
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+}
+.nd-canvas-map, .nd-top-layer { transform: none; }
+.nd-canvas-map, .oanc-container canvas { image-rendering: auto; }
+.oanc-label { line-height: 1; }
+/* Standalone native cursor is drawn after the cached ND texture in X-Plane. */
+html[data-native-cursor='true'] .mfd-mouse-cursor { display: none !important; }

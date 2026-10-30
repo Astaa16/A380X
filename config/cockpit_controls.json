@@ -7,7 +7,8 @@
   {
     "node": "PUSH_RTO_ARM",
     "command": "a380x/xp12/center_right/rto_toggle",
-    "label": "RTO - arm or disarm on ground"
+    "label": "RTO - arm or disarm on ground",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_SWITCHING_BRK",
@@ -41,77 +42,92 @@
   {
     "node": "PUSH_CHRONO_CHR",
     "command": "a380x/xp12/clock/chr_toggle",
-    "label": "CLOCK CHR - start or stop; increase setting in SET"
+    "label": "CLOCK CHR - start or stop; increase setting in SET",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_CHRONO_RST",
     "command": "a380x/xp12/clock/chr_reset",
-    "label": "CLOCK RST - reset CHR; decrease setting in SET"
+    "label": "CLOCK RST - reset CHR; decrease setting in SET",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_CHRONO_SET",
     "command": "a380x/xp12/clock/date",
-    "label": "CLOCK DATE - hold to show date; select field in SET"
+    "label": "CLOCK DATE - hold to show date; select field in SET",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_CHRONO",
     "command": "a380x/xp12/glareshield/chrono_left",
-    "label": "CAPT CHRONO - start, stop, reset"
+    "label": "CAPT CHRONO - start, stop, reset",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_CHRONO",
     "command": "a380x/xp12/glareshield/chrono_right",
-    "label": "FO CHRONO - start, stop, reset"
+    "label": "FO CHRONO - start, stop, reset",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_SIDESTICK",
     "command": "a380x/xp12/glareshield/takeover_left",
-    "label": "CAPT SIDESTICK PRIORITY - select sidestick priority"
+    "label": "CAPT SIDESTICK PRIORITY - select sidestick priority",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_SIDESTICK",
     "command": "a380x/xp12/glareshield/takeover_right",
-    "label": "FO SIDESTICK PRIORITY - select sidestick priority"
+    "label": "FO SIDESTICK PRIORITY - select sidestick priority",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_MASTERCAUT",
     "command": "a380x/xp12/glareshield/master_caution_left",
-    "label": "CAPT MASTER CAUTION - acknowledge"
+    "label": "CAPT MASTER CAUTION - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_MASTERCAUT",
     "command": "a380x/xp12/glareshield/master_caution_right",
-    "label": "FO MASTER CAUTION - acknowledge"
+    "label": "FO MASTER CAUTION - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_MASTERWARN",
     "command": "a380x/xp12/glareshield/master_warning_left",
-    "label": "CAPT MASTER WARNING - acknowledge"
+    "label": "CAPT MASTER WARNING - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_MASTERWARN",
     "command": "a380x/xp12/glareshield/master_warning_right",
-    "label": "FO MASTER WARNING - acknowledge"
+    "label": "FO MASTER WARNING - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_ATCMSG",
     "command": "a380x/xp12/glareshield/atc_ack_left",
-    "label": "CAPT ATC MSG - acknowledge"
+    "label": "CAPT ATC MSG - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_ATCMSG",
     "command": "a380x/xp12/glareshield/atc_ack_right",
-    "label": "FO ATC MSG - acknowledge"
+    "label": "FO ATC MSG - acknowledge",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_CS_PTT",
     "command": "a380x/xp12/glareshield/ptt_left",
-    "label": "CAPT RADIO PTT - hold to transmit"
+    "label": "CAPT RADIO PTT - hold to transmit",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_GLARESHIELD_FO_PTT",
     "command": "a380x/xp12/glareshield/ptt_right",
-    "label": "FO RADIO PTT - hold to transmit"
+    "label": "FO RADIO PTT - hold to transmit",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_GLARESHIELD_CS_SPEAKER",
@@ -228,47 +244,56 @@
   {
     "node": "PUSH_FCU_ALT",
     "command": "a380x/xp12/fcu/altitude_hold",
-    "label": "ALT - altitude hold"
+    "label": "ALT - altitude hold",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_LOC",
     "command": "a380x/xp12/fcu/loc_toggle",
-    "label": "LOC - localizer arm"
+    "label": "LOC - localizer arm",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_AP1",
     "command": "a380x/xp12/fcu/ap1_toggle",
-    "label": "AP1 - autopilot 1"
+    "label": "AP1 - autopilot 1",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_FD",
     "command": "a380x/xp12/fcu/fd_toggle",
-    "label": "FD - flight director"
+    "label": "FD - flight director",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_ATHR",
     "command": "a380x/xp12/fcu/athr_toggle",
-    "label": "A/THR - autothrust"
+    "label": "A/THR - autothrust",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_SPDMACH",
     "command": "a380x/xp12/fcu/speed_mach_toggle",
-    "label": "SPD/MACH - toggle selected speed units"
+    "label": "SPD/MACH - toggle selected speed units",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_TRUEMAG",
     "command": "a380x/xp12/fcu/true_mag_toggle",
-    "label": "TRUE/MAG - heading reference"
+    "label": "TRUE/MAG - heading reference",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_METER",
     "command": "a380x/xp12/fcu/metric_toggle",
-    "label": "METER - metric altitude display"
+    "label": "METER - metric altitude display",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_HDGTRK",
     "command": "a380x/xp12/fcu/trk_fpa_toggle",
-    "label": "HDG/TRK - toggle HDG/VS and TRK/FPA"
+    "label": "HDG/TRK - toggle HDG/VS and TRK/FPA",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_FCU_SPEED",
@@ -321,63 +346,74 @@
     "label": "V/S/FPA - rotate outer edge",
     "command_push": "a380x/xp12/fcu/vertical_speed_push",
     "command_pull": "a380x/xp12/fcu/vertical_speed_pull",
-    "push_label": "V/S/FPA PUSH - level off (upper center)",
+    "push_label": "V/S/FPA PUSH - no mode change (upper center)",
     "pull_label": "V/S/FPA PULL - selected vertical speed/path (lower center)"
   },
   {
     "node": "PUSH_FCU_AP2",
     "command": "a380x/xp12/fcu/ap2_toggle",
-    "label": "AP2 - autopilot 2"
+    "label": "AP2 - autopilot 2",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_FCU_APPR",
     "command": "a380x/xp12/fcu/approach_toggle",
-    "label": "APPR - approach arm"
+    "label": "APPR - approach arm",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_LS",
     "command": "a380x/xp12/efis/captain/ls_toggle",
-    "label": "CAPT LS - toggle display information"
+    "label": "CAPT LS - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_WX",
     "command": "a380x/xp12/efis/captain/wx_toggle",
-    "label": "CAPT WX - weather radar INOP"
+    "label": "CAPT WX - weather radar INOP",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_TERR",
     "command": "a380x/xp12/efis/captain/terr_toggle",
-    "label": "CAPT TERR - toggle display information"
+    "label": "CAPT TERR - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_TRAF",
     "command": "a380x/xp12/efis/captain/traf_toggle",
-    "label": "CAPT TRAF - toggle display information"
+    "label": "CAPT TRAF - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_CSTR",
     "command": "a380x/xp12/efis/captain/cstr_toggle",
-    "label": "CAPT CSTR - toggle display information"
+    "label": "CAPT CSTR - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_WPT",
     "command": "a380x/xp12/efis/captain/wpt_toggle",
-    "label": "CAPT WPT - toggle display information"
+    "label": "CAPT WPT - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_VORD",
     "command": "a380x/xp12/efis/captain/vord_toggle",
-    "label": "CAPT VORD - VOR/DME station layer"
+    "label": "CAPT VORD - VOR/DME station layer",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_NDB",
     "command": "a380x/xp12/efis/captain/ndb_toggle",
-    "label": "CAPT NDB - toggle display information"
+    "label": "CAPT NDB - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_ARPT",
     "command": "a380x/xp12/efis/captain/arpt_toggle",
-    "label": "CAPT ARPT - toggle display information"
+    "label": "CAPT ARPT - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_EFIS_CS_RANGE",
@@ -410,47 +446,56 @@
   {
     "node": "PUSH_EFIS_FO_LS",
     "command": "a380x/xp12/efis/first_officer/ls_toggle",
-    "label": "FO LS - toggle display information"
+    "label": "FO LS - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_WX",
     "command": "a380x/xp12/efis/first_officer/wx_toggle",
-    "label": "FO WX - weather radar INOP"
+    "label": "FO WX - weather radar INOP",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_TERR",
     "command": "a380x/xp12/efis/first_officer/terr_toggle",
-    "label": "FO TERR - toggle display information"
+    "label": "FO TERR - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_TRAF",
     "command": "a380x/xp12/efis/first_officer/traf_toggle",
-    "label": "FO TRAF - toggle display information"
+    "label": "FO TRAF - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_CSTR",
     "command": "a380x/xp12/efis/first_officer/cstr_toggle",
-    "label": "FO CSTR - toggle display information"
+    "label": "FO CSTR - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_WPT",
     "command": "a380x/xp12/efis/first_officer/wpt_toggle",
-    "label": "FO WPT - toggle display information"
+    "label": "FO WPT - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_VORD",
     "command": "a380x/xp12/efis/first_officer/vord_toggle",
-    "label": "FO VORD - VOR/DME station layer"
+    "label": "FO VORD - VOR/DME station layer",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_NDB",
     "command": "a380x/xp12/efis/first_officer/ndb_toggle",
-    "label": "FO NDB - toggle display information"
+    "label": "FO NDB - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_ARPT",
     "command": "a380x/xp12/efis/first_officer/arpt_toggle",
-    "label": "FO ARPT - toggle display information"
+    "label": "FO ARPT - toggle display information",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_EFIS_FO_RANGE",
@@ -482,33 +527,39 @@
   },
   {
     "node": "PUSH_OVHD_ELEC_BAT1",
-    "command": "sim/electrical/battery_1_toggle",
-    "label": "BAT 1 - native battery toggle"
+    "command": "a380x/xp12/elec/bat1_toggle",
+    "label": "BAT 1 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ELEC_BAT2",
-    "command": "sim/electrical/battery_2_toggle",
-    "label": "BAT 2 - native battery toggle"
+    "command": "a380x/xp12/elec/bat2_toggle",
+    "label": "BAT 2 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ELEC_GEN1",
-    "command": "sim/electrical/generator_1_toggle",
-    "label": "GEN 1 - native generator toggle"
+    "command": "a380x/xp12/elec/gen1_toggle",
+    "label": "GEN 1 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ELEC_GEN2",
-    "command": "sim/electrical/generator_2_toggle",
-    "label": "GEN 2 - native generator toggle"
+    "command": "a380x/xp12/elec/gen2_toggle",
+    "label": "GEN 2 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ELEC_GEN3",
-    "command": "sim/electrical/generator_3_toggle",
-    "label": "GEN 3 - native generator toggle"
+    "command": "a380x/xp12/elec/gen3_toggle",
+    "label": "GEN 3 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ELEC_GEN4",
-    "command": "sim/electrical/generator_4_toggle",
-    "label": "GEN 4 - native generator toggle"
+    "command": "a380x/xp12/elec/gen4_toggle",
+    "label": "GEN 4 - AUTO / OFF",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_APU_MASTERSW",
@@ -524,92 +575,110 @@
   {
     "node": "PUSH_OVHD_APU_START",
     "command": "sim/electrical/APU_start",
-    "label": "APU START - start native APU"
+    "label": "APU START - start native APU",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ANTIICE_ENG1",
     "command": "sim/ice/inlet_eai0_tog",
-    "label": "ENG 1 ANTI ICE - native toggle"
+    "label": "ENG 1 ANTI ICE - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ANTIICE_ENG2",
     "command": "sim/ice/inlet_eai1_tog",
-    "label": "ENG 2 ANTI ICE - native toggle"
+    "label": "ENG 2 ANTI ICE - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ANTIICE_ENG3",
     "command": "sim/ice/inlet_eai2_tog",
-    "label": "ENG 3 ANTI ICE - native toggle"
+    "label": "ENG 3 ANTI ICE - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ANTIICE_ENG4",
     "command": "sim/ice/inlet_eai3_tog",
-    "label": "ENG 4 ANTI ICE - native toggle"
+    "label": "ENG 4 ANTI ICE - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_ANTIICE_WING",
     "command": "sim/ice/wing_tai_tog",
-    "label": "WING ANTI ICE - native bleed-air toggle"
+    "label": "WING ANTI ICE - native bleed-air toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_PROBESWINDOW",
     "command": "sim/ice/window_heat_tog",
-    "label": "PROBES/WINDOW HEAT - native window-heat toggle"
+    "label": "PROBES/WINDOW HEAT - native window-heat toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_ENG1BLEED",
     "command": "sim/bleed_air/engine_1_toggle",
-    "label": "ENG 1 BLEED - native toggle"
+    "label": "ENG 1 BLEED - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_ENG2BLEED",
     "command": "sim/bleed_air/engine_2_toggle",
-    "label": "ENG 2 BLEED - native toggle"
+    "label": "ENG 2 BLEED - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_ENG3BLEED",
     "command": "sim/bleed_air/engine_3_toggle",
-    "label": "ENG 3 BLEED - native toggle"
+    "label": "ENG 3 BLEED - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_ENG4BLEED",
     "command": "sim/bleed_air/engine_4_toggle",
-    "label": "ENG 4 BLEED - native toggle"
+    "label": "ENG 4 BLEED - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_PACK1",
     "command": "sim/bleed_air/pack_left_toggle",
-    "label": "PACK 1 - native left-pack toggle"
+    "label": "PACK 1 - native left-pack toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_PACK2",
     "command": "sim/bleed_air/pack_right_toggle",
-    "label": "PACK 2 - native right-pack toggle"
+    "label": "PACK 2 - native right-pack toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_AIRCOND_APUBLEED",
     "command": "sim/bleed_air/apu_toggle",
-    "label": "APU BLEED - native toggle"
+    "label": "APU BLEED - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_FUEL_FEEDTK1_MAIN",
     "command": "sim/fuel/fuel_pump_1_tog",
-    "label": "FEED 1 MAIN PUMP - native toggle"
+    "label": "FEED 1 MAIN PUMP - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_FUEL_FEEDTK2_MAIN",
     "command": "sim/fuel/fuel_pump_2_tog",
-    "label": "FEED 2 MAIN PUMP - native toggle"
+    "label": "FEED 2 MAIN PUMP - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_FUEL_FEEDTK3_MAIN",
     "command": "sim/fuel/fuel_pump_3_tog",
-    "label": "FEED 3 MAIN PUMP - native toggle"
+    "label": "FEED 3 MAIN PUMP - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_OVHD_FUEL_FEEDTK4_MAIN",
     "command": "sim/fuel/fuel_pump_4_tog",
-    "label": "FEED 4 MAIN PUMP - native toggle"
+    "label": "FEED 4 MAIN PUMP - native toggle",
+    "command_cursor": "button"
   },
   {
     "node": "SWITCH_OVHD_EXTLT_NAVLOGO",
@@ -771,12 +840,14 @@
   {
     "node": "ATHR_DISCONNECT_ENG1",
     "command": "a380x/xp12/fcu/athr_disconnect",
-    "label": "A/THR DISCONNECT - left thrust lever"
+    "label": "A/THR DISCONNECT - left thrust lever",
+    "command_cursor": "button"
   },
   {
     "node": "ATHR_DISCONNECT_ENG2",
     "command": "a380x/xp12/fcu/athr_disconnect",
-    "label": "A/THR DISCONNECT - right thrust lever"
+    "label": "A/THR DISCONNECT - right thrust lever",
+    "command_cursor": "button"
   },
   {
     "node": "SWITCH_DOOR_LOCK",
@@ -801,22 +872,26 @@
   {
     "node": "PUSH_EFIS_CS_TAXI",
     "command": "a380x/xp12/efis/captain/taxi_toggle",
-    "label": "CAPT TAXI - ETACS unavailable"
+    "label": "CAPT TAXI - ETACS unavailable",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_VV",
     "command": "a380x/xp12/efis/captain/vv_toggle",
-    "label": "CAPT VV - velocity vector"
+    "label": "CAPT VV - velocity vector",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_VOR",
     "command": "a380x/xp12/efis/captain/vor1_toggle",
-    "label": "CAPT VOR1 - tuned navigation source"
+    "label": "CAPT VOR1 - tuned navigation source",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_CS_ADF",
     "command": "a380x/xp12/efis/captain/vor2_toggle",
-    "label": "CAPT VOR2 - tuned navigation source"
+    "label": "CAPT VOR2 - tuned navigation source",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_EFIS_CS_BARO2",
@@ -827,22 +902,26 @@
   {
     "node": "PUSH_EFIS_FO_TAXI",
     "command": "a380x/xp12/efis/first_officer/taxi_toggle",
-    "label": "FO TAXI - ETACS unavailable"
+    "label": "FO TAXI - ETACS unavailable",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_VV",
     "command": "a380x/xp12/efis/first_officer/vv_toggle",
-    "label": "FO VV - velocity vector"
+    "label": "FO VV - velocity vector",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_VOR",
     "command": "a380x/xp12/efis/first_officer/vor1_toggle",
-    "label": "FO VOR1 - tuned navigation source"
+    "label": "FO VOR1 - tuned navigation source",
+    "command_cursor": "button"
   },
   {
     "node": "PUSH_EFIS_FO_ADF",
     "command": "a380x/xp12/efis/first_officer/vor2_toggle",
-    "label": "FO VOR2 - tuned navigation source"
+    "label": "FO VOR2 - tuned navigation source",
+    "command_cursor": "button"
   },
   {
     "node": "KNOB_EFIS_FO_BARO2",

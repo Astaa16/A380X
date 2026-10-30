@@ -2,6 +2,7 @@
  * Center-right gear/brake controls backed by X-Plane's landing-gear,
  * anti-skid and autobrake systems.
  */
+#include "a380x_elec_power.h"
 typedef struct {
     int gear_lever, gear_nose, gear_wing, gear_body, gear_arrow;
     int gear_not_down_warning;
@@ -23,6 +24,9 @@ typedef struct {
     float original_decels[4];
     int abs_initial;
     int previous_gear_lever;
+    /* L/G GRVTY (a380x_lg_grvty.inc): while gravity extension isolates the gear hydraulics the
+     * plugin holds X-Plane's gear handle and the physical lever is owned_lever_down. */
+    int lever_owned, owned_lever_down;
     float gear_selection_elapsed;
     XPLMDataRef lever_ref, autobrake_ref, abs_ref, accumulator_ref;
     XPLMDataRef hydraulic_ref[2], pedal_ref[2], brake_failure_ref[2];
@@ -122,7 +126,9 @@ static int center_right_command_handler(XPLMCommandRef command,
     center_right_update(0.0f);
     switch (item->action) {
     case CR_GEAR:
-        XPLMSetDatai(center_right.lever_ref,!XPLMGetDatai(center_right.lever_ref));
+        /* Hydraulics isolated by L/G GRVTY: the lever moves without commanding the gear. */
+        if (center_right.lever_owned) center_right.owned_lever_down=!center_right.owned_lever_down;
+        else XPLMSetDatai(center_right.lever_ref,!XPLMGetDatai(center_right.lever_ref));
         break;
     case CR_AUTOBRAKE_UP: case CR_AUTOBRAKE_DOWN:
         center_right.autobrake_selected+=item->action==CR_AUTOBRAKE_UP ? 1 : -1;
@@ -179,7 +185,8 @@ static void center_right_update(float dt)
     float hydraulic_pressure=0.0f, pedal[2], wheel_brakes[5]={0};
     int native_mode, inertial_available, spoilers_deployed, on_ground;
     int all_down=1, all_up=1, below_750, i;
-    center_right.gear_lever=XPLMGetDatai(center_right.lever_ref)!=0;
+    center_right.gear_lever=center_right.lever_owned ? center_right.owned_lever_down!=0
+                                                     : XPLMGetDatai(center_right.lever_ref)!=0;
     if (center_right.gear_lever!=center_right.previous_gear_lever) {
         center_right.previous_gear_lever=center_right.gear_lever;
         center_right.gear_selection_elapsed=0.0f;
@@ -251,7 +258,8 @@ static void center_right_update(float dt)
     center_right.emergency_braking=!center_right.antiskid_on;
     center_right.antiskid_available=center_right.antiskid_on &&
         (center_right.normal_brakes_available || center_right.body_accu_psi>1305);
-    inertial_available=XPLMGetDatai(refs.avionics_power) &&
+    /* Autobrake panel: AC ESS 400XP (spec 6.4) with ADIRS attitude/heading. */
+    inertial_available=a380x_power_bus(A380X_ELN_AC_ESS, XPLMGetDatai(refs.avionics_power)) &&
         ((refs.side[0].attitude_valid && refs.side[0].heading_valid) ||
          (refs.side[1].attitude_valid && refs.side[1].heading_valid));
     center_right.autobrake_available=center_right.antiskid_on &&

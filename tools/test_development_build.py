@@ -15,7 +15,8 @@ from build_development_aircraft import (
     set_value,
     write_empty_2d_panel,
 )
-from build_cockpit_controls import MFD_SCREEN_TEXTURE, build_mfd_screens_obj, mfd_screen_black_png
+from build_cockpit_controls import (MFD_SCREEN_TEXTURE, MFD_TOUCH_LIFT, build_mfd_screens_obj,
+                                    mfd_device_quads, mfd_screen_black_png)
 from avionics_provider import (
     AVIONICS_DATAREFS, DISPLAY_TARGETS, FCU_COMMANDS, FCU_DATAREFS, FILES as AVIONICS_FILES,
     MANIFEST as AVIONICS_MANIFEST, SOURCE_REVISION, package_avionics_provider,
@@ -25,10 +26,10 @@ from validate_aircraft import cockpit_device_quads, validate, validate_native_pa
 MFD_CAPT, MFD_FO = 'a380x.xp12.mfd.captain', 'a380x.xp12.mfd.first_officer'
 MFD_TOUCH_BLOCK = (
     'ATTR_draw_disable\n'
-    f'ATTR_cockpit_device {MFD_CAPT} 1 14 1\nATTR_manip_device arrow {MFD_CAPT} CAPT MFD\n'
-    'TRIS 66 6\nATTR_manip_none\nATTR_no_cockpit\n'
-    f'ATTR_cockpit_device {MFD_FO} 1 15 1\nATTR_manip_device arrow {MFD_FO} F/O MFD\n'
-    'TRIS 72 6\nATTR_manip_none\nATTR_no_cockpit\n'
+    f'ATTR_cockpit_device\t{MFD_CAPT}\t1\t14\t1\nATTR_manip_device\tarrow\t{MFD_CAPT}\tCAPT MFD\n'
+    'TRIS\t66\t6\nATTR_manip_none\nATTR_no_cockpit\n'
+    f'ATTR_cockpit_device\t{MFD_FO}\t1\t15\t1\nATTR_manip_device\tarrow\t{MFD_FO}\tF/O MFD\n'
+    'TRIS\t72\t6\nATTR_manip_none\nATTR_no_cockpit\n'
     'ATTR_draw_enable\n'
 )
 
@@ -102,10 +103,12 @@ class DevelopmentBuildTests(unittest.TestCase):
             (152 / 2048, 1016 / 2048), (872 / 2048, 1016 / 2048),
             (872 / 2048, 516 / 2048), (152 / 2048, 516 / 2048),
         )
-        uv += tuple(point for i in range(4) for point in (
-            ((i + 1) * 256 / 2048, 472 / 2048), (i * 256 / 2048, 472 / 2048),
-            (i * 256 / 2048, 512 / 2048), ((i + 1) * 256 / 2048, 512 / 2048),
+        uv += tuple(point for i in range(2) for point in (
+            ((1024+(i+1)*512)/2048, 1088/2048), ((1024+i*512)/2048, 1088/2048),
+            ((1024+i*512)/2048, 1216/2048), ((1024+(i+1)*512)/2048, 1216/2048),
         ))
+        # Retain the historical unused slots so EWD/MFD fixture IDs stay fixed.
+        uv += ((0.0, 0.0),) * 8
         uv += ((1024 / 2048, 1024 / 2048), (1792 / 2048, 1024 / 2048),
                (1792 / 2048, 0.0), (1024 / 2048, 0.0))
         # Two MFD device touch quads, BL/TL/TR/BR with the full device UVs.
@@ -122,18 +125,21 @@ class DevelopmentBuildTests(unittest.TestCase):
                          for vertex in (base, base + 1, base + 2, base, base + 2, base + 3))
         indices += (40, 41, 42, 40, 42, 43)
         indices += (44, 45, 46, 44, 46, 47, 48, 49, 50, 48, 50, 51)
+        touch_vertices = {44+side*4+corner: point
+                          for side, _device, points in mfd_device_quads(MFD_TOUCH_LIFT)
+                          for corner, point in enumerate(points)}
         obj.write_text(
             'I\n800\nOBJ\n# A380X FLYPAD ORIENTATION: UV0 TOUCH0 A380_CONTROL_UI_V3\n'
             'COCKPIT_REGION 0 0 2048 2048\n'
             'POINT_COUNTS 52 0 0 78\n'
             + ''.join(
-                f'VT {index} 0 0 0 0 1 {u} {v}\n'
+                'VT\t'+'\t'.join(f'{value:.9g}' for value in touch_vertices.get(index, (index,0,0,0,0,1,u,v)))+'\n'
                 for index, (u, v) in enumerate(uv)
             )
-            + ''.join(f'IDX {index}\n' for index in indices)
+            + ''.join(f'IDX\t{index}\n' for index in indices)
             + 'ATTR_cockpit_region 0\nTRIS 0 6\nTRIS 6 6\nTRIS 12 6\nTRIS 18 6\n'
             + 'TRIS 24 6\nTRIS 30 6\n'
-            + 'TRIS 36 6\nTRIS 42 6\nTRIS 48 6\nTRIS 54 6\n'
+            + 'TRIS 36 6\nTRIS 42 6\n'
             + 'TRIS 60 6\n'
             + 'ATTR_no_cockpit\n'
             + MFD_TOUCH_BLOCK
@@ -436,7 +442,7 @@ class DevelopmentBuildTests(unittest.TestCase):
             acf, paths = self.make_native_panel_package(root)
             errors, report = validate_native_panel(root, acf, paths)
             self.assertEqual(errors, [])
-            self.assertEqual(report['cockpit_region_fcu_quads'], 4)
+            self.assertEqual(report['cockpit_region_fcu_quads'], 2)
             errors, _report = validate_native_panel(
                 root, acf.replace('END_GROUP', 'gen_LED Speed\nDATAREF sim/cockpit2/autopilot/airspeed_dial_kts\nEND_GROUP'), paths)
             self.assertTrue(any('forbidden stock' in error for error in errors))
@@ -445,15 +451,15 @@ class DevelopmentBuildTests(unittest.TestCase):
             errors, _report = validate_native_panel(root, acf, paths)
             self.assertTrue(any('stock autopilot route' in error for error in errors))
 
-    def test_native_fcu_requires_all_four_display_regions(self):
+    def test_native_fcu_requires_both_shared_display_regions(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             acf, paths = self.make_native_panel_package(root)
             obj = root / 'objects' / paths[0]
-            obj.write_text(obj.read_text().replace('TRIS 54 6\n', ''))
+            obj.write_text(obj.read_text().replace('TRIS 42 6\n', ''))
             errors, report = validate_native_panel(root, acf, paths)
-            self.assertEqual(report['cockpit_region_fcu_quads'], 3)
-            self.assertTrue(any('four native FCU' in error for error in errors))
+            self.assertEqual(report['cockpit_region_fcu_quads'], 1)
+            self.assertTrue(any('two shared native FCU' in error for error in errors))
 
 
     def write_package_acf(self, root: Path) -> tuple[str, list[str]]:
@@ -496,8 +502,8 @@ class DevelopmentBuildTests(unittest.TestCase):
             acf, paths = self.make_native_panel_package(root)
             obj = root / 'objects' / paths[0]
             obj.write_text(obj.read_text().replace(
-                f'ATTR_cockpit_device {MFD_FO} 1 15 1\nATTR_manip_device arrow {MFD_FO} F/O MFD\n'
-                'TRIS 72 6\nATTR_manip_none\nATTR_no_cockpit\n', ''))
+                f'ATTR_cockpit_device\t{MFD_FO}\t1\t15\t1\nATTR_manip_device\tarrow\t{MFD_FO}\tF/O MFD\n'
+                'TRIS\t72\t6\nATTR_manip_none\nATTR_no_cockpit\n', ''))
             errors, report = validate_native_panel(root, acf, paths)
             self.assertEqual(report['cockpit_device_touch_quads'], {MFD_CAPT: 1, MFD_FO: 0})
             self.assertTrue(any('touch quad for MFD device ' + MFD_FO in error and 'found 0' in error
@@ -535,13 +541,13 @@ class DevelopmentBuildTests(unittest.TestCase):
             root = Path(directory)
             acf, paths = self.write_package_acf(root)
             obj = root / 'objects' / paths[0]
-            obj.write_text(obj.read_text().replace(f'ATTR_cockpit_device {MFD_CAPT} 1 14 1\n', ''))
+            obj.write_text(obj.read_text().replace(f'ATTR_cockpit_device\t{MFD_CAPT}\t1\t14\t1\n', ''))
             errors = validate(root)['errors']
             self.assertTrue(any(f'ATTR_manip_device {MFD_CAPT} is not preceded by a matching '
                                 'ATTR_cockpit_device' in error for error in errors), errors)
             self.assertTrue(any('touch quad for MFD device ' + MFD_CAPT in error for error in errors))
-            obj.write_text(obj.read_text().replace(f'ATTR_cockpit_device {MFD_FO} 1 15 1',
-                                                   f'ATTR_cockpit_device {MFD_FO} 1 15'))
+            obj.write_text(obj.read_text().replace(f'ATTR_cockpit_device\t{MFD_FO}\t1\t15\t1',
+                                                   f'ATTR_cockpit_device\t{MFD_FO}\t1\t15'))
             self.assertTrue(any('malformed ATTR_cockpit_device' in error for error in validate(root)['errors']))
 
     def test_validator_requires_visible_mfd_screen_attachment(self):

@@ -85,7 +85,6 @@ static void glEnd(void) {
         svg_color(current_color);fprintf(svg,"\"/>\n");
     }
 }
-static float XPLMMeasureString(int font,const char *value,int length) { (void)font;(void)value;return length*5.8f; }
 static void XPLMSetGraphicsState(int a,int b,int c,int d,int e,int f,int g) { (void)a;(void)b;(void)c;(void)d;(void)e;(void)f;(void)g; }
 static float XPLMGetElapsedTime(void) { return clock_seconds; }
 static void XPLMDrawString(float *rgb,int x,int y,const char *text,void *wrap,int font) {
@@ -116,6 +115,21 @@ static struct {
     int gear_not_locked_down_warning, gear_not_locked_up_warning;
 } center_right;
 #include "a380x_pfd_render.inc"
+/* FCU LCD text: capture each string (the GL atlas path is a380x_fcu_font.inc,
+ * covered pixel-for-pixel by test_fcu_render.c). */
+#include "a380x_fcu_font.h"
+static int captured_face[2000];
+static void fcu_text_draw(int face,float x,float y,const char *text,Color color) {
+    assert(label_count<ARRAY_LEN(labels));
+    captured_face[label_count]=face;
+    labels[label_count].x=x;labels[label_count].y=y;labels[label_count].color=color;
+    snprintf(labels[label_count++].value,80,"%s",text);
+    if(svg) {
+        fprintf(svg,"<text x=\"%.1f\" y=\"%.1f\" font-family=\"%s\" font-size=\"%.0f\" fill=\"",
+                x,svg_y_origin-y,face==2?"Poppins":"Digital",fcu_face_size[face]);
+        svg_color(color);fprintf(svg,"\">%s</text>\n",text);
+    }
+}
 #include "a380x_fcu_render.inc"
 #include "a380x_efis_render.inc"
 
@@ -166,45 +180,77 @@ static void export_svg(const char *path) {
     draw_pfd(&refs.side[0],0,32,"CAPT");
     fprintf(svg,"</svg>\n");fclose(svg);svg=NULL;
 }
-static int fcu_white_vertices(float left,float right) {
-    int i,count=0;
-    for (i=0;i<vertex_count;++i)
-        if(vertices[i].x>=left && vertices[i].x<right && fabsf(vertices[i].color.r-WHITE.r)<.01f &&
-           fabsf(vertices[i].color.g-WHITE.g)<.01f) ++count;
-    return count;
-}
 static void export_fcu_svg(const char *path) {
-    svg=fopen(path,"w");assert(svg);svg_y_origin=512;
-    fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1536\" height=\"60\" viewBox=\"0 0 1024 40\">\n");
+    svg=fopen(path,"w");assert(svg);svg_y_origin=FCU_GLASS_Y+FCU_GLASS_H;
+    fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"2048\" height=\"212\" viewBox=\"0 0 2048 212\">\n");
     clear_capture();draw_fcu();
     fprintf(svg,"</svg>\n");fclose(svg);svg=NULL;svg_y_origin=448;
 }
+static const CapturedText *fcu_text(const char *wanted) {
+    int i;for(i=0;i<label_count;++i) if(!strcmp(labels[i].value,wanted)) return &labels[i];
+    return NULL;
+}
+static int same_color(Color a,Color b) { return fabsf(a.r-b.r)<.002f&&fabsf(a.g-b.g)<.002f&&fabsf(a.b-b.b)<.002f; }
 static void test_fcu(void) {
-    guidance_inputs.powered=0;clear_capture();draw_fcu();assert(label_count==0 && vertex_count==4);
+    const CapturedText *t;
+    guidance_inputs.powered=0;clear_capture();draw_fcu();assert(label_count==0&&vertex_count==8);
     memset(&guidance,0,sizeof(guidance));guidance_inputs.powered=1;
     guidance.selected_speed_knots=250;guidance.selected_heading_deg=359;
     guidance.selected_altitude_ft=12000;guidance.selected_vs_fpm=-1800;
+    guidance_inputs.ias_knots=320; /* Actual speed must not replace selected speed. */
+    FcuGlass v=fcu_glass_values(&guidance);
+    assert(!strcmp(v.value[0],"250")&&!strcmp(v.value[1],"359"));
+    /* FBW VsDisplay: sign, two hundreds digits, then two small zeros. */
+    assert(!strcmp(v.value[2],"12000")&&!strcmp(v.value[3],"-18oo"));
+    assert(!strcmp(v.title[0],"SPD")&&!strcmp(v.title[3],"V/S")&&v.knots&&v.degrees);
     clear_capture();draw_fcu();
-    assert(has_label("SPD") && has_label("HDG") && has_label("ALT") && has_label("V/S"));
-    assert(vertex_count>16 && vertices[4].color.b>.9f && vertices[4].color.r<.2f);
-    assert(fcu_white_vertices(0,256)==64); /* 250 */
-    assert(fcu_white_vertices(256,512)==64); /* 359 */
-    assert(fcu_white_vertices(512,768)==100); /* 12000 */
-    assert(fcu_white_vertices(768,1024)==88); /* -1800 */
+    /* Two full-width LCD backgrounds in the 1024 x 212 slices, FBW reference colour. */
+    for(int screen=0;screen<2;++screen) {
+        assert(vertices[screen*4].x==FCU_GLASS_X+FCU_LCD_W*screen);
+        for(int corner=0;corner<4;++corner) assert(same_color(vertices[screen*4+corner].color,FCU_LCD_BACKGROUND));
+    }
+    for(int i=0;i<label_count;++i) {
+        assert(labels[i].x>=FCU_GLASS_X&&labels[i].x+fcu_text_width(captured_face[i],labels[i].value)<=FCU_GLASS_X+FCU_GLASS_W);
+        assert(labels[i].y>FCU_GLASS_Y&&labels[i].y<FCU_GLASS_Y+FCU_GLASS_H);
+    }
+    t=fcu_text("250");assert(t&&same_color(t->color,FCU_LCD_INK)&&t->x<FCU_LCD_W);
+    t=fcu_text("SPD");assert(t&&same_color(t->color,FCU_LCD_INK));
+    t=fcu_text("MACH");assert(t&&same_color(t->color,FCU_LCD_GHOST));          /* ghosted legend */
+    assert(t->x+fcu_text_width(FCU_FACE_LABEL,"MACH")<fcu_text("SPD")->x);  /* MACH left of SPD */
+    t=fcu_text("TRK");assert(t&&same_color(t->color,FCU_LCD_GHOST)&&t->x>fcu_text("HDG")->x);
+    t=fcu_text("FPA");assert(t&&same_color(t->color,FCU_LCD_GHOST)&&t->x>fcu_text("V/S")->x);
+    assert(fcu_text("KT")&&fcu_text("\xb0")&&!fcu_text("TRUE"));
+    t=fcu_text("12000");assert(t&&t->x>=FCU_LCD_W);
+    /* Managed targets: dashes, no units; the ALT window never shows dashes. */
     guidance.speed_dashes=guidance.heading_dashes=guidance.vs_dashes=1;
     guidance.speed_managed=guidance.heading_managed=guidance.altitude_managed=1;
-    clear_capture();draw_fcu();
-    assert(fcu_white_vertices(0,256)==38 && fcu_white_vertices(256,512)==38);
-    assert(fcu_white_vertices(768,1024)==20); /* ----- */
-    assert(has_vertex(205,487,WHITE) && has_vertex(461,487,WHITE) && has_vertex(751,487,WHITE));
+    v=fcu_glass_values(&guidance);
+    assert(!strcmp(v.value[0],"---")&&!strcmp(v.value[1],"---")&&!strcmp(v.value[2],"12000")&&!strcmp(v.value[3],"~----"));
+    clear_capture();draw_fcu();assert(!fcu_text("KT")&&!fcu_text("\xb0"));
     guidance.speed_dashes=guidance.heading_dashes=guidance.vs_dashes=0;
     guidance.speed_managed=guidance.heading_managed=guidance.altitude_managed=0;
     guidance.mach_mode=guidance.trk_fpa_mode=guidance.true_heading=1;
-    guidance.selected_mach=.78;guidance.selected_fpa_deg=-3.2;
-    clear_capture();draw_fcu();assert(has_label("MACH") && has_label("TRK") && has_label("FPA") && has_label("TRUE"));
-    assert(fcu_white_vertices(0,256)==68 && fcu_white_vertices(768,1024)==48);
-    clear_capture();fcu_digit(0,0,'+',AMBER);assert(vertex_count==8);
-    clear_capture();fcu_digit(0,0,'-',AMBER);assert(vertex_count==4);
+    guidance.selected_mach=.78;guidance.selected_fpa_deg=-3.2;guidance.selected_heading_deg=359.8;
+    v=fcu_glass_values(&guidance);
+    assert(!strcmp(v.value[0],"0.78")&&!strcmp(v.value[1],"000")&&!strcmp(v.value[3],"~-3.2"));
+    assert(!strcmp(v.title[0],"MACH")&&!strcmp(v.title[1],"TRK")&&!strcmp(v.title[3],"FPA"));
+    assert(v.true_reference&&!v.knots);
+    clear_capture();draw_fcu();
+    assert(same_color(fcu_text("MACH")->color,FCU_LCD_INK)&&same_color(fcu_text("SPD")->color,FCU_LCD_GHOST));
+    assert(same_color(fcu_text("TRK")->color,FCU_LCD_INK)&&same_color(fcu_text("HDG")->color,FCU_LCD_GHOST));
+    assert(same_color(fcu_text("FPA")->color,FCU_LCD_INK)&&fcu_text("TRUE"));
+    guidance.selected_fpa_deg=0;v=fcu_glass_values(&guidance);assert(!strcmp(v.value[3],"~+0.0"));
+    guidance.trk_fpa_mode=0;guidance.selected_vs_fpm=0;v=fcu_glass_values(&guidance);assert(!strcmp(v.value[3],"+00oo"));
+    guidance.selected_vs_fpm=6000;v=fcu_glass_values(&guidance);assert(!strcmp(v.value[3],"+60oo"));
+    guidance.selected_altitude_ft=100;v=fcu_glass_values(&guidance);assert(!strcmp(v.value[2],"00100"));
+    /* Every drawn character exists in the embedded atlas. */
+    for(const char *p="0123456789-+.~o\xb0";*p;++p)assert(fcu_glyph_find(FCU_FACE_VALUE,(unsigned char)*p));
+    for(const char *p="0123456789-+.~o";*p;++p)assert(fcu_glyph_find(FCU_FACE_VS,(unsigned char)*p));
+    for(const char *p="MACHSPDTRKALV/FUEGT";*p;++p)assert(fcu_glyph_find(FCU_FACE_LABEL,(unsigned char)*p));
+    fcu_lcd_level=0;clear_capture();draw_fcu();assert(vertex_count==8&&label_count==0);
+    fcu_lcd_level=.25f;clear_capture();draw_fcu();
+    assert(vertices[0].color.b<=.25f&&labels[0].color.r<=.25f);
+    fcu_lcd_level=1;
 }
 static const CapturedText *find_label(const char *wanted) {
     int i;
@@ -509,6 +555,24 @@ static void test_pfd_boundaries(void) {
     clear_capture();draw_pfd_configuration(&p);assert(find_label("2")->color.g==CYAN.g);
     pfd_guidance.flap_fault=1;
     clear_capture();draw_pfd_configuration(&p);assert(count_color(AMBER)>0);
+    /* FBW SFCC display (docs/FLAPS_LEVER.md): "1+F" settled green, target cyan, F RELIEF / A LOCK. */
+    normal_state();
+    pfd_guidance.sfcc_valid=1;pfd_guidance.flap_handle_index=1;pfd_guidance.flap_config=2;
+    pfd_guidance.flap_fppu=215.68;pfd_guidance.slat_fppu=286.48;
+    pfd_guidance.flap_target_index=pfd_guidance.slat_target_index=-1;
+    clear_capture();draw_pfd_configuration(&p);assert(find_label("1+F")->color.g==GREEN.g&&has_label("S")&&has_label("F"));
+    pfd_guidance.flap_config=1;pfd_guidance.flap_target_index=0;
+    clear_capture();draw_pfd_configuration(&p);assert(find_label("1")->color.g==CYAN.g);
+    pfd_guidance.flap_handle_index=3;pfd_guidance.flap_config=4;pfd_guidance.flap_relief=1;pfd_guidance.flap_target_index=3;
+    pfd_guidance.flap_fppu=259.28;pfd_guidance.slat_fppu=327.39;
+    clear_capture();draw_pfd_configuration(&p);assert(has_label("F RELIEF")&&!has_label("F")&&find_label("3")->color.g==CYAN.g);
+    pfd_guidance.flap_handle_index=0;pfd_guidance.flap_config=0;pfd_guidance.flap_relief=0;pfd_guidance.alpha_lock=1;
+    pfd_guidance.flap_fppu=215.68;pfd_guidance.slat_fppu=286.48;pfd_guidance.flap_target_index=0;pfd_guidance.slat_target_index=0;
+    clear_capture();draw_pfd_configuration(&p);assert(has_label("A LOCK")&&!has_label("S"));
+    pfd_guidance.alpha_lock=0;pfd_guidance.flap_fppu=pfd_guidance.slat_fppu=0;
+    pfd_guidance.flap_target_index=pfd_guidance.slat_target_index=-1;
+    clear_capture();draw_pfd_configuration(&p);assert(!has_label("0"));   /* clean: hidden */
+    pfd_guidance.sfcc_valid=0;
     normal_state();pfd_guidance.stall_warning=1;
     clear_capture();draw_pfd(&refs.side[0],0,32,"CAPT");assert(has_label("STALL"));
     pfd_guidance.on_ground=1;
@@ -599,15 +663,23 @@ int main(int argc,char **argv) {
     efis[0].taxi_requested=1;
     clear_capture();draw_pfd(&refs.side[0],0,32,"CAPT");assert(has_label("ETACS NOT AVAILABLE"));
     memset(efis,0,sizeof(efis));
-    clear_capture();draw_efis_cp();assert(vertex_count==22*4);
+    /* Unpowered: dark bed only (upper row, five lower cells, baro) per side. */
+    clear_capture();draw_efis_cp();assert(vertex_count==2*7*4&&label_count==0);
     efis[0].powered=efis[1].powered=1;efis[0].qnh_hpa=1013.2075f;
     efis[0].baro_inhg=1;efis[0].wpt=1;
     efis[1].baro_std=1;efis[1].baro_preset_hpa=1001;
     clear_capture();draw_efis_cp();assert(vertex_count>1000);
+    /* FBW dot-matrix legends and baro window stay inside the EFIS atlas band. */
     for(int i=0;i<vertex_count;++i) {
-        assert(vertices[i].y>=520&&vertices[i].y<=988);
-        assert((vertices[i].x>=4&&vertices[i].x<=148)||(vertices[i].x>=876&&vertices[i].x<=1020));
+        assert(vertices[i].y>=1500&&vertices[i].y<=1996);
+        assert(vertices[i].x>=0&&vertices[i].x<=1928);
     }
+    assert(has_label("29.92")&&has_label("Std")&&has_label("QNH")&&has_label("QFE"));
+    assert(!has_label("1001")); /* STD preset hidden until the knob is turned */
+    efis[1].baro_preset_visible=1;efis[1].baro_inhg=0;
+    clear_capture();draw_efis_cp();assert(has_label("1001"));
+    efis[0].baro_inhg=0;efis[0].qnh_hpa=998.4f;
+    clear_capture();draw_efis_cp();assert(has_label("0998"));
     if(argc>5) {
         svg=fopen(argv[5],"w");assert(svg);svg_y_origin=1024;
         fprintf(svg,"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1024\" height=\"504\" viewBox=\"0 0 1024 504\">\n");
@@ -621,7 +693,7 @@ int main(int argc,char **argv) {
         guidance.speed_managed=guidance.heading_managed=guidance.altitude_managed=1;
         export_fcu_svg(argv[4]);
     }
-    puts("FCU renderer: power blanking, selected values, managed dashes/dots, MACH, TRK/FPA, TRUE and signed V/S passed");
+    puts("FCU renderer: FBW fonts, power blanking, selected values, managed dashes, ghost legends, MACH, TRK/FPA, TRUE and FBW V/S format passed");
     puts("PFD renderer: heading wrap/scroll, bank pointer, FD direction, FMA, altitude sign, RA, LS validity/offscale and failures passed");
     puts("ND renderer: independent EFIS filters, FMS constraints, PLAN projection/centre, real traffic/terrain validity and airport moving map passed");
     return 0;

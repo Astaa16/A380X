@@ -23,7 +23,7 @@ from pathlib import Path
 from urllib.parse import unquote_to_bytes
 
 from avionics_provider import ADIRS_COMMANDS, CENTER_RIGHT_COMMANDS, CLOCK_COMMANDS, DU_COMMANDS, EFIS_COMMANDS, FCU_COMMANDS, GLARESHIELD_COMMANDS
-from avionics_provider import KCCU_COMMANDS, MFD_COMMANDS
+from avionics_provider import KCCU_COMMANDS, MFD_COMMANDS, SD_COMMANDS
 
 from avionics_panel_layout import (
     CLOCK_CHR_PANEL_RECT,
@@ -101,13 +101,13 @@ FCU_LABELS = (
 # SEQ2 nodes identify the authored white text, not an engagement lamp. Use their
 # parent button meshes to place separate green bars above the untouched legends.
 FCU_ANNUNCIATORS = (
-    ('AP1', 'PUSH_FCU_AP1_SEQ2', 'a380x/xp12/fcu/ap1_active'),
-    ('AP2', 'PUSH_FCU_AP2_SEQ2', 'a380x/xp12/fcu/ap2_active'),
-    ('FD', 'PUSH_FCU_FD_SEQ2', 'a380x/xp12/fcu/fd_active'),
-    ('A/THR', 'PUSH_FCU_ATHR_SEQ2', 'a380x/xp12/fcu/athr_armed'),
-    ('LOC', 'PUSH_FCU_LOC_SEQ2', 'a380x/xp12/fcu/loc_active'),
-    ('ALT', 'PUSH_FCU_ALT_SEQ2', 'a380x/xp12/fcu/altitude_hold_active'),
-    ('APPR', 'PUSH_FCU_APPR_SEQ2', 'a380x/xp12/fcu/approach_active'),
+    ('AP1', 'PUSH_FCU_AP1_SEQ2', 'a380x/xp12/fcu/ap1_light'),
+    ('AP2', 'PUSH_FCU_AP2_SEQ2', 'a380x/xp12/fcu/ap2_light'),
+    ('FD', 'PUSH_FCU_FD_SEQ2', 'a380x/xp12/fcu/fd_light'),
+    ('A/THR', 'PUSH_FCU_ATHR_SEQ2', 'a380x/xp12/fcu/athr_light'),
+    ('LOC', 'PUSH_FCU_LOC_SEQ2', 'a380x/xp12/fcu/loc_light'),
+    ('ALT', 'PUSH_FCU_ALT_SEQ2', 'a380x/xp12/fcu/altitude_hold_light'),
+    ('APPR', 'PUSH_FCU_APPR_SEQ2', 'a380x/xp12/fcu/approach_light'),
 )
 FCU_ANNUNCIATOR_FIRST_CELL = len(FCU_LABELS)
 GLARE_ANNUNCIATORS = (
@@ -148,6 +148,10 @@ ADIRS_ANNUNCIATORS = tuple(
     )
 )
 ADIRS_ANNUNCIATOR_FIRST_CELL = GLARE_ANNUNCIATOR_FIRST_CELL + len(GLARE_ANNUNCIATORS)
+# ELEC overhead legends (tools/elec_cockpit_panel.py). FAULT and OFF reuse the ADIRS cells;
+# these four follow them in the previously empty last row of the atlas.
+ELEC_LEGEND_FIRST_CELL = ADIRS_ANNUNCIATOR_FIRST_CELL + 12
+ELEC_LEGEND_CELLS = {legend: ELEC_LEGEND_FIRST_CELL + i for i, legend in enumerate(('altn', 'disc', 'avail', 'on'))}
 EFIS_ANNUNCIATORS = tuple(
     (label, f'PUSH_EFIS_{source}_{label}_SEQ2', f'a380x/xp12/efis/{side}/{label.lower()}')
     for source, side in (('CS', 'captain'), ('FO', 'first_officer'))
@@ -163,10 +167,14 @@ EFIS_SELECTORS = tuple(
     ) for value, label in enumerate(labels)
 )
 
+# One continuous surface per physical LCD; each contains two target fields.
 FCU_SCREEN_QUADS = (
-    # Split the two central AFS windows into SPD/HDG and ALT/V/S halves.
-    # SCREEN_AUTOPILOT also contains outer EFIS faces, which must stay separate.
-    # Positive source X is pilot-left after the 180-degree aircraft attachment.
+    (0.014283556, 0.115242831, 0.00, 0.50),  # SPD + HDG
+    (-0.115033157, -0.016629022, 0.50, 1.00),  # ALT + V/S
+)
+
+# Historical split faces, used only by the preservation-aware migration.
+FCU_LEGACY_SCREEN_QUADS = (
     (0.064763194, 0.115242831, 0.00, 0.25),
     (0.014283556, 0.064763194, 0.25, 0.50),
     (-0.065831089, -0.016629022, 0.50, 0.75),
@@ -210,7 +218,7 @@ MFD_SEATS = ('CAPT', 'F/O')
 MFD_SCREEN_TEXTURE = 'mfd_screen_black.png'
 MFD_SCREEN_TEXTURE_PATH = '../../../textures/interior/cockpit-panels/' + MFD_SCREEN_TEXTURE
 MFD_SCREEN_LIFT = 0.002   # visible quad, like the PFD/ND overlays
-MFD_TOUCH_LIFT = 0.001    # touch quad in the cockpit object
+MFD_TOUCH_LIFT = 0.003    # touch twin 1 mm IN FRONT of the visible screen
 # UV (0,0) is device texel (0,0), the bottom-left as seen from the seat.
 MFD_CORNER_UVS = ((0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0))   # BL TL TR BR
 
@@ -595,6 +603,10 @@ def build_obj(
         and command not in (*KCCU_COMMANDS, *MFD_COMMANDS))
     if unregistered_kccu:
         raise ValueError('Commands absent from native KCCU/MFD provider: ' + ', '.join(unregistered_kccu))
+    unregistered_sd = sorted(command for command in configured_commands
+        if command.startswith('a380x/xp12/ecam/sd/') and command not in SD_COMMANDS)
+    if unregistered_sd:
+        raise ValueError('Commands absent from native ECAM provider: ' + ', '.join(unregistered_sd))
     configured_datarefs = {
         re.sub(r'\[\d+\]$', '', control.dataref)
         for _group_source, group_controls in source_groups
@@ -627,6 +639,11 @@ def build_obj(
             from patch_center_right_animations import animation_block
             from patch_adirs_animations import adirs_targets
             for target in adirs_targets(group_source):
+                control_motions[(group_source, target['name'])] = target
+        if 'KNOB_FCU_ALT' in names and 'PUSH_FCU_AP1' in names:
+            from patch_center_right_animations import animation_block
+            from patch_fcu_animations import fcu_touch_targets
+            for target in fcu_touch_targets(group_source):
                 control_motions[(group_source, target['name'])] = target
         parents = {child: index for index, node in enumerate(nodes) for child in node.get('children', [])}
         matrices: dict[int, list[list[float]]] = {}
@@ -767,7 +784,8 @@ def build_obj(
                     (rotary, left, low, centre_left, high),
                     (rotary, centre_right, low, right, high),
                     (Control(control.node + ':push', control.command_push,
-                             control.push_label or control.label + ' - PUSH'), centre_left, middle, centre_right, high),
+                             control.push_label or control.label + ' - PUSH', command_cursor='button'),
+                     centre_left, middle, centre_right, high),
                     (Control(control.node + ':pull', control.command_pull,
                              control.pull_label or control.label + ' - PULL'), centre_left, low, centre_right, middle),
                 )
@@ -1190,7 +1208,8 @@ def build_obj(
                 f'ATTR_manip_drag_axis\thand\t{axis}\t{float(control.value_min):.9g}\t'
                 f'{float(control.value_max):.9g}\t{control.dataref}\t{control.label}'
             )
-        motion = control_motions.get((_group_source, control.node))
+        motion_node = control.node.split(':', 1)[0] if control.node.startswith('KNOB_FCU_') else control.node
+        motion = control_motions.get((_group_source, motion_node))
         if motion:
             lines.extend(animation_block(motion, start, count))
         else:
@@ -1220,25 +1239,31 @@ def build_obj(
         lamp_draws = {name.removeprefix('lamp:'): (start, count)
                       for name, start, count in overlay_draws if name.startswith('lamp:')}
         if lamp_draws:
-            lines.extend(['ATTR_poly_os\t2',
-                          'ATTR_light_level\t0\t1\tsim/cockpit2/switches/avionics_power_on'])
+            lines.append('ATTR_poly_os\t2')
+            fcu_lamp_nodes = {row[1] for row in FCU_ANNUNCIATORS}
             for _label, lamp_node, dataref in [*FCU_ANNUNCIATORS, *EFIS_ANNUNCIATORS,
                 *((label,node,ref) for label,node,ref,_color in GLARE_ANNUNCIATORS)]:
                 if lamp_node not in lamp_draws:
                     continue
                 start, count = lamp_draws[lamp_node]
-                lines.extend([f'# FCU ANNUNCIATOR {lamp_node}', 'ANIM_begin',
-                              'ANIM_hide\t0\t0\tsim/cockpit2/switches/avionics_power_on',
-                              # ANIM_show only resumes drawing; it does not hide
-                              # geometry outside its range. Both off conditions
-                              # must explicitly suspend the lamp's triangles.
-                              f'ANIM_hide\t-0.5\t0.5\t{dataref}'])
+                lines.append(f'# FCU ANNUNCIATOR {lamp_node}')
+                if lamp_node in fcu_lamp_nodes:
+                    # FCU light values already include power, mode state and
+                    # integral dimming. A dim but active 0.25 lamp stays lit.
+                    lines.extend([f'ATTR_light_level\t0\t1\t{dataref}', 'ANIM_begin',
+                                  f'ANIM_hide\t-0.0001\t0.0001\t{dataref}'])
+                else:
+                    # Preserve the existing EFIS/glareshield electrical gate
+                    # and binary state thresholds independently of FCU dimming.
+                    lines.extend(['ATTR_light_level\t0\t1\tsim/cockpit2/switches/avionics_power_on',
+                                  'ANIM_begin', 'ANIM_hide\t0\t0\tsim/cockpit2/switches/avionics_power_on',
+                                  f'ANIM_hide\t-0.5\t0.5\t{dataref}'])
                 motion = next((target for (_path, name), target in control_motions.items()
                                if name == lamp_node), None)
                 lines.extend(animation_block(motion, start, count) if motion
                              else [f'TRIS\t{start}\t{count}'])
-                lines.append('ANIM_end')
-            lines.extend(['ATTR_light_level_reset', 'ATTR_poly_os\t0'])
+                lines.extend(['ANIM_end', 'ATTR_light_level_reset'])
+            lines.append('ATTR_poly_os\t0')
         adirs_draws = {name.removeprefix('adirs-lamp:'): (start, count)
                        for name, start, count in overlay_draws if name.startswith('adirs-lamp:')}
         if adirs_draws:
@@ -1345,7 +1370,7 @@ def build_obj(
         'limitations': [
             'FCU controls are routed exclusively through the aircraft-native FBW-derived guidance plugin.',
             'The source FCU supplies the daylight legends; configured labels also remain available as mouse hover tooltips.',
-            'Mapped overhead, EFIS, and engine-master controls use native-state movement; FCU engagement bars are fitted above the authored legends and follow native states; throttle and FCU knob travel are not yet animated.',
+            'Mapped overhead, EFIS, and engine-master controls use native-state movement; FCU click regions and engagement bars follow independent authored mechanical travel. Retained FCU meshes are animated by patch_fcu_animations.py; throttle travel is not yet animated.',
             'Passenger-door click targets use the authored closed-position handle meshes; native door commands remain bindable when a door is open.',
         ],
     }
@@ -1365,6 +1390,7 @@ def main() -> None:
     parser.add_argument('--mfd-screens-output', type=Path,
                         help='Also write the visible MFD device-screen OBJ and its black '
                              f'{MFD_SCREEN_TEXTURE} texture into this OBJ path\'s directory')
+    parser.add_argument('--native-nd', action='store_true', help='Add the local xp-kit ND device screens and touch twins')
     parser.add_argument(
         '--additional-source', nargs=2, action='append', default=[], metavar=('SOURCE', 'CONFIG'),
         help='Append named controls from another glTF and JSON configuration to the same cockpit object',
@@ -1380,11 +1406,18 @@ def main() -> None:
     encoded, report = build_obj(
         args.source, controls, known, known_datarefs, args.fcu_overlay, additional_sources,
     )
+    if args.native_nd:
+        from nd_cockpit_devices import augment
+        encoded=augment(encoded,True)
+        report['native_nd_device_touch_quads']=2
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(encoded, encoding='ascii', newline='\n')
     if args.mfd_screens_output:
         args.mfd_screens_output.parent.mkdir(parents=True, exist_ok=True)
-        args.mfd_screens_output.write_text(build_mfd_screens_obj(), encoding='ascii', newline='\n')
+        screens=build_mfd_screens_obj()
+        if args.native_nd:
+            screens=augment(screens,False)
+        args.mfd_screens_output.write_text(screens, encoding='ascii', newline='\n')
         (args.mfd_screens_output.parent / MFD_SCREEN_TEXTURE).write_bytes(mfd_screen_black_png())
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)

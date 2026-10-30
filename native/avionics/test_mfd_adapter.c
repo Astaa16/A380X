@@ -48,6 +48,9 @@ typedef struct {
     int writable;
     XPLMGetDatai_f geti;
     XPLMSetDatai_f seti;
+    XPLMGetDataf_f getf;
+    XPLMGetDatavf_f getvf;
+    XPLMSetDatavf_f setvf;
     XPLMGetDatab_f getb;
     void *refcon;
 } MockRef;
@@ -76,11 +79,19 @@ XPLMDataRef XPLMRegisterDataAccessor(const char *name, XPLMDataTypeID types, int
     memset(r, 0, sizeof(*r));
     snprintf(r->name, sizeof(r->name), "%s", name);
     r->active = 1; r->types = types; r->writable = writable;
-    r->geti = geti; r->seti = seti; r->getb = getb; r->refcon = readref;
+    r->geti = geti; r->seti = seti; r->getf = getf; r->getvf = getvf; r->setvf = setvf;
+    r->getb = getb; r->refcon = readref;
     return r;
 }
 
 void XPLMUnregisterDataAccessor(XPLMDataRef ref) { MockRef *r = (MockRef *)ref; assert(r && r->active); r->active = 0; }
+XPLMDataTypeID XPLMGetDataRefTypes(XPLMDataRef ref) { return ((MockRef *)ref)->types; }
+int XPLMGetDatai(XPLMDataRef ref) { MockRef *r=ref;return r->geti?r->geti(r->refcon):0; }
+float XPLMGetDataf(XPLMDataRef ref) { MockRef *r=ref;return r->getf?r->getf(r->refcon):0; }
+int XPLMGetDatavf(XPLMDataRef ref,float *out,int offset,int count)
+{ MockRef *r=ref;return r->getvf?r->getvf(r->refcon,out,offset,count):0; }
+void XPLMSetDatavf(XPLMDataRef ref,float *in,int offset,int count)
+{ MockRef *r=ref;if(r->setvf)r->setvf(r->refcon,in,offset,count); }
 
 static int active_refs(void)
 {
@@ -283,7 +294,17 @@ static uint32_t mfd_gl_draw(const MfdDrawList *dl, float ox, float oy, float sca
     return dl ? dl->cmd_count : 0;
 }
 
+static int xpkit_draw_mfd(int side,float x,float y,float scale) {
+    (void)side;(void)x;(void)y;(void)scale;return 0;
+}
+static void mfd_gl_cursor(const MfdDrawList *dl,float x,float y,float scale) {
+    (void)dl;(void)x;(void)y;(void)scale;
+}
 #include "a380x_mfd_adapter.inc"
+#include "a380x_xpkit_shared.h"
+static A380XXpKitShared mock_shared;
+static A380XXpKitShared *xpkit_shared=&mock_shared;
+#include "a380x_xpkit_mfd.inc"
 
 /* ---- Test page: one input field ------------------------------------------------------------- */
 
@@ -490,6 +511,56 @@ static void test_keyboard(void)
     CHECK(mfda_capture_side == -1);
 }
 
+static void test_zero_coordinate_release_and_data_entry(void)
+{
+    int s;
+    start();
+    g_commits = 0;
+    memset(&g_value, 0, sizeof(g_value));
+    for (s = 0; s < MFD_SIDE_COUNT; ++s) {
+        MockDevice *d = device(s);
+        a380x_mfd_navigate(&mfda_mfd, (MfdSide)s, "fms/test/kbd");
+        frame(3);
+        /* Reproduce the real log: valid press, then MouseUp at raw (0,0),
+         * both before the next flight loop and with no hover callback. */
+        touch(s, 120.0f, 215.0f, xplm_MouseDown);
+        d->p.screenTouchCallback(0, 0, xplm_MouseUp, d->p.refcon);
+        frame(5);
+        CHECK(mfda_mfd.sides[s].ui.focus_id != 0);
+        /* X-Plane 12 (Oct 2026 log): the release arrives at the off-screen
+         * sentinel (-16,-16). It must still click the pressed field. */
+        a380x_mfd_navigate(&mfda_mfd, (MfdSide)s, "fms/data/status");
+        frame(3);
+        a380x_mfd_navigate(&mfda_mfd, (MfdSide)s, "fms/test/kbd");
+        frame(3);
+        CHECK(mfda_mfd.sides[s].ui.focus_id == 0);
+        touch(s, 120.0f, 215.0f, xplm_MouseDown);
+        d->p.screenTouchCallback(-16, -16, xplm_MouseUp, d->p.refcon);
+        frame(5);
+        CHECK(mfda_mfd.sides[s].ui.focus_id != 0);
+        CHECK(mfda_capture_side == s && mfda_dev[s].keyboard_captured);
+        CHECK(mfda_dev[s].last_up_x == 120 && mfda_dev[s].last_up_y == 215);
+        const char *digits = s ? "160" : "150";
+        for (int n = 0; digits[n]; ++n)
+            CHECK(mock_sniffer(digits[n], xplm_DownFlag,
+                  (char)(XPLM_VK_0 + digits[n] - '0'), NULL) == 0);
+        frame(4);
+        CHECK(!strcmp(mfda_mfd.sides[s].ui.buf, digits));
+        CHECK(mock_sniffer('\r', xplm_DownFlag, (char)XPLM_VK_RETURN, NULL) == 0);
+        frame(15);
+        CHECK(g_commits == s + 1 && g_value.num == (s ? 160.0 : 150.0));
+        CHECK(mfda_capture_side == -1);
+        /* Do not turn a real drag away from a field into a click on it. */
+        touch(s, 120.0f, 215.0f, xplm_MouseDown);
+        touch(s, 700.0f, 900.0f, xplm_MouseDrag);
+        d->p.screenTouchCallback(-16, -16, xplm_MouseUp, d->p.refcon);
+        frame(5);
+        CHECK(mfda_mfd.sides[s].ui.focus_id == 0);
+        CHECK(mfda_dev[s].last_up_x == 700 && mfda_dev[s].last_up_y == 900);
+    }
+    stop();
+}
+
 static void test_brightness(void)
 {
     CHECK(mfda_brightness_law(1, 0.5f, 0.8f) == 0.4f);
@@ -497,6 +568,122 @@ static void test_brightness(void)
     CHECK(mfda_brightness_law(0, 1.0f, 1.0f) == 0.0f);
     CHECK(mfda_brightness_law(1, 0.0f, 1.0f) == 0.0f);
     CHECK(mfda_brightness_law(1, 1.0f, 3.0f) == 1.0f);
+}
+
+/* Use the actual registered XPLM callbacks, not the browser input bridge. A
+ * quick down/up can both arrive before the next simulator flight-loop frame. */
+static void tap(int side, float x, float y)
+{
+    touch(side, x, y, xplm_MouseDown);
+    touch(side, x, y, xplm_MouseUp);
+    frame(5);
+}
+
+static void test_cockpit_dropdowns(void)
+{
+    static const struct { float x, y, item_x, item_y; const char *uri; } cases[] = {
+        {175, 22, 80, 98, "atccom/connect"},
+        {175, 22, 80, 134, "surv/controls"},
+        {175, 22, 80, 170, "fcubkup/afs"},
+        {100, 70, 80, 116, "fms/active/f-pln"},
+        {100, 70, 80, 152, "fms/active/perf"},
+        {100, 70, 80, 188, "fms/active/fuel-load"},
+        {100, 70, 80, 260, "fms/active/init"},
+        {290, 70, 280, 224, "fms/position/irs"},
+        {480, 70, 470, 152, "fms/sec/index/2"},
+        {680, 70, 660, 260, "fms/data/airport"},
+    };
+    start();
+    frame(2);
+    for (int side=0; side<2; ++side) {
+        for (int n=0; n<ARRAY_LEN(cases); ++n) {
+            a380x_mfd_navigate(&mfda_mfd, (MfdSide)side, "fms/data/status");
+            frame(3);
+            tap(side, cases[n].x, cases[n].y);
+            CHECK(mfda_dev[side].menu_open);
+            CHECK(mfda_mfd.sides[side].ui.open_menu != 0);
+            CHECK(mfda_dev[side].last_down_x == (int)cases[n].x &&
+                  mfda_dev[side].last_down_y == (int)cases[n].y);
+            CHECK(mfda_dev[side].last_up_x == (int)cases[n].x &&
+                  mfda_dev[side].last_up_y == (int)cases[n].y);
+            CHECK(mfda_dev[side].press_target == mfda_dev[side].click_target);
+            CHECK(mfda_dev[side].menu_open_count == n + 1);
+            tap(side, cases[n].item_x, cases[n].item_y);
+            if (strcmp(a380x_mfd_active_uri(&mfda_mfd, (MfdSide)side), cases[n].uri))
+                fprintf(stderr, "dropdown %d seat %d: expected %s, got %s\n", n, side, cases[n].uri,
+                        a380x_mfd_active_uri(&mfda_mfd, (MfdSide)side));
+            CHECK(!strcmp(a380x_mfd_active_uri(&mfda_mfd, (MfdSide)side), cases[n].uri));
+            CHECK(mfda_mfd.sides[side].page_index >= 0); /* not just a changed URI / NOT FOUND page */
+            CHECK(!mfda_dev[side].menu_open);
+            CHECK(!mfda_dev[side].events_dropped);
+            CHECK(mfda_dev[side].device_bound);
+        }
+    }
+    CHECK(mfda_dev[0].touch_down_count >= 20 && mfda_dev[0].touch_up_count >= 20);
+    CHECK(mfda_dev[1].touch_down_count >= 20 && mfda_dev[1].touch_up_count >= 20);
+    /* Read-only diagnostics cannot be used to fake a physical cockpit click. */
+    MockRef *r = XPLMFindDataRef("a380x/xp12/mfd/captain/touch_down_count");
+    CHECK(r && !r->writable && !r->seti && r->geti(r->refcon) >= 20);
+    stop();
+}
+
+static void test_arrow_keys_and_held_kccu(void)
+{
+    MfdKey key;
+    char out;
+    CHECK(mfda_map_key(0, XPLM_VK_UP, &key, &out) && key == MFD_KEY_UP);
+    CHECK(mfda_map_key(0, XPLM_VK_DOWN, &key, &out) && key == MFD_KEY_DOWN);
+    CHECK(mfda_map_key(0, XPLM_VK_LEFT, &key, &out) && key == MFD_KEY_LEFT);
+    CHECK(mfda_map_key(0, XPLM_VK_RIGHT, &key, &out) && key == MFD_KEY_RIGHT);
+    start();
+    frame(2);
+    MockDevice *d = device(0);
+    d->p.screenCursorCallback(100, MFD_H-1-70, d->p.refcon);
+    frame(1);
+    run_command("a380x/xp12/kccu/captain/click", xplm_CommandBegin);
+    frame(3); /* No hover callback for several frames while the button is held. */
+    CHECK(mfda_mfd.sides[0].ui.button_down);
+    run_command("a380x/xp12/kccu/captain/click", xplm_CommandEnd);
+    frame(3);
+    CHECK(mfda_dev[0].menu_open);
+    stop();
+}
+
+static void test_cursor_transport(void)
+{
+    start();
+    memset(&mock_shared,0,sizeof(mock_shared));
+    frame(3);
+    xpkit_mfd_publish();
+    uint32_t before=atomic_load(&mock_shared.mfd[0].sequence);
+    CHECK(before>0);
+    uint64_t full_before=mfda_list_hash(a380x_mfd_display_list(&mfda_mfd,MFD_CAPT),1);
+    /* 1,000 pointer positions in empty page space: no page snapshots/uploads.
+     * Raw display lists still change, so the local cursor is not frozen. */
+    for(int n=0;n<1000;++n) {
+        MockDevice *d=device(0);
+        d->p.screenCursorCallback(300+n%80,MFD_H-1-(280+n%100),d->p.refcon);
+        frame(1);
+        xpkit_mfd_publish();
+        if(atomic_load(&mock_shared.mfd[0].sequence)!=before) {
+            CHECK(0);break;
+        }
+    }
+    CHECK(full_before!=mfda_list_hash(a380x_mfd_display_list(&mfda_mfd,MFD_CAPT),1));
+    CHECK(mfda_mfd.sides[0].ui.cursor_visible);
+    for(uint32_t n=0;n<mock_shared.mfd[0].list.cmd_count;++n)
+        CHECK(mock_shared.mfd[0].list.cmds[n].layer!=MFD_LAYER_CURSOR);
+    CHECK(mock_shared.mfd[0].list.point_count+6==a380x_mfd_display_list(&mfda_mfd,MFD_CAPT)->point_count);
+    tap(0,100,70);
+    xpkit_mfd_publish();
+    CHECK(atomic_load(&mock_shared.mfd[0].sequence)>before);
+    CHECK(mfda_dev[0].menu_open);
+    before=atomic_load(&mock_shared.mfd[0].sequence);
+    tap(0,80,152);
+    xpkit_mfd_publish();
+    CHECK(!strcmp(mock_shared.mfd[0].uri,"fms/active/perf"));
+    CHECK(atomic_load(&mock_shared.mfd[0].sequence)>before);
+    stop();
 }
 
 static void test_fallback(void)
@@ -523,7 +710,7 @@ static void test_reload(void)
     int i, commands = -1;
     for (i = 0; i < 3; ++i) {
         start();
-        CHECK(active_refs() == 9 && active_commands() == 140 && mock_sniffers == 1 && mock_menus == 1);
+        CHECK(active_refs() == MFDA_REF_COUNT && active_commands() == 140 && mock_sniffers == 1 && mock_menus == 1);
         if (commands < 0) commands = mock_command_count;
         CHECK(mock_command_count == commands);
         frame(2);
@@ -539,7 +726,11 @@ int main(int argc, char **argv)
     test_devices();
     test_side_isolation_and_du();
     test_keyboard();
+    test_zero_coordinate_release_and_data_entry();
     test_brightness();
+    test_cockpit_dropdowns();
+    test_arrow_keys_and_held_kccu();
+    test_cursor_transport();
     test_fallback();
     test_reload();
     if (g_fail) {

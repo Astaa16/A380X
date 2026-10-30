@@ -3,10 +3,15 @@
  * physical selector positions; our native PFD/ND renderers consume this state.
  * WX and ETACS selections are recorded for an explicit INOP annunciation only.
  */
+#include "a380x_elec_power.h"
 #include <stddef.h>
 
 #include "a380x_efis.h"
+#include "a380x_control_motion.h"
 static EfisSide efis[2];
+enum { EFIS_PRESS_KEYS = 13, EFIS_PRESS_BARO = 13, EFIS_PRESS_COUNT = 14 };
+static A380XPress efis_press[2][EFIS_PRESS_COUNT];
+static float efis_motion_clock;
 
 typedef struct {
     XPLMDataRef cstr, wpt, vord, ndb, arpt, vor1, vor2, terr, traf, wx;
@@ -50,7 +55,14 @@ static const EfisField efis_fields[] = {
     EFIS_INT(vor1), EFIS_INT(vor2), EFIS_INT(terr), EFIS_INT(traf), EFIS_INT(ls), EFIS_INT(vv),
     EFIS_INT(wx_requested), EFIS_INT(taxi_requested), EFIS_INT(mode), EFIS_INT(range_index),
     EFIS_INT(zoom), EFIS_INT(baro_std), EFIS_INT(baro_inhg), EFIS_INT(powered),
-    EFIS_FLOAT(range_nm), EFIS_FLOAT(qnh_hpa), EFIS_FLOAT(baro_preset_hpa)
+    EFIS_FLOAT(range_nm), EFIS_FLOAT(qnh_hpa), EFIS_FLOAT(baro_preset_hpa),
+#define EFIS_PRESSED(n, i) {#n, offsetof(EfisSide, pressed[i]), 1}
+    EFIS_PRESSED(cstr_pressed, 0), EFIS_PRESSED(wpt_pressed, 1), EFIS_PRESSED(vord_pressed, 2),
+    EFIS_PRESSED(ndb_pressed, 3), EFIS_PRESSED(arpt_pressed, 4), EFIS_PRESSED(vor1_pressed, 5),
+    EFIS_PRESSED(vor2_pressed, 6), EFIS_PRESSED(terr_pressed, 7), EFIS_PRESSED(traf_pressed, 8),
+    EFIS_PRESSED(wx_pressed, 9), EFIS_PRESSED(taxi_pressed, 10), EFIS_PRESSED(ls_pressed, 11),
+    EFIS_PRESSED(vv_pressed, 12), EFIS_PRESSED(baro_knob_axial, 13)
+#undef EFIS_PRESSED
 };
 #undef EFIS_INT
 #undef EFIS_FLOAT
@@ -121,6 +133,14 @@ static int efis_command_handler(XPLMCommandRef command, XPLMCommandPhase phase, 
     float now = XPLMGetElapsedTime();
     int repeatable = c->action >= EFIS_MODE_UP && c->action <= EFIS_BARO_DOWN;
     (void)command;
+    if (plugin_enabled) {
+        /* Mechanical feedback follows the command phases (mouse held = key held). */
+        int press = c->action < EFIS_PRESS_KEYS ? c->action
+            : (c->action == EFIS_BARO_STD || c->action == EFIS_BARO_QNH) ? EFIS_PRESS_BARO : -1;
+        if (press >= 0 && phase == xplm_CommandBegin)
+            a380x_press_begin(&efis_press[c->side][press], now, c->action == EFIS_BARO_QNH ? -1.0f : 1.0f);
+        else if (press >= 0 && phase == xplm_CommandEnd) a380x_press_end(&efis_press[c->side][press]);
+    }
     if (!plugin_enabled || phase == xplm_CommandEnd) return 1;
     if (phase == xplm_CommandContinue && (!repeatable || now < c->next_repeat)) return 1;
     c->next_repeat = now + (phase == xplm_CommandBegin ? 0.4f : 0.10f);
@@ -149,10 +169,11 @@ static int efis_command_handler(XPLMCommandRef command, XPLMCommandPhase phase, 
                 : roundf(s->baro_preset_hpa) + direction;
             s->baro_preset_hpa = efis_clamp_baro(next);
             if (!s->baro_std) s->qnh_hpa = s->baro_preset_hpa;
+            else s->baro_preset_visible = 1;
             break;
         }
-        case EFIS_BARO_STD: s->baro_std = 1; break;
-        case EFIS_BARO_QNH: s->baro_std = 0; s->qnh_hpa = s->baro_preset_hpa; break;
+        case EFIS_BARO_STD: s->baro_std = 1; s->baro_preset_visible = 0; break;
+        case EFIS_BARO_QNH: s->baro_std = 0; s->baro_preset_visible = 0; s->qnh_hpa = s->baro_preset_hpa; break;
         case EFIS_BARO_UNIT: s->baro_inhg = !s->baro_inhg; break;
         case EFIS_PLAN_NEXT:
         case EFIS_PLAN_PREVIOUS: {
@@ -172,7 +193,18 @@ static void efis_update(float dt)
     int side;
     int loc_active = guidance.loc_armed || guidance.lateral_mode == A380X_C1_LOC
         || guidance.lateral_mode == A380X_C1_LOC_STAR;
+    float now = XPLMGetElapsedTime(), wall = now - efis_motion_clock;
     (void)dt;
+    /* Key travel uses wall time so it also works while the simulation is paused. */
+    if (!(wall >= 0.0f) || wall > 0.5f) wall = 0.0f;
+    efis_motion_clock = now;
+    for (side = 0; side < 2; ++side) {
+        int k;
+        for (k = 0; k < EFIS_PRESS_COUNT; ++k) {
+            a380x_press_update(&efis_press[side][k], now, wall);
+            efis[side].pressed[k] = efis_press[side][k].position;
+        }
+    }
     if (loc_active && !efis_previous_loc_active) guidance.ls1 = guidance.ls2 = 1;
     efis_previous_loc_active = loc_active;
     for (side = 0; side < 2; ++side) {
@@ -182,7 +214,9 @@ static void efis_update(float dt)
         int standard = XPLMGetDatai(b->standard) != 0;
         float hpa = XPLMGetDataf(b->baro) * efis_hpa_per_inhg;
         int changed_pressure = !isfinite(hpa) || fabsf(hpa - b->written_baro_hpa) > 0.02f;
-        s->powered = guidance_inputs.powered && refs.side[side].display_valid;
+        /* EFIS CP: CAPT DC ESS, F/O DC 2 (A380 network, spec 9.2 assumption). */
+        s->powered = a380x_power_bus(side ? A380X_ELN_DC2 : A380X_ELN_DC_ESS,
+                                     guidance_inputs.powered && refs.side[side].display_valid);
 #define EFIS_READ(field) s->field = XPLMGetDatai(b->field) != 0
         EFIS_READ(cstr); EFIS_READ(wpt); EFIS_READ(vord); EFIS_READ(ndb); EFIS_READ(arpt);
         EFIS_READ(terr); EFIS_READ(traf);
@@ -203,9 +237,11 @@ static void efis_update(float dt)
         if (changed_pressure && !(standard && !b->written_std && fabsf(hpa - 1013.25f) < 0.02f)) {
             s->baro_preset_hpa = efis_clamp_baro(hpa);
             if (!standard) s->qnh_hpa = s->baro_preset_hpa;
+            else s->baro_preset_visible = 1;
         }
         if (standard != b->written_std) {
             s->baro_std = standard;
+            s->baro_preset_visible = 0;
             if (!standard) s->qnh_hpa = s->baro_preset_hpa;
         }
         efis_sync_side(side);
@@ -240,6 +276,8 @@ static int efis_init(void)
     XPLMDataRef range_steps = find_required("sim/cockpit2/EFIS/map_range_steps", &ok);
     memset(efis, 0, sizeof(efis));
     memset(efis_boundary, 0, sizeof(efis_boundary));
+    memset(efis_press, 0, sizeof(efis_press));
+    efis_motion_clock = 0.0f;
     efis_previous_loc_active = 0;
     for (side = 0; side < 2; ++side) {
         EfisSide *s = &efis[side];

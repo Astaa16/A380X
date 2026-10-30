@@ -9,6 +9,11 @@ from pathlib import Path
 import shutil
 
 
+from elec_panel_contract import (COMMANDS as ELEC_COMMANDS, DATAREFS as ELEC_DATAREFS,
+                                 SOUND_FILES as ELEC_SOUND_FILES)
+from elec_system_contract import COMMANDS as ELEC_NETWORK_COMMANDS, DATAREFS as ELEC_NETWORK_DATAREFS
+from ovhd_lamps_contract import COMMANDS as OVHD_COMMANDS, DATAREFS as OVHD_DATAREFS
+
 PROVIDER_ID = "a380x-fbw-avionics-v1"
 SOURCE_REVISION = "2baa2b35eadaf4c78e172ce41bbe6b40b4aeafb2"
 MANIFEST = Path("avionics-providers/fbw-avionics-v1.json")
@@ -17,6 +22,9 @@ FILES = (
     ("native/avionics/dist/win.xpl", "plugins/A380XAvionics/win_x64/A380XAvionics.xpl"),
     ("native/avionics/sounds/priority_left.pcm", "plugins/A380XAvionics/sounds/priority_left.pcm"),
     ("native/avionics/sounds/priority_right.pcm", "plugins/A380XAvionics/sounds/priority_right.pcm"),
+    *((f"native/avionics/sounds/{name}", f"plugins/A380XAvionics/sounds/{name}") for name in ELEC_SOUND_FILES),
+    # Thrust-lever magnetic detent click (synthesized by tools/build_detent_click.py).
+    ("native/avionics/sounds/thrust_detent_click.wav", "plugins/A380XAvionics/sounds/thrust_detent_click.wav"),
     ("native/avionics/dist/build-report.json", "plugins/A380XAvionics/build-report.json"),
 )
 DISPLAY_TARGETS = (
@@ -50,6 +58,17 @@ FCU_DATAREFS = tuple("a380x/xp12/fcu/" + name for name in (
     "altitude_step_ft", "servo_active", "ls_captain", "ls_first_officer",
     "athr_armed", "altitude_hold_active",
 ))
+FCU_MOTION_DATAREFS = tuple("a380x/xp12/fcu/" + name for name in (
+    *(f"{button}_pressed" for button in ("ap1", "ap2", "fd", "athr", "loc", "alt_button",
+                                         "approach", "speed_mach", "true_mag", "trk_fpa", "metric")),
+    *(f"{knob}_knob_{axis}" for knob in ("speed", "heading", "altitude", "vertical_speed")
+      for axis in ("rotation", "axial")),
+    "altitude_selector",
+))
+FCU_LIGHT_DATAREFS = tuple("a380x/xp12/fcu/" + name for name in (
+    "ap1_light", "ap2_light", "fd_light", "athr_light", "loc_light",
+    "altitude_hold_light", "approach_light",
+))
 PFD_DATAREFS = tuple("a380x/xp12/pfd/" + name for name in (
     "on_ground", "flap_handle_index", "flap_config", "flap_valid", "slat_valid",
     "speedbrake_valid", "spoilers_armed", "gear_down", "flap_fault", "slat_fault",
@@ -75,6 +94,10 @@ EFIS_DATAREFS = tuple(
         "ls", "vv", "wx_requested", "taxi_requested", "mode", "range_index",
         "zoom", "baro_std", "baro_inhg", "powered", "range_nm", "qnh_hpa",
         "baro_preset_hpa",
+        # momentary key travel and baro shaft push/pull (a380x_control_motion.h)
+        "cstr_pressed", "wpt_pressed", "vord_pressed", "ndb_pressed", "arpt_pressed",
+        "vor1_pressed", "vor2_pressed", "terr_pressed", "traf_pressed", "wx_pressed",
+        "taxi_pressed", "ls_pressed", "vv_pressed", "baro_knob_axial",
     )
 )
 LIGHTING_CHANNELS = ("captain_flood", "integral", "lcd", "first_officer_flood")
@@ -163,6 +186,58 @@ COCKPIT_DOOR_COMMANDS = (
 COCKPIT_DOOR_DATAREFS = (
     "a380x/xp12/cockpit_door/position", "a380x/xp12/cockpit_door/locked",
 )
+# L/G GRVTY panel (native/avionics/a380x_lg_grvty.inc, docs/LG_GRVTY.md). Order = native registry.
+GRVTY_COMMANDS = tuple("a380x/xp12/gear/" + name for name in (
+    "grvty_master_guard_toggle", "grvty_guard_1_toggle", "grvty_guard_2_toggle",
+    "grvty_switch_up", "grvty_switch_down",
+))
+GRVTY_DATAREFS = tuple("a380x/xp12/gear/" + name for name in (
+    "grvty_master_guard", "grvty_guard_1", "grvty_guard_2", "grvty_switch_pos", "grvty_handle_turns",
+    "grvty_hyd_isolated", "grvty_doors_released", "grvty_gears_released", "grvty_lever_disconnected",
+    "grvty_emer_override", "grvty_handle_angle_deg", "grvty_master_guard_anim", "grvty_guard_1_anim",
+    "grvty_guard_2_anim", "grvty_switch_anim",
+))
+# Thrust and reverse levers, FADEC rating / FLEX, instinctive disconnect (native/avionics/a380x_thrust.inc,
+# docs/THRUST_LEVERS.md). Order = native registry (test_thrust_adapter --contracts).
+THRUST_COMMANDS = tuple("a380x/xp12/thrust/" + name for name in (
+    "athr_disconnect_left", "athr_disconnect_right",
+))
+THRUST_INPUT_DATAREFS = tuple("a380x/xp12/thrust/" + name for name in (
+    "lever_1_input", "lever_2_input", "lever_3_input", "lever_4_input", "reverse_2_input", "reverse_3_input",
+))
+THRUST_DATAREFS = (*THRUST_INPUT_DATAREFS, *("a380x/xp12/thrust/" + name for name in (
+    "fadec_mode", "thrust_limit_type", "flex_rating", "flex_latch", "limits_valid", "athr_disabled",
+    "engine_override", "lever_1_anim", "lever_2_anim", "lever_3_anim", "lever_4_anim",
+    "reverse_2_anim", "reverse_3_anim", "disc_left_anim", "disc_right_anim",
+    "tla_1", "tla_2", "tla_3", "tla_4", "n1_command_1", "n1_command_2", "n1_command_3", "n1_command_4",
+    "engine_command_1", "engine_command_2", "engine_command_3", "engine_command_4",
+    "thrust_limit_n1", "flex_n1", "flex_temp_c", "athr_disc_held_s",
+)))
+# FLAPS lever (pull-out detents, gates at 1 and 3), FBW SFCC 1 / 1+F, load relief, cruise baulk, alpha lock
+# and the FPPU flap/slat drives (native/avionics/a380x_flaps.inc, docs/FLAPS_LEVER.md). Order = native
+# registry (test_flaps_adapter --contracts).
+FLAPS_COMMANDS = tuple("a380x/xp12/flaps/" + name for name in ("lever_down", "lever_up"))
+FLAPS_INPUT_DATAREFS = tuple("a380x/xp12/flaps/" + name for name in ("lever_input", "lift_input"))
+FLAPS_DATAREFS = (*FLAPS_INPUT_DATAREFS, *("a380x/xp12/flaps/" + name for name in (
+    "handle_index", "lever_latched", "conf_index", "config_display", "flap_relief", "alpha_lock",
+    "cruise_baulk", "xp_layout_ok",
+    "lever_anim", "lock_anim", "flap_anim_ratio", "slat_anim_ratio", "flap_angle_deg", "slat_angle_deg",
+    "flap_fppu_deg", "slat_fppu_deg", "flap_target_fppu_deg", "slat_target_fppu_deg", "aileron_droop_deg",
+    "vfe_knots", "vfe_next_knots",
+)))
+# SPEED BRAKE lever (push down to move, 1/2 notch, ARM pulled up at RET), FBW PRIM speed brake and ground
+# spoilers (native/avionics/a380x_speedbrake.inc, docs/SPEED_BRAKE.md). Order = native registry
+# (test_speedbrake_adapter --contracts).
+SPEEDBRAKE_COMMANDS = tuple("a380x/xp12/speedbrake/" + name for name in (
+    "extend_one", "retract_one", "arm_toggle", "arm", "retract",
+))
+SPEEDBRAKE_INPUT_DATAREFS = ("a380x/xp12/speedbrake/lever_input",)
+SPEEDBRAKE_DATAREFS = (*SPEEDBRAKE_INPUT_DATAREFS, *("a380x/xp12/speedbrake/" + name for name in (
+    "ground_spoilers_armed", "lever_position", "lever_held", "speed_brake_inhibited", "ground_spoilers_out",
+    "phased_lift_dumping", "spoiler_lift_active", "wheel_latch",
+    "handle_position", "lever_anim", "lift_anim", "speed_brake_command_deg", "ground_spoiler_command_deg",
+    "spoiler_lift_deg", *(f"spoiler_{k}_deg" for k in range(1, 9)), "extension_ratio", "xp_handle_ratio",
+)))
 # MFD + KCCU (docs/mfd-spec/09-port-integration.md section 1.4, spec 01 section 12.5,
 # spec 08 sections 10.1 and 10.5, spec 07 section 10.3).
 KCCU_SIDES = ("captain", "first_officer")
@@ -178,7 +253,10 @@ KCCU_DATAREFS = tuple(f"a380x/xp12/kccu/{side}/{name}"
 MFD_COMMANDS = tuple(f"a380x/xp12/mfd/{side}/{name}"
                      for side in KCCU_SIDES for name in ("popup", "popout"))
 MFD_DATAREFS = (*(f"a380x/xp12/mfd/{side}/{name}" for side in KCCU_SIDES
-                  for name in ("active_page", "keyboard_captured")),
+                  for name in ("active_page", "keyboard_captured", "device_bound", "touch_down_count",
+                               "touch_up_count", "cursor_x", "cursor_y", "cursor_visible", "menu_open", "events_dropped",
+                               "last_down_x", "last_down_y", "last_up_x", "last_up_y",
+                               "press_target", "click_target", "click_count", "menu_open_count")),
                 "a380x/xp12/mfd/pc_keyboard_capture")
 FMS_DATAREFS = tuple("a380x/xp12/fms/" + name for name in (
     "flight_phase", "v1_knots", "vr_knots", "v2_knots", "to_flex_temp_c", "to_power_setting",
@@ -208,13 +286,27 @@ SURV_DATAREFS = tuple("a380x/xp12/surv/" + name for name in (
 ))  # spec 06 section 4.2, shared by both MFDs, writable
 MFD_DEVICES = (("a380x.xp12.mfd.captain", "A380X MFD CAPT"),
                ("a380x.xp12.mfd.first_officer", "A380X MFD F/O"))
+SD_COMMANDS = tuple("a380x/xp12/ecam/sd/" + name for name in
+                    ("engine","apu","bleed","cond","press","door","elec_ac","elec_dc","fuel","wheel","hyd","fctl","cb","cruise","status","video",
+                     "next_page","brightness_up","brightness_down","popup","all","more","to_config","clear_left","clear_right","recall","recall_last",
+                     "checklist","abnormal_procedures","up","down","check_left","check_right","emergency_cancel","ewd_brightness_up","ewd_brightness_down"))
+SD_DATAREFS = tuple("a380x/xp12/ecam/sd/" + name for name in
+                    ("active_page","powered","device_bound","draw_count","select_count","brightness","manual_selection","more","all_held",
+                     "action_count","last_action","checklist_visible","checklist_cursor","checklist_group","abnormal_visible","ewd_brightness")) + (
+                         "a380x/xp12/ecam/buttons/eng/press_ratio",
+                         "a380x/xp12/ecam/buttons/eng/selected")
+SD_DEVICES = ("a380x.xp12.ecam.sd",)
 AVIONICS_COMMANDS = (*EFB_COMMANDS, *FCU_COMMANDS, *EFIS_COMMANDS, *LIGHTING_COMMANDS, *DU_COMMANDS,
                      *GLARESHIELD_COMMANDS, *CLOCK_COMMANDS, *CENTER_RIGHT_COMMANDS,
-                     *COCKPIT_DOOR_COMMANDS, *ADIRS_COMMANDS, *KCCU_COMMANDS, *MFD_COMMANDS)
-AVIONICS_DATAREFS = (*FCU_DATAREFS, *PFD_DATAREFS, *EFIS_DATAREFS, *LIGHTING_DATAREFS, *DU_DATAREFS,
+                     *COCKPIT_DOOR_COMMANDS, *ADIRS_COMMANDS, *KCCU_COMMANDS, *MFD_COMMANDS, *SD_COMMANDS,
+                     *ELEC_COMMANDS, *ELEC_NETWORK_COMMANDS, *OVHD_COMMANDS, *GRVTY_COMMANDS, *THRUST_COMMANDS,
+                     *FLAPS_COMMANDS, *SPEEDBRAKE_COMMANDS)
+AVIONICS_DATAREFS = (*FCU_DATAREFS, *FCU_MOTION_DATAREFS, *FCU_LIGHT_DATAREFS,
+                     *PFD_DATAREFS, *EFIS_DATAREFS, *LIGHTING_DATAREFS, *DU_DATAREFS,
                      *GLARESHIELD_DATAREFS, *CLOCK_DATAREFS, *CENTER_RIGHT_DATAREFS,
                      *COCKPIT_DOOR_DATAREFS, *ADIRS_DATAREFS, *KCCU_DATAREFS, *MFD_DATAREFS,
-                     *FMS_DATAREFS, *SURV_DATAREFS)
+                     *FMS_DATAREFS, *SURV_DATAREFS, *SD_DATAREFS, *ELEC_DATAREFS, *ELEC_NETWORK_DATAREFS,
+                     *OVHD_DATAREFS, *GRVTY_DATAREFS, *THRUST_DATAREFS, *FLAPS_DATAREFS, *SPEEDBRAKE_DATAREFS)
 
 
 def digest(path: Path) -> str:
@@ -289,6 +381,29 @@ def validate_avionics_provider(root: Path) -> tuple[dict | None, list[str]]:
             raise ValueError("provider lacks physical EFIS selector inputs")
         if document.get("cockpit_devices") != [device for device, _ in MFD_DEVICES]:
             raise ValueError("provider does not own the two MFD cockpit devices")
+        if document.get('xpkit_nd'):
+            from nd_cockpit_devices import ND_DEVICES, ND_COMMANDS, ND_DATAREFS
+            nd=document['xpkit_nd']
+            if (nd.get('cockpit_devices')!=list(ND_DEVICES) or nd.get('commands')!=list(ND_COMMANDS)
+                    or nd.get('datarefs')!=list(ND_DATAREFS)):
+                raise ValueError('invalid native ND cockpit-device contracts')
+        if document.get('xpkit_pfd'):
+            from pfd_cockpit_devices import PFD_DEVICES, PFD_COMMANDS, PFD_DATAREFS
+            pfd=document['xpkit_pfd']
+            if (pfd.get('cockpit_devices')!=list(PFD_DEVICES) or pfd.get('commands')!=list(PFD_COMMANDS)
+                    or pfd.get('datarefs')!=list(PFD_DATAREFS)):
+                raise ValueError('invalid native PFD cockpit-device contracts')
+        if document.get('isis'):
+            from isis_cockpit_device import ISIS_DEVICES, ISIS_COMMANDS, ISIS_DATAREFS
+            isis=document['isis']
+            if (isis.get('cockpit_devices')!=list(ISIS_DEVICES) or isis.get('commands')!=list(ISIS_COMMANDS)
+                    or isis.get('datarefs')!=list(ISIS_DATAREFS)):
+                raise ValueError('invalid native ISIS cockpit-device contracts')
+        if document.get('ecam_sd'):
+            sd=document['ecam_sd']
+            if (sd.get('cockpit_devices')!=list(SD_DEVICES) or sd.get('commands')!=list(SD_COMMANDS)
+                    or sd.get('datarefs')!=list(SD_DATAREFS)):
+                raise ValueError('invalid native ECAM SD contracts')
         rows = document.get("files")
         if not isinstance(rows, list) or len(rows) != len(FILES):
             raise ValueError("expected Mac, Windows, voice, and build-report files")

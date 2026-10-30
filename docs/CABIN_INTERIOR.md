@@ -113,7 +113,7 @@ The cockpit door keeps its authored `COCKPITDOOR_OPEN_ANIM` clip and follows
 `sim/flight_controls/door_toggle_17`. The detailed cockpit rebuild uses LOD00
 because the LOD01 source had flattened this door into static geometry.
 
-Cargo doors remain static. Pressure interlocks, arming/disarming, slide logic,
+The cargo update adds independently animated forward/aft/bulk doors and the authored textured cargo holds; see [CARGO_DOORS.md](CARGO_DOORS.md). The bulk hinge motion is provisional. Pressure interlocks, arming/disarming, slide logic,
 sounds, and Airbus door-system indications are not implemented.
 
 ## Verification

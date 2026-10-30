@@ -1,8 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later
  * X-Plane raw sensor/actuator boundary for the imported FBW guidance laws.
- * No native AP/FD/FMS mode is read or delegated to. Overrides are leased only
- * while engaged, and released on pause, failure, disable and unload.
+ * Guidance never derives modes/targets from native AP/FD/FMS state. A separate
+ * authority monitor reads native servo status solely to detect contention.
+ * Overrides are leased while engaged and released on pause/failure/unload.
  */
+#include "a380x_elec_power.h"
 typedef struct {
     XPLMDataRef paused, replay, magvar, tas, pitch_rate, roll_rate, yaw_rate;
     XPLMDataRef alpha, beta, weight, vmax, mmo, pressure_altitude;
@@ -14,6 +16,13 @@ typedef struct {
     int own_pitch, own_roll, own_throttle, suppress_native_disconnect;
 } FcuBoundary;
 static FcuBoundary fcu;
+/* Thrust-lever / FADEC module link (a380x_thrust.inc, docs/THRUST_LEVERS.md). All zero while the
+ * module is absent: the legacy lever-ratio behaviour below is then unchanged.
+ *   lease          the module holds override_throttles for the FADEC N1 command (not foreign);
+ *   flex_rating    FBW FLEX rating of engine 1 (MAN FLX / take-off detent arming);
+ *   athr_inhibited instinctive disconnect held > 15 s: no A/THR, no alpha floor;
+ *   ceiling[]      A/THR authority per engine = FADEC engine command of the lever's own N1. */
+static struct { int ready, lease, flex_rating, athr_inhibited, ceiling_valid; double ceiling[4]; } fcu_thrust_link;
 
 #include "a380x_pfd_inputs.inc"
 
@@ -63,6 +72,8 @@ static float fcu_get_float(void *refcon) { return ((FcuPublished *)refcon)->valu
 static int fcu_get_int(void *refcon) { return (int)((FcuPublished *)refcon)->value; }
 static float normalized_heading(float value) { return fmodf(fmodf(value,360.0f)+360.0f,360.0f); }
 
+#include "a380x_fcu_motion.inc"
+
 static void release_ap_controls(void)
 {
     if (fcu.own_pitch) { XPLMSetDataf(fcu.pitch,0); XPLMSetDatai(fcu.override_pitch,0); fcu.own_pitch=0; }
@@ -84,12 +95,17 @@ static int controls_available(void)
 /* Optional observer of applied FCU commands (the native FMS knob events, spec 07 section 2.1). */
 static void (*fcu_command_observer)(A380XFcuCommand command);
 
+#include "a380x_fcu_thrust.inc"
+#include "a380x_fcu_authority.inc"
+
 static int fcu_command_handler(XPLMCommandRef command, XPLMCommandPhase phase, void *refcon)
 {
     FcuCommand *c=(FcuCommand *)refcon;
     A380XGuidanceInputs command_inputs=guidance_inputs;
     float now=XPLMGetElapsedTime();
     (void)command;
+    if(plugin_enabled || phase==xplm_CommandEnd)
+        a380x_fcu_motion_phase(&fcu_motion,c->command,(int)phase,now);
     if (!plugin_enabled || phase==xplm_CommandEnd) return 1;
     if (phase==xplm_CommandContinue && (c->amount==0 || now<c->next_repeat)) return 1;
     c->next_repeat=now+(phase==xplm_CommandBegin ? 0.4f : 0.08f);
@@ -113,8 +129,10 @@ static int fcu_command_handler(XPLMCommandRef command, XPLMCommandPhase phase, v
         fcu.suppress_native_disconnect=0;
     }
     if (c->command==A380X_FCU_ATHR && !guidance.athr_armed
-        && XPLMGetDatai(fcu.override_throttle) && !fcu.own_throttle) return 1;
+        && XPLMGetDatai(fcu.override_throttle) && !fcu.own_throttle && !fcu_thrust_link.lease) return 1;
+    if (c->command==A380X_FCU_ATHR && !guidance.athr_armed) fcu_authority_prepare_athr();
     a380x_guidance_command(&guidance,&command_inputs,c->command,c->amount);
+    a380x_fcu_motion_applied(&fcu_motion,c->command,c->amount);
     if (fcu_command_observer) fcu_command_observer(c->command);
     if (c->command==A380X_FCU_FD1 && guidance.fd1!=guidance.fd2)
         a380x_guidance_command(&guidance,&guidance_inputs,A380X_FCU_FD2,0);
@@ -169,12 +187,14 @@ static void read_guidance_inputs(float dt)
         guidance_inputs.managed_mach=fms_feed.managed_mach;
     }
     ground_track_degrees=normalized_heading(XPLMGetDataf(refs.ground_track)-variation);
-    guidance_inputs.powered=XPLMGetDatai(refs.avionics_power)!=0;
+    /* FCU channel 1 on 108PH, channel 2 on DC 2 (FBWI:2372); stock avionics master without the network. */
+    guidance_inputs.powered=a380x_power_fcu(XPLMGetDatai(refs.avionics_power)!=0);
     guidance_inputs.paused=XPLMGetDatai(fcu.paused)||XPLMGetDatai(fcu.replay);
     guidance_inputs.on_ground=XPLMGetDatai(refs.on_ground)!=0;
     guidance_inputs.attitude_valid=s->display_valid && s->attitude_valid && s->heading_valid && s->navigation_valid;
     guidance_inputs.airdata_valid=s->air_valid && s->altitude_valid && s->vertical_speed_valid;
     guidance_inputs.ias_knots=s->ias_value; guidance_inputs.mach=s->mach_value;
+    guidance_inputs.athr_speed_valid=s->air_valid && isfinite(s->ias_value) && isfinite(s->mach_value);
     guidance_inputs.tas_knots=XPLMGetDataf(fcu.tas)*1.94384449;
     guidance_inputs.ground_speed_knots=ground_speed_knots;
     guidance_inputs.altitude_ft=s->altitude_value;
@@ -190,6 +210,7 @@ static void read_guidance_inputs(float dt)
     guidance_inputs.yaw_rate_deg_s=XPLMGetDataf(fcu.yaw_rate);
     guidance_inputs.alpha_deg=XPLMGetDataf(fcu.alpha); guidance_inputs.beta_deg=XPLMGetDataf(fcu.beta);
     guidance_inputs.weight_kg=XPLMGetDataf(fcu.weight);
+    fcu_thrust_read_into(&guidance_inputs);
     guidance_inputs.vmax_knots=XPLMGetDataf(fcu.vmax);
     /* At the measured air-data pressure, CAS scales nonlinearly with Mach.
      * The isentropic pitot relation converts MMO to the current IAS scale. */
@@ -302,16 +323,20 @@ static void publish_guidance(void)
 static void update_guidance(float dt)
 {
     float thrust[4]; int i;
+    a380x_fcu_motion_update(&fcu_motion,dt,XPLMGetElapsedTime(),guidance.altitude_increment_1000);
     read_guidance_inputs(dt);
     if ((guidance.ap1||guidance.ap2) && (!controls_available() || pilot_override()
         || (fcu.own_pitch && !XPLMGetDatai(fcu.override_pitch))
         || (fcu.own_roll && !XPLMGetDatai(fcu.override_roll))))
         a380x_guidance_command(&guidance,&guidance_inputs,A380X_FCU_AP_DISCONNECT,0);
     if ((guidance.athr_armed || guidance.athr_active)
-        && ((XPLMGetDatai(fcu.override_throttle) && !fcu.own_throttle)
+        && ((XPLMGetDatai(fcu.override_throttle) && !fcu.own_throttle && !fcu_thrust_link.lease)
             || (fcu.own_throttle && !XPLMGetDatai(fcu.override_throttle))))
         a380x_guidance_command(&guidance,&guidance_inputs,A380X_FCU_ATHR_DISCONNECT,0);
     a380x_guidance_update(&guidance,&guidance_inputs,dt);
+    /* A direct foreign native activation must be caught after automatic
+     * detent arming and before either custom actuator lease is acquired. */
+    fcu_authority_guard();
     if (guidance_inputs.paused || !guidance_inputs.powered) release_guidance_controls();
     else {
         if ((guidance.ap1||guidance.ap2) && guidance.guidance_valid && controls_available()) {
@@ -323,9 +348,25 @@ static void update_guidance(float dt)
             if (fcu.own_pitch) { XPLMSetDataf(fcu.pitch,0); XPLMSetDatai(fcu.override_pitch,0); fcu.own_pitch=0; }
             if (fcu.own_roll) { XPLMSetDataf(fcu.roll,0); XPLMSetDatai(fcu.override_roll,0); fcu.own_roll=0; }
         }
-        if (guidance.athr_active && (!XPLMGetDatai(fcu.override_throttle)||fcu.own_throttle)) {
+        if (guidance.athr_active && (!XPLMGetDatai(fcu.override_throttle)||fcu.own_throttle||fcu_thrust_link.lease)) {
             XPLMSetDatai(fcu.override_throttle,1); fcu.own_throttle=1;
-            for (i=0;i<4;++i) thrust[i]=(float)guidance.throttle_command;
+            for (i=0;i<4;++i) {
+                double command=fmax(0,fmin(1,guidance.throttle_command));
+                /* Normal speed regulation respects each pilot lever. A CL
+                 * lever on one engine must never advance another idle engine.
+                 * Qualified A.FLOOR / TOGA LK intentionally override levers. */
+                if (!(guidance.alpha_floor_latched &&
+                      (guidance.thrust_mode==A380X_A1A2_A_FLOOR || guidance.thrust_mode==A380X_A1A2_TOGA_LK))) {
+                    double ceiling=0;
+                    if (fcu_thrust_link.ready && fcu_thrust_link.ceiling_valid && isfinite(fcu_thrust_link.ceiling[i]))
+                        ceiling=fmax(0,fmin(1,fcu_thrust_link.ceiling[i]));   /* FADEC N1 of the lever */
+                    else if (guidance_inputs.throttle_levers_valid && isfinite(guidance_inputs.cl_detent_ratio)
+                        && guidance_inputs.cl_detent_ratio>0 && isfinite(guidance_inputs.throttle_lever_ratio[i]))
+                        ceiling=fmax(0,fmin(.88,guidance_inputs.throttle_lever_ratio[i]/guidance_inputs.cl_detent_ratio*.88));
+                    command=fmin(command,ceiling);
+                }
+                thrust[i]=(float)command;
+            }
             XPLMSetDatavf(fcu.engine_throttle,thrust,0,4);
         } else if (fcu.own_throttle) { XPLMSetDatai(fcu.override_throttle,0); fcu.own_throttle=0; }
     }
@@ -334,6 +375,9 @@ static void update_guidance(float dt)
 
 static void fcu_shutdown(void)
 {
+    fcu_authority_shutdown();
+    fcu_thrust_shutdown();
+    fcu_motion_shutdown();
     pfd_outputs_shutdown();
     int i;
     release_guidance_controls();
@@ -391,6 +435,7 @@ static int fcu_init(void)
         snprintf(name,sizeof(name),"sim/cockpit/radios/nav%d_slope_degt",i+1); fcu.gs_angle[i]=find_required(name,&ok);
     }
     if (!ok) return 0;
+    if (!fcu_thrust_init()) return 0;
     pfd_inputs_find();
     read_side(&refs.side[0],XPLMGetDatai(refs.avionics_power));
     read_side(&refs.side[1],XPLMGetDatai(refs.avionics_power));
@@ -403,6 +448,7 @@ static int fcu_init(void)
             fcu_get_int,NULL,fcu_get_float,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,&fcu_outputs[i],NULL);
         if (!fcu_outputs[i].handle) { fcu_shutdown(); return 0; }
     }
+    if(!fcu_motion_init()){ fcu_shutdown();return 0; }
     if(!pfd_outputs_init()){ fcu_shutdown();return 0; }
     for (i=0;i<ARRAY_LEN(fcu_commands);++i) {
         fcu_commands[i].handle=XPLMCreateCommand(fcu_commands[i].name,fcu_commands[i].name+15);
@@ -412,6 +458,7 @@ static int fcu_init(void)
     fcu.native_disconnect=XPLMFindCommand("sim/autopilot/servos_off_any");
     if (!fcu.native_disconnect) { fcu_shutdown(); return 0; }
     XPLMRegisterCommandHandler(fcu.native_disconnect,native_disconnect_handler,1,NULL);
+    if (!fcu_authority_init()) { fcu_shutdown(); return 0; }
     publish_guidance();
     return 1;
 }

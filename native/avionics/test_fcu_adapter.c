@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "XPLMDataAccess.h"
 #include "XPLMUtilities.h"
 #include "a380x_guidance.h"
@@ -16,18 +17,24 @@
 typedef struct {
     char name[180]; double value; int array_i[500],count,registered,writable,writes;
     float array_f[500]; char bytes[150];
+    XPLMDataTypeID types;
     XPLMGetDatai_f read_i; XPLMGetDataf_f read_f; void *read_refcon;
 } MockRef;
 typedef struct { char name[180]; XPLMCommandCallback_f callback; void *refcon; int active; } MockCommand;
 static MockRef mock_refs[200];
-static MockCommand mock_commands[60];
+static MockCommand mock_commands[100];
 static int ref_count,command_count,registrations,registration_fail=-1,command_once_count;
 static float mock_clock;
 static const char *missing_raw;
+static char mock_aircraft_root[1024],mock_aircraft_path[1200],mock_debug[32768];
+static const char *const mock_calibration="version=1\nidle_detent_ratio=.01\ncl_detent_ratio=.5555555555555556\nmct_detent_ratio=.7777777777777778\ntoga_detent_ratio=1\ndetent_tolerance_ratio=.02\n";
 static MockRef *r(XPLMDataRef ref) { assert(ref);return (MockRef *)ref; }
 static MockRef *new_ref(const char *name) {
     MockRef *p;int i;assert(ref_count<ARRAY_LEN(mock_refs));p=&mock_refs[ref_count++];
     memset(p,0,sizeof(*p));snprintf(p->name,sizeof(p->name),"%s",name);p->count=500;
+    p->types=xplmType_Int|xplmType_Float;
+    if(strstr(name,"/throttle_ratio"))p->types=xplmType_FloatArray;
+    if(strstr(name,"/prop_mode"))p->types=xplmType_IntArray;
     for(i=0;i<500;++i) p->array_f[i]=strstr(name,"maximum")?1:strstr(name,"minimum")?0:.5f;
     if(strstr(name,"gear/deploy_ratio"))for(i=0;i<500;++i)p->array_f[i]=0;
     if(strstr(name,"acf_flap_detents"))p->value=6;
@@ -57,6 +64,7 @@ XPLMDataRef XPLMFindDataRef(const char *name) {
     return !strncmp(name,"sim/",4)?new_ref(name):NULL;
 }
 int XPLMGetDatai(XPLMDataRef ref) { MockRef*p=r(ref);return p->read_i?p->read_i(p->read_refcon):(int)p->value; }
+XPLMDataTypeID XPLMGetDataRefTypes(XPLMDataRef ref) {return r(ref)->types;}
 float XPLMGetDataf(XPLMDataRef ref) { MockRef*p=r(ref);assert(!strstr(p->name,"pressure_altitude"));return p->read_f?p->read_f(p->read_refcon):(float)p->value; }
 double XPLMGetDatad(XPLMDataRef ref) { return r(ref)->value; }
 void XPLMSetDatai(XPLMDataRef ref,int value) { r(ref)->value=value;r(ref)->writes++; }
@@ -86,7 +94,7 @@ XPLMDataRef XPLMRegisterDataAccessor(const char *name,XPLMDataTypeID type,int wr
     assert(!writable&&!write_i&&!write_f);
     if(registrations++==registration_fail)return NULL;
     assert(!XPLMFindDataRef(name));p=new_ref(name);p->registered=1;p->writable=writable;
-    p->read_i=read_i;p->read_f=read_f;p->read_refcon=read_refcon;return p;
+    p->types=type;p->read_i=read_i;p->read_f=read_f;p->read_refcon=read_refcon;return p;
 }
 void XPLMUnregisterDataAccessor(XPLMDataRef ref) { r(ref)->registered=0;r(ref)->name[0]=0; }
 XPLMCommandRef XPLMFindCommand(const char *name) {
@@ -104,10 +112,25 @@ void XPLMUnregisterCommandHandler(XPLMCommandRef ref,XPLMCommandCallback_f handl
     MockCommand*p=(MockCommand*)ref;assert(before&&p->callback==handler&&p->refcon==refcon);p->active=0;
 }
 void XPLMCommandOnce(XPLMCommandRef ref) {
-    MockCommand*p=(MockCommand*)ref;assert(p);command_once_count++;
-    if(p->active){p->callback(p,xplm_CommandBegin,p->refcon);p->callback(p,xplm_CommandEnd,p->refcon);}
+    MockCommand*p=(MockCommand*)ref;int pass=1;assert(p);command_once_count++;
+    if(p->active)pass=p->callback(p,xplm_CommandBegin,p->refcon);
+    if(pass&&!strcmp(p->name,"sim/autopilot/servos_off_any")) {
+        r(XPLMFindDataRef("sim/cockpit2/autopilot/servos_on"))->value=0;
+        r(XPLMFindDataRef("sim/cockpit2/autopilot/servos2_on"))->value=0;
+        r(XPLMFindDataRef("sim/cockpit2/autopilot/servos3_on"))->value=0;
+    }
+    if(pass&&!strcmp(p->name,"sim/autopilot/servos_on"))r(XPLMFindDataRef("sim/cockpit2/autopilot/servos_on"))->value=1;
+    if(pass&&!strcmp(p->name,"sim/autopilot/servos2_on"))r(XPLMFindDataRef("sim/cockpit2/autopilot/servos2_on"))->value=1;
+    if(pass&&(!strcmp(p->name,"sim/autopilot/autothrottle_hard_off")||!strcmp(p->name,"sim/autopilot/autothrottle_off")))
+        r(XPLMFindDataRef("sim/cockpit2/autopilot/autothrottle_enabled"))->value=-1;
+    if(pass&&!strcmp(p->name,"sim/autopilot/autothrottle_on"))r(XPLMFindDataRef("sim/cockpit2/autopilot/autothrottle_enabled"))->value=1;
+    if(p->active)p->callback(p,xplm_CommandEnd,p->refcon);
 }
 float XPLMGetElapsedTime(void) { return mock_clock; }
+void XPLMDebugString(const char *message) {size_t n=strlen(mock_debug);snprintf(mock_debug+n,sizeof(mock_debug)-n,"%s",message);}
+void XPLMGetNthAircraftModel(int index,char *filename,char *path) {
+    assert(index==0);strcpy(filename,"User Selected Aircraft.acf");strcpy(path,mock_aircraft_path);
+}
 
 typedef struct {
     XPLMDataRef baro,baro_standard,nav_type,nav_horizontal,nav_vertical,nav_loc,nav_gs,nav_course,nav_distance;
@@ -191,16 +214,37 @@ static void normal_side(Side*s) {
     s->navigation_valid=1;
     s->air_valid=s->altitude_valid=s->vertical_speed_valid=s->attitude_valid=s->heading_valid=s->radio_altitude_valid=s->display_valid=1;
 }
+static void cleanup_aircraft(void) {
+    char path[1200];
+    if(!mock_aircraft_root[0])return;
+    snprintf(path,sizeof(path),"%s/fcu-calibration.ini",mock_aircraft_root);unlink(path);
+    unlink(mock_aircraft_path);rmdir(mock_aircraft_root);
+}
+static void prepare_aircraft(void) {
+    char path[1200];FILE *file;
+    if(!mock_aircraft_root[0]) {
+        const char *task_tmp=getenv("TMPDIR");
+        snprintf(mock_aircraft_root,sizeof(mock_aircraft_root),"%s/a380x-fcu-test-XXXXXX",task_tmp?task_tmp:".");
+        assert(mkdtemp(mock_aircraft_root));
+        snprintf(mock_aircraft_path,sizeof(mock_aircraft_path),"%s/User Selected Aircraft.acf",mock_aircraft_root);
+        file=fopen(mock_aircraft_path,"wb");assert(file);fclose(file);atexit(cleanup_aircraft);
+    }
+    snprintf(path,sizeof(path),"%s/fcu-calibration.ini",mock_aircraft_root);
+    file=fopen(path,"wb");assert(file);assert(fputs(mock_calibration,file)>=0);assert(!fclose(file));
+}
 static void setup(void) {
     int i;memset(mock_refs,0,sizeof(mock_refs));memset(mock_commands,0,sizeof(mock_commands));
     memset(&fcu,0,sizeof(fcu));memset(&guidance,0,sizeof(guidance));
     ref_count=command_count=registrations=command_once_count=0;registration_fail=-1;missing_raw=NULL;mock_clock=0;
+    mock_debug[0]=0;prepare_aircraft();
     refs.avionics_power=XPLMFindDataRef("sim/cockpit2/switches/avionics_power_on");
     refs.on_ground=XPLMFindDataRef("sim/flightmodel/failures/onground_any");
     refs.ground_track=XPLMFindDataRef("sim/flightmodel/position/hpath");r(refs.ground_track)->value=90;
     normal_side(&refs.side[0]);normal_side(&refs.side[1]);ground_speed_knots=280;
     for(i=0;i<4;++i)throttle_values[i]=.5f;
-    XPLMCreateCommand("sim/autopilot/servos_off_any","native disconnect");plugin_enabled=1;
+    XPLMCreateCommand("sim/autopilot/servos_off_any","native disconnect");
+    for(i=0;i<ARRAY_LEN(fcu_authority_commands);++i)XPLMCreateCommand(fcu_authority_commands[i].name,"stock command");
+    plugin_enabled=1;
 }
 static void tick(int count) {int i;for(i=0;i<count;++i){mock_clock+=.1f;update_guidance(.1f);}}
 static void command(const char *suffix) {
@@ -364,7 +408,9 @@ static void test_override_lifecycles(void) {
     r(fcu.paused)->value=0;tick(1);assert(fcu.own_pitch&&fcu.own_roll&&fcu.own_throttle);
     r(fcu.replay)->value=1;tick(1);assert(!fcu.own_pitch&&!fcu.own_roll&&!fcu.own_throttle);
     r(fcu.replay)->value=0;tick(1);
-    refs.side[0].attitude_valid=0;tick(1);assert(!guidance.ap1&&!fcu.own_pitch&&!fcu.own_roll&&!fcu.own_throttle);
+    refs.side[0].attitude_valid=0;tick(1);
+    assert(!guidance.ap1&&!fcu.own_pitch&&!fcu.own_roll&&guidance.athr_active&&fcu.own_throttle);
+    refs.side[0].air_valid=0;tick(1);assert(!guidance.athr_active&&!fcu.own_throttle);
     fcu_shutdown();
     setup();assert(fcu_init());engage();r(fcu.override_roll)->value=0;tick(1);assert(!guidance.ap1&&!fcu.own_pitch&&!fcu.own_roll);
     command("athr_toggle");tick(1);assert(fcu.own_throttle);r(fcu.override_throttle)->value=0;tick(1);assert(!guidance.athr_armed&&!guidance.athr_active&&!fcu.own_throttle);
@@ -382,20 +428,115 @@ static void test_hardware_and_disconnect(void) {
     command("ap1_toggle");tick(1);r(refs.avionics_power)->value=0;tick(1);assert(!guidance.ap1&&!guidance.athr_armed&&!fcu.own_pitch);
     fcu_shutdown();
 }
+static int calibration_text(const char *text,size_t length) {
+    char path[1200];FILE *file;FcuThrustBoundary parsed={0};int valid;
+    snprintf(path,sizeof(path),"%s/parser-fixture.ini",mock_aircraft_root);
+    file=fopen(path,"wb");assert(file);assert(fwrite(text,1,length,file)==length);assert(!fclose(file));
+    file=fopen(path,"rb");assert(file);valid=fcu_thrust_parse(file,&parsed);fclose(file);unlink(path);return valid;
+}
+static void test_thrust_calibration_parser(void) {
+    char text[5000];size_t n;
+    setup();assert(calibration_text(mock_calibration,strlen(mock_calibration)));
+    snprintf(text,sizeof(text),"%scl_detent_ratio=.5\n",mock_calibration);assert(!calibration_text(text,strlen(text)));
+    snprintf(text,sizeof(text),"%sunknown=1\n",mock_calibration);assert(!calibration_text(text,strlen(text)));
+    strcpy(text,"version=1\nidle_detent_ratio=.01\ncl_detent_ratio=nan\nmct_detent_ratio=.78\ntoga_detent_ratio=1\ndetent_tolerance_ratio=.02\n");assert(!calibration_text(text,strlen(text)));
+    strcpy(text,"version=1\nidle_detent_ratio=.01\ncl_detent_ratio=.6\nmct_detent_ratio=.6\ntoga_detent_ratio=1\ndetent_tolerance_ratio=.02\n");assert(!calibration_text(text,strlen(text)));
+    strcpy(text,"version=1\nidle_detent_ratio=.01\ncl_detent_ratio=.6\nmct_detent_ratio=.63\ntoga_detent_ratio=1\ndetent_tolerance_ratio=.02\n");assert(!calibration_text(text,strlen(text)));
+    strcpy(text,"version=1\nidle_detent_ratio=.01\ncl_detent_ratio=.6\nmct_detent_ratio=.78\ntoga_detent_ratio=1.1\ndetent_tolerance_ratio=.02\n");assert(!calibration_text(text,strlen(text)));
+    strcpy(text,"version=1\nidle_detent_ratio=.01\ncl_detent_ratio=.6\nmct_detent_ratio=.78\ntoga_detent_ratio=1\n");assert(!calibration_text(text,strlen(text)));
+    snprintf(text,sizeof(text),"%s",mock_calibration);n=strlen(text);text[n++]='\0';text[n++]='x';assert(!calibration_text(text,n));
+    memset(text,'#',sizeof(text));assert(!calibration_text(text,sizeof(text)));
+    n=strlen(mock_calibration);memcpy(text,mock_calibration,n);text[n-1]=0;assert(calibration_text(text,n-1));
+}
+static void test_raw_pilot_thrust_boundary(void) {
+    A380XGuidanceInputs in={0};int i;char saved_path[1200];MockRef *valid,*request,*mode,*temp,*healthy;
+    setup();assert(fcu_init());assert(fcu_thrust.calibrated);
+    assert(strstr(fcu_thrust.calibration_path,"fcu-calibration.ini")&&strstr(fcu_thrust.aircraft_path,"User Selected Aircraft.acf"));
+    for(i=0;i<4;++i) {r(fcu_thrust.levers)->array_f[i]=.55f;r(fcu_thrust.prop_mode)->array_i[i]=1;r(fcu.engine_throttle)->array_f[i]=.99f;}
+    fcu_thrust_read_into(&in);assert(in.throttle_levers_valid&&fabs(in.throttle_lever_ratio[0]-.55)<.0001);
+    assert(in.idle_detent_ratio==.01&&fabs(in.cl_detent_ratio-25./45)<1e-12);
+    r(fcu_thrust.prop_mode)->array_i[2]=3;fcu_thrust_read_into(&in);assert(in.reverse_selected[2]&&in.throttle_levers_valid);
+    r(fcu_thrust.levers)->array_f[3]=NAN;fcu_thrust_read_into(&in);assert(!in.throttle_levers_valid&&strstr(mock_debug,"invalid pilot throttle"));
+    r(fcu_thrust.levers)->array_f[3]=1.01f;fcu_thrust_read_into(&in);assert(!in.throttle_levers_valid);
+    r(fcu_thrust.levers)->array_f[3]=.5f;r(fcu_thrust.prop_mode)->count=3;fcu_thrust_read_into(&in);assert(!in.throttle_levers_valid);
+    r(fcu_thrust.prop_mode)->count=4;r(fcu_thrust.prop_mode)->array_i[2]=4;fcu_thrust_read_into(&in);assert(!in.throttle_levers_valid);
+    r(fcu_thrust.prop_mode)->array_i[2]=1;fcu_thrust_read_into(&in);assert(in.throttle_levers_valid);
+    assert(!in.alpha_floor_valid&&!in.alpha_floor_request&&!in.flex_valid);
+    valid=new_ref("a380x/xp12/flight_envelope/valid");request=new_ref("a380x/xp12/flight_envelope/alpha_floor_request");
+    valid->value=1;request->value=1;fcu_thrust_read_into(&in);assert(in.alpha_floor_valid&&in.alpha_floor_request);
+    valid->value=0;fcu_thrust_read_into(&in);assert(!in.alpha_floor_valid&&!in.alpha_floor_request);
+    valid->value=1;request->value=2;fcu_thrust_read_into(&in);assert(!in.alpha_floor_valid&&!in.alpha_floor_request);
+    request->value=0;fcu_thrust_read_into(&in);assert(in.alpha_floor_valid&&!in.alpha_floor_request);
+    mode=new_ref("a380x/xp12/fms/to_power_setting");temp=new_ref("a380x/xp12/fms/to_flex_temp_c");healthy=new_ref("a380x/xp12/fms/fmc_b_healthy");
+    mode->value=1;temp->value=.1;healthy->value=1;fcu_thrust_read_into(&in);assert(in.flex_valid);
+    temp->value=0;fcu_thrust_read_into(&in);assert(!in.flex_valid);
+    temp->value=50;mode->value=0;fcu_thrust_read_into(&in);assert(!in.flex_valid);
+    mode->value=1;healthy->value=0;fcu_thrust_read_into(&in);assert(!in.flex_valid);
+    healthy->value=1;temp->value=NAN;fcu_thrust_read_into(&in);assert(!in.flex_valid);
+    strcpy(saved_path,mock_aircraft_path);strcpy(mock_aircraft_path,"/different/Unverified.acf");
+    fcu_thrust_init();fcu_thrust_read_into(&in);assert(!in.throttle_levers_valid&&!fcu_thrust.calibrated);
+    strcpy(mock_aircraft_path,saved_path);fcu_thrust_init();fcu_thrust_read_into(&in);assert(in.throttle_levers_valid);
+    fcu_shutdown();
+}
+static void stock_command(const char *name) {XPLMCommandRef c=XPLMFindCommand(name);assert(c);XPLMCommandOnce(c);}
+static void test_stock_authority_bridge(void) {
+    MockCommand *stock;int i;
+    setup();assert(fcu_init());tick(70);
+    stock_command("sim/autopilot/servos_on");tick(1);assert(guidance.ap1&&fcu.own_pitch&&!XPLMGetDatai(fcu_authority.stock_servos[0]));
+    stock_command("sim/autopilot/servos_on");assert(guidance.ap1); /* ON remains idempotent. */
+    stock=XPLMFindCommand("sim/autopilot/servos_toggle");assert(!stock->callback(stock,xplm_CommandContinue,stock->refcon));assert(guidance.ap1);
+    stock_command("sim/autopilot/servos2_on");tick(1);assert(!guidance.ap1&&guidance.ap2&&!XPLMGetDatai(fcu_authority.stock_servos[1]));
+    stock_command("sim/autopilot/servos2_toggle");assert(!guidance.ap2&&!fcu.own_pitch);
+    stock_command("sim/autopilot/servos3_on");assert(!guidance.ap1&&!guidance.ap2&&!XPLMGetDatai(fcu_authority.stock_servos[2]));
+    stock_command("sim/autopilot/servos_on");tick(1);r(fcu_authority.stock_servos[2])->value=1;tick(1);
+    assert(!guidance.ap1&&!fcu.own_pitch&&!fcu.own_roll&&XPLMGetDatai(fcu_authority.stock_servos[2])==1);
+    stock_command("sim/autopilot/servos_off_any");assert(!XPLMGetDatai(fcu_authority.stock_servos[2]));
+    stock_command("sim/autopilot/autothrottle_on");tick(1);assert(guidance.athr_armed&&guidance.athr_active&&fcu.own_throttle);
+    assert(XPLMGetDatai(fcu_authority.stock_athr)==-1);
+    stock_command("sim/autopilot/autothrottle_on");assert(guidance.athr_armed);
+    stock_command("sim/autopilot/autothrottle_off");assert(!guidance.athr_armed&&!fcu.own_throttle&&XPLMGetDatai(fcu_authority.stock_athr)==-1);
+    stock_command("sim/autopilot/autothrottle_on");tick(1);r(fcu_authority.stock_athr)->value=2;tick(1);
+    assert(!guidance.athr_active&&!guidance.athr_armed&&!fcu.own_throttle&&XPLMGetDatai(fcu_authority.stock_athr)==2);
+    plugin_enabled=0;stock_command("sim/autopilot/servos_on");assert(XPLMGetDatai(fcu_authority.stock_servos[0])==1&&!guidance.ap1);
+    fcu_shutdown();for(i=0;i<command_count;++i)assert(!mock_commands[i].active);
+}
+static void test_individual_engine_lever_limits(void) {
+    const float levers[4]={0,.2f,25.f/45,.4f};int i;MockRef *valid,*request;
+    setup();assert(fcu_init());refs.side[0].ias_value=200;
+    for(i=0;i<4;++i) {r(fcu_thrust.levers)->array_f[i]=levers[i];throttle_values[i]=levers[i];}
+    tick(70);command("athr_toggle");tick(100);assert(guidance.athr_active&&fcu.own_throttle);
+    assert(r(fcu.engine_throttle)->array_f[0]==0);
+    for(i=1;i<4;++i) {
+        double limit=fmin(.88,levers[i]/guidance_inputs.cl_detent_ratio*.88);
+        assert(r(fcu.engine_throttle)->array_f[i]<=limit+1e-6);
+        assert(r(fcu.engine_throttle)->array_f[i]>0);
+    }
+    assert(r(fcu.engine_throttle)->array_f[2]>r(fcu.engine_throttle)->array_f[1]);
+    valid=new_ref("a380x/xp12/flight_envelope/valid");request=new_ref("a380x/xp12/flight_envelope/alpha_floor_request");
+    valid->value=request->value=1;tick(1);assert(guidance.thrust_mode==A380X_A1A2_A_FLOOR);
+    for(i=0;i<4;++i)assert(r(fcu.engine_throttle)->array_f[i]==1);
+    request->value=0;tick(1);assert(guidance.thrust_mode==A380X_A1A2_TOGA_LK);
+    for(i=0;i<4;++i)assert(r(fcu.engine_throttle)->array_f[i]==1);
+    command("athr_disconnect");assert(!guidance.athr_active&&!fcu.own_throttle);fcu_shutdown();
+}
 int main(int argc,char **argv) {
     int i;
     if(argc>1&&!strcmp(argv[1],"--contracts")){
-        setup();assert(fcu_init());
+        setup();assert(fcu_init());assert(lighting_init());
         for(i=0;i<ARRAY_LEN(fcu_commands);++i)printf("C %s\n",fcu_commands[i].name);
         for(i=0;i<ARRAY_LEN(fcu_outputs);++i)printf("D %s\n",fcu_outputs[i].name);
+        for(i=0;i<ARRAY_LEN(fcu_motion_outputs);++i)printf("M %s\n",fcu_motion_outputs[i].name);
+        for(i=0;i<FCU_LIGHT_COUNT;++i)printf("L a380x/xp12/fcu/%s\n",fcu_light_names[i]);
         for(i=0;i<ARRAY_LEN(pfd_outputs);++i)printf("P %s\n",pfd_outputs[i].name);
         for(i=0;i<ref_count;++i)if(!strncmp(mock_refs[i].name,"sim/",4))printf("R %s\n",mock_refs[i].name);
-        fcu_shutdown();return 0;
+        lighting_shutdown();fcu_shutdown();return 0;
     }
     test_registry_and_partial_init();test_raw_sensor_and_radio_contracts();test_override_lifecycles();test_hardware_and_disconnect();
     test_glareshield_lighting();
     test_display_unit_controls();
     test_pfd_aircraft_inputs();
     test_clean_performance_boundary();
+    test_thrust_calibration_parser();test_raw_pilot_thrust_boundary();test_stock_authority_bridge();
+    test_individual_engine_lever_limits();
     puts("a380x FCU XPLM adapter tests passed");return 0;
 }

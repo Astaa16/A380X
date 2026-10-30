@@ -34,6 +34,26 @@ typedef struct {
      * CAS equivalent of managed_mach at the current pressure, as FBW passes it to the FG. */
     int managed_speed_is_mach;
     double managed_mach;
+    /* Physical PILOT handles, never A/THR actuator outputs. The X-Plane
+     * boundary validates an aircraft-local calibration before asserting valid.
+     * Ratios are not engine N1; default TLA mapping is a port assumption. */
+    int throttle_levers_valid;
+    double throttle_lever_ratio[4];
+    int reverse_selected[4];
+    double idle_detent_ratio, cl_detent_ratio, mct_detent_ratio, toga_detent_ratio;
+    double detent_tolerance_ratio;
+    int flex_valid;
+    /* A qualified FE provider owns alpha-floor computation/inhibits. Missing
+     * FE input must remain invalid; never infer this request from raw AoA. */
+    int alpha_floor_valid, alpha_floor_request;
+    int athr_speed_valid; /* ADR speed validity, independent of IR/VS/navigation */
+    /* Thrust-lever / FADEC module (docs/THRUST_LEVERS.md); zero = legacy behaviour.
+     * athr_inhibited: instinctive disconnect held > 15 s (FBW FADEC ATHR_disabled): A/THR cannot
+     * arm or engage, alpha floor included, until FMGC power-up on the ground.
+     * athr_ceiling: normalised engine command of the highest lever's FADEC N1 (FBW clamps the A/THR
+     * N1 to the lever's N1), replacing the 0.88-at-CL approximation when valid. */
+    int athr_inhibited, athr_ceiling_valid;
+    double athr_ceiling;
 } A380XGuidanceInputs;
 
 typedef enum {
@@ -75,7 +95,8 @@ typedef struct {
     double previous_gs_dots, previous_loc_dots, athr_integral, pitch_integral;
     double unavailable_seconds, reversion_seconds, disconnect_seconds;
     double held_altitude_ft, last_selected_altitude_ft;
-    int have_previous_ils, initialized;
+    int have_previous_ils, previous_powered, takeoff_detent_active, all_levers_idle;
+    int alpha_floor_latched, alpha_floor_inhibited, initialized;
 } A380XGuidanceState;
 
 void a380x_guidance_init(A380XGuidanceState *state, const A380XGuidanceInputs *inputs);

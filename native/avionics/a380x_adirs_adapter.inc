@@ -4,6 +4,7 @@
  * channels. This adapter does not claim to reproduce Airbus bus contactors.
  */
 #include "a380x_adirs.h"
+#include "a380x_elec_power.h"
 static A380XAdirsState adirs;
 static A380XAdirsInputs adirs_inputs;
 typedef struct {
@@ -74,9 +75,17 @@ static void adirs_read_inputs(void)
     for(i=0;i<3;++i) {
         AdirsSample *s=&adirs_sample[i];
         A380XAdirsUnitInputs *in=&adirs_inputs.unit[i];
-        int powered=isfinite(bus[0]) && bus[0]>=18; /* Package uses a common native bus. */
-        in->adr_powered=powered; in->ir_powered=powered;
-        in->on_battery=powered && battery_available && !external;
+        int powered=isfinite(bus[0]) && bus[0]>=18; /* legacy: one common stock bus */
+        if(a380x_power.available) {
+            /* A380 network (spec 6.4 proposal): ADIRU 1 AC EMER, 2 AC 2, 3 AC 1 / AC ESS, each
+             * backed by its hot bus; ON BAT = running from the hot-bus backup only. */
+            int primary=a380x_power.adiru_primary[i], backup=a380x_power.adiru_backup[i];
+            in->adr_powered=in->ir_powered=primary || backup;
+            in->on_battery=!primary && backup;
+        } else {
+            in->adr_powered=powered; in->ir_powered=powered;
+            in->on_battery=powered && battery_available && !external;
+        }
         s->ias=XPLMGetDataf(s->ias_ref); s->altitude=XPLMGetDataf(s->altitude_ref);
         s->alpha=XPLMGetDataf(s->alpha_ref); s->sat=XPLMGetDataf(s->sat_ref); s->tat=XPLMGetDataf(s->tat_ref);
         s->mach=i<2 ? XPLMGetDataf(refs.side[i].mach) : XPLMGetDataf(adirs_raw[AR_MACH]);
@@ -280,6 +289,8 @@ static void adirs_reset(void)
     int i,hot=!XPLMGetDatai(refs.on_ground); float engine[4]={0};
     adirs_read_inputs(); XPLMGetDatavf(refs.n1,engine,0,4);
     for(i=0;i<4;++i) if(isfinite(engine[i]) && engine[i]>15) hot=1;
+    /* READY / TURNAROUND spawn of the A380 network: ADIRS aligned in NAV (spec 7.2). */
+    if(a380x_power.available && a380x_power.spawn_mode!=A380X_ELN_SPAWN_COLD_DARK) hot=1;
     a380x_adirs_init(&adirs,&adirs_inputs,hot); adirs_update(0);
 }
 static void adirs_shutdown(void)

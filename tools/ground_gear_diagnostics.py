@@ -39,6 +39,16 @@ def acf_values(path: Path) -> dict[str, float]:
     return found
 
 
+def extended_gear_contact(values: dict, index: int) -> tuple[float, float, float]:
+    """Neutral strut-end/tire envelope, excluding suspension and truck pitch."""
+    g = lambda name: float(values[f'_gear/{index}/_{name}'])
+    lat, lon = math.radians(g('latE')), math.radians(g('lonE'))
+    length = g('leg_len')
+    return (g('gear_x') + length * math.sin(lat),
+            g('gear_y') - length * math.cos(lat) * math.cos(lon) - g('tire_radius'),
+            g('gear_z') + length * math.sin(lon))
+
+
 def geometry(values: dict[str, float], pitch_deg: float = 0.0) -> dict:
     theta = math.radians(pitch_deg)
     cg_y = values["acf/_cgY"]
@@ -46,9 +56,7 @@ def geometry(values: dict[str, float], pitch_deg: float = 0.0) -> dict:
     wheels = []
     for index, name in enumerate(GEAR_NAMES):
         field = lambda suffix: values[f"_gear/{index}/{suffix}"]
-        attach_y_ft = field("_gear_y")
-        contact_y_ft = attach_y_ft - field("_leg_len") - field("_tire_radius")
-        contact_z_ft = field("_gear_z")
+        contact_x_ft, contact_y_ft, contact_z_ft = extended_gear_contact(values, index)
         # X-Plane's Z coordinate increases aft; positive pitch lifts forward
         # contacts, hence the minus sign on the Z rotation term.
         contact_y_from_cg_m = (contact_y_ft - cg_y) * FT_TO_M
@@ -56,7 +64,7 @@ def geometry(values: dict[str, float], pitch_deg: float = 0.0) -> dict:
         wheels.append({
             "name": name,
             "type": int(field("_gear_type")),
-            "lateral_from_datum_m": field("_gear_x") * FT_TO_M,
+            "lateral_from_datum_m": contact_x_ft * FT_TO_M,
             "contact_y_from_datum_m": contact_y_ft * FT_TO_M,
             "contact_z_from_cg_m": contact_z_from_cg_m,
             "contact_y_from_cg_m": contact_y_from_cg_m,

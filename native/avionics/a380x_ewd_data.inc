@@ -30,7 +30,7 @@ enum {
     ER_IDLE_N1, ER_MAX_N1, ER_REV_N1, ER_COMMANDED_N1,
     ER_THROTTLE_N1, ER_RATING_N1, ER_RATING_MODE, ER_FLEX,
     ER_ATHR_STATUS, ER_SAT, ER_PRESSURE, ER_PRESSURE_ALT, ER_MACH,
-    ER_CAS, ER_CAS_FAIL, ER_ENG_SELECTOR, ER_FIRE_PB, ER_REF_COUNT
+    ER_CAS, ER_CAS_FAIL, ER_ENG_SELECTOR, ER_FIRE_PB, ER_TAT, ER_REF_COUNT
 };
 
 typedef struct {
@@ -96,6 +96,8 @@ static EwdInputRef ewd_inputs[ER_REF_COUNT] = {
     /* Optional true fire pushbutton state. A fire warning or extinguisher
      * discharge is not an equivalent source and must not blank the gauge. */
     EWD_INPUT("a380x/xp12/engine/fire_pushbutton", xplmType_IntArray),
+    /* TAT for the FADEC FLEX condition (flex temperature > TAT). */
+    EWD_INPUT("sim/cockpit2/temperature/outside_air_LE_temp_degc", xplmType_Float),
 };
 #undef EWD_INPUT
 
@@ -182,6 +184,48 @@ static void ewd_bleed_append(const char *text)
     snprintf(ewd.bleed+used,sizeof(ewd.bleed)-used,"%s%s",used ? "/" : "",text);
 }
 
+/* FBW A380FadecComputer.cpp thrust_limit_type (fbw_a380/src/model, pinned revision, the block
+ * after "rtb_y_mv = (rtb_NOT1_f && (rtb_y_pg > ...TAT_degC))"): the EWD shows engine 1's FADEC.
+ * Used only while no a380x/xp12/engine/thrust_limit_type producer is registered. TLA scale of the
+ * A380 lever: idle 0, CL 25, FLX/MCT 35, TOGA 45 degrees, reverse negative. Detent positions are
+ * the aircraft-local lever calibration (a380x_fcu_thrust.inc); inside the calibrated tolerance a
+ * lever IS in its detent, so the FBW exact comparisons (TLA == 35 ...) hold. */
+static int ewd_flex_latch;
+/* Optional native rating source (a380x_thrust.inc): engine 1's FADEC rating and N1 from the FBW
+ * FADEC that also drives the engines (FLEX by the FBW limitN1 FLEX method, CLB after a FLEX
+ * take-off), so the EWD always shows what the engines get. NULL: the selection below is used. */
+typedef struct { int valid, mode; double rating_n1, flex_n1; } EwdRatingSource;
+static int (*ewd_rating_source)(EwdRatingSource *out);
+static double ewd_lever_tla(double ratio,double idle,double cl,double mct,double toga,double tolerance,int reverse)
+{
+    if (reverse) return -20.0;
+    if (fabs(ratio-idle)<=tolerance) return 0.0;
+    if (fabs(ratio-cl)<=tolerance) return 25.0;
+    if (fabs(ratio-mct)<=tolerance) return 35.0;
+    if (fabs(ratio-toga)<=tolerance) return 45.0;
+    if (ratio<cl) return 25.0*(ratio-idle)/(cl-idle);
+    if (ratio<mct) return 25.0+10.0*(ratio-cl)/(mct-cl);
+    return 35.0+10.0*(ratio-mct)/(toga-mct);
+}
+/* Returns 0 NONE, 1 CLB, 2 MCT, 3 FLX, 4 TOGA, 5 MREV; updates the FLEX latch. */
+static int ewd_thrust_limit_type(double tla,int on_ground,int engine_operative,int flex_candidate,
+                                 int ats_toga,int *latch)
+{
+    int flex;
+    double angle=on_ground?tla:fmax(0.0,tla);
+    *latch=(flex_candidate && on_ground && tla==35.0) || *latch;
+    *latch=(!*latch || (tla!=25.0 && tla!=45.0)) && *latch;
+    flex=(flex_candidate && on_ground) || (!on_ground && *latch);
+    if (!on_ground || !engine_operative) {
+        if (ats_toga || angle>35.0) return 4;
+        if (angle>25.0) return flex?3:2;
+        if (angle>=0.0) return 1;
+        return 5;
+    }
+    if (angle>=0.0) return (!flex || angle>35.0)?4:3;
+    return 5;
+}
+
 static void ewd_update(float dt, int powered)
 {
     static const char *modes[]={"","CLB","MCT","FLX","TOGA","MREV"};
@@ -196,6 +240,8 @@ static void ewd_update(float dt, int powered)
     int cas_valid;
     float cas=0.0f;
     A380xEwdFadecLimits native_limits;
+    float native_rating_n1=0.0f;
+    int native_rating_n1_valid=0;
     char text[64];
 
     if (isfinite(dt) && dt>0.0f) ewd_rebind_timer+=dt;
@@ -262,6 +308,57 @@ static void ewd_update(float dt, int powered)
         reverse_limit_valid=isfinite(reverse_limit) && reverse_limit>idle;
     }
     mode_valid=ewd_integer(ER_RATING_MODE,0,1,5,&mode);
+    native_rating_n1_valid=0;
+    if (!ewd_inputs[ER_RATING_MODE].ref && native_limits_valid && ewd_rating_source) {
+        EwdRatingSource source;
+        if (ewd_rating_source(&source) && source.valid && source.mode >= 1 && source.mode <= 5
+            && isfinite(source.rating_n1)) {
+            mode = source.mode;
+            mode_valid = 1;
+            native_rating_n1 = (float)source.rating_n1;
+            native_rating_n1_valid = 1;
+        }
+    } else if (!ewd_inputs[ER_RATING_MODE].ref && native_limits_valid && guidance_inputs.throttle_levers_valid) {
+        const A380XGuidanceInputs *g=&guidance_inputs;
+        int on_ground=0, combustion=0, flex_candidate=0;
+        float flex=0.0f, tat=0.0f;
+        if (ewd_integer(ER_ON_GROUND,0,0,1,&on_ground) && ewd_integer(ER_BURNING,0,0,1,&combustion)
+            && g->cl_detent_ratio>g->idle_detent_ratio && g->mct_detent_ratio>g->cl_detent_ratio
+            && g->toga_detent_ratio>g->mct_detent_ratio) {
+            double tla=ewd_lever_tla(g->throttle_lever_ratio[0],g->idle_detent_ratio,g->cl_detent_ratio,
+                g->mct_detent_ratio,g->toga_detent_ratio,g->detent_tolerance_ratio,g->reverse_selected[0]);
+            /* FLEX: a valid FMS FLEX temperature above TAT (0 = none, 0.1 = FLEX 0 degC). */
+            if (ewd_float(ER_FLEX,0,-100.0f,100.0f,&flex) && flex!=0.0f
+                && ewd_float(ER_TAT,0,-100.0f,100.0f,&tat)) {
+                if (fabsf(flex-0.1f)<0.001f) flex=0.0f;
+                flex_candidate=flex>tat;
+            }
+            mode=ewd_thrust_limit_type(tla,on_ground,combustion,flex_candidate,0,&ewd_flex_latch);
+            mode_valid=mode>=1 && mode<=5;
+            switch (mode) {
+            case 1: native_rating_n1=(float)native_limits.climb_n1; break;
+            case 2: native_rating_n1=(float)native_limits.mct_n1; break;
+            case 4: native_rating_n1=(float)native_limits.toga_n1; break;
+            case 5: native_rating_n1=(float)native_limits.reverse_n1; break;
+            case 3: {
+                /* Port assumption: the FLEX N1 is the TOGA limit at the assumed temperature
+                 * (the vendored FADEC equations have no FLEX table), never above TOGA. */
+                A380xEwdFadecLimits assumed;
+                float pressure=0.0f, altitude=0.0f, mach=0.0f;
+                if (ewd_float(ER_PRESSURE,0,1.0f,120000.0f,&pressure)
+                    && ewd_float(ER_PRESSURE_ALT,0,-2000.0f,60000.0f,&altitude)
+                    && ewd_float(ER_MACH,0,0.0f,1.0f,&mach)
+                    && a380x_ewd_fadec_limits(flex,pressure*0.01,altitude,mach,
+                           ewd_bool(ER_PACK_L,0)+ewd_bool(ER_PACK_R,0),0,ewd_bool(ER_WING_ICE,0),&assumed))
+                    native_rating_n1=(float)fmin(assumed.toga_n1,native_limits.toga_n1);
+                else native_rating_n1=(float)native_limits.toga_n1;
+                break;
+            }
+            default: mode_valid=0; break;
+            }
+            native_rating_n1_valid=mode_valid && isfinite(native_rating_n1);
+        }
+    }
     ewd.athr_valid=ewd_integer(ER_ATHR_STATUS,0,0,2,&athr);
     ewd.athr_engaged=ewd.athr_valid && athr!=0;
 
@@ -372,11 +469,10 @@ static void ewd_update(float dt, int powered)
     if (ewd_bool(ER_GEAR_NOT_LOCKED_UP,0))
         ewd_add_message(ewd.warning,&ewd.warning_count,"L/G GEAR NOT LOCKED UP",EWD_COLOR_AMBER);
 
-    /* Native guidance THR_CLB currently controls a fixed lever ratio (.88),
-     * not a calibrated FADEC N1 limit; its FMA does not establish this EWD
-     * rating. Keep XX until an actual rating-mode/limit producer exists. */
+    /* Rating: the external producer when registered, else the native FADEC selection above. */
+    if (native_rating_n1_valid) { value=native_rating_n1; }
     if (reference_valid && mode_valid && !reverse_any &&
-        ewd_float(ER_RATING_N1,0,0.0f,150.0f,&value)) {
+        (native_rating_n1_valid || ewd_float(ER_RATING_N1,0,0.0f,150.0f,&value))) {
         ewd.thrust_limit=ewd_thrust_from_n1(value,idle,maximum,1);
         ewd.thrust_limit_valid=1;
         snprintf(ewd.thrust_mode,sizeof(ewd.thrust_mode),"%s",modes[mode]);

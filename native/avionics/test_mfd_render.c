@@ -11,6 +11,7 @@
 #include "a380x_mfd.h"
 #include "a380x_mfd_page_data.h"
 #include "a380x_mfd_font.h"
+#include "a380x_xpkit_shared.h"
 
 #include <assert.h>
 #include <math.h>
@@ -228,6 +229,7 @@ static int write_ppm(const char *dir, const char *name)
     return 1;
 }
 
+#ifndef A380X_MFD_RASTER_ONLY
 /* ======================================================================================== */
 /* Fixture                                                                                  */
 /* ======================================================================================== */
@@ -313,6 +315,16 @@ static void reset(void)
 
 static void snap(const char *dir, const char *name)
 {
+    /* The same page fixtures are exercised by the actual WebKit renderer. */
+    A380XXpKitMfd *fixture=calloc(1,sizeof(*fixture));
+    assert(fixture);
+    fixture->powered=1;atomic_store(&fixture->sequence,2);
+    snprintf(fixture->uri,sizeof(fixture->uri),"%s",a380x_mfd_active_uri(&g_mfd,MFD_CAPT));
+    memcpy(&fixture->list,a380x_mfd_display_list(&g_mfd,MFD_CAPT),sizeof(fixture->list));
+    assert(!fixture->list.overflowed);
+    char path[1024];snprintf(path,sizeof(path),"%s/%s.mfd",dir,name);
+    FILE *out=fopen(path,"wb");assert(out);
+    assert(fwrite(fixture,sizeof(*fixture),1,out)==1);fclose(out);free(fixture);
     render(a380x_mfd_display_list(&g_mfd, MFD_CAPT));
     if (!write_ppm(dir, name)) {
         fprintf(stderr, "cannot write %s\n", name);
@@ -498,3 +510,4 @@ int main(int argc, char **argv)
     printf("test_mfd_render: OK\n");
     return 0;
 }
+#endif /* !A380X_MFD_RASTER_ONLY */

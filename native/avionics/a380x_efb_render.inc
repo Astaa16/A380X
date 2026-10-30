@@ -79,7 +79,7 @@ static const char *efb_tab_names[PAGE_COUNT] = {
 static const char *efb_action_names[PAGE_COUNT][6] = {
     {"LOADING", "GROUND SERVICES", "PERFORMANCE", "NAVIGATION", "CHECKLISTS", "SETTINGS"},
     {"242 PASSENGERS", "484 PASSENGERS", "FUEL 50%", "FUEL 100%", "OPEN FMS", "CLEAR LOAD"},
-    {"JETWAY", "SERVICES", "GROUND POWER", "DOOR 1", "ALL 17 DOORS", "PUSHBACK"},
+    {"JETWAY", "SERVICES", "GROUND POWER", "DOOR 1", "ALL 20 DOORS", "PUSHBACK"},
     {"ALTITUDE -1000", "ALTITUDE +1000", "ANGLE -0.5", "ANGLE +0.5", "RESET", "NAVIGATION"},
     {"CURRENT MAP", "LOW ENROUTE", "HIGH ENROUTE", "ZOOM IN", "ZOOM OUT", "AIRPORTS"},
     {"COM1 SWAP", "XPDR STANDBY", "XPDR ALTITUDE", "XPDR TA/RA", "COM1 GUARD", "XPDR 2000"},
@@ -87,6 +87,10 @@ static const char *efb_action_names[PAGE_COUNT][6] = {
     {"PREVIOUS", "NEXT", "CHECK ITEM", "RESET PAGE", "RESET ALL", "COMPLETE"},
     {"COLD & DARK", "TURNAROUND", "READY FOR TAXI", "REPAIR ALL", "GROUND", "CHECKLISTS"},
     {"METRIC UNITS", "AUTO CHECK", "BATTERY SIM", "BRIGHTNESS -", "BRIGHTNESS +", "TABLET POWER"}
+};
+
+static const char *efb_native_preset_names[6] = {
+    "COLD & DARK", "TURNAROUND", "READY PUSHBACK", "READY TAXI", "READY TAKEOFF", "EXPEDITE ON/OFF"
 };
 
 static void efb_draw_aircraft(void)
@@ -143,25 +147,25 @@ static void efb_draw_loading(void)
 
 static void efb_draw_ground(void)
 {
-    float doors[17] = {0};
+    float doors[20] = {0};
     int i, open = 0;
     char value[80];
-    if (refs.doors) XPLMGetDatavf(refs.doors, doors, 0, 17);
-    for (i = 0; i < 17; ++i) if (doors[i] > 0.5f) ++open;
+    if (refs.doors) XPLMGetDatavf(refs.doors, doors, 0, 20);
+    for (i = 0; i < 20; ++i) if (doors[i] > 0.5f) ++open;
     efb_group(170, "GROUND SERVICES");
     efb_pair(170, 843, "AIRCRAFT", on_ground() ? "ON GROUND" : "AIRBORNE");
-    efb_pair(170, 811, "GPU", get_int(refs.gpu) ? "CONNECTED" : "DISCONNECTED");
+    efb_pair(170, 811, "GPU", gpu_connected() ? "CONNECTED" : "DISCONNECTED");
     efb_pair(170, 779, "ENGINES", engines_off() ? "OFF" : "RUNNING");
     efb_pair(170, 747, "LOADING", on_ground() && engines_off() ? "AVAILABLE" : "BLOCKED");
     efb_group(524, "DOORS AND LOAD");
-    snprintf(value, sizeof(value), "%d / 17", open);
+    snprintf(value, sizeof(value), "%d / 20", open);
     efb_pair(524, 843, "DOORS OPEN", value);
     snprintf(value, sizeof(value), "%.0f %s", get_float(refs.fuel_total) * (metric_units ? 1.0f : 2.20462262f), metric_units ? "KG" : "LB");
     efb_pair(524, 811, "FUEL", value);
     snprintf(value, sizeof(value), "%.0f %s", get_float(refs.payload) * (metric_units ? 1.0f : 2.20462262f), metric_units ? "KG" : "LB");
     efb_pair(524, 779, "PAYLOAD", value);
     efb_pair(524, 747, "COCKPIT DOOR", doors[16] > 0.5f ? "OPEN" : "CLOSED");
-    efb_note(706, "ALL DOORS INCLUDES MAIN, UPPER DECK, AND COCKPIT");
+    efb_note(706, "ALL DOORS INCLUDES MAIN, UPPER, COCKPIT AND CARGO");
 }
 
 static void efb_draw_performance(void)
@@ -236,7 +240,7 @@ static void efb_draw_faults(void)
     int failed = refs.failures[selected_failure]
         && XPLMGetDatai(refs.failures[selected_failure]) >= 6;
     efb_group(170, "SELECTED SYSTEM");
-    snprintf(value, sizeof(value), "%d / 17", selected_failure + 1);
+    snprintf(value, sizeof(value), "%d / 20", selected_failure + 1);
     efb_pair(170, 843, "INDEX", value);
     efb_pair(170, 811, "SYSTEM", failure_names[selected_failure]);
     efb_pair(170, 779, "STATE", failed ? "FAILED" : "OPERATIONAL");
@@ -273,6 +277,30 @@ static void efb_draw_checks(void)
 
 static void efb_draw_states(void)
 {
+    if (elec_network_active()) {
+        static const char *const names[6] = {"NONE", "COLD & DARK", "TURNAROUND", "READY FOR PUSHBACK",
+                                             "READY FOR TAXI", "READY FOR TAKEOFF"};
+        char value[80], step[64];
+        int active = elec_native_int("a380x/xp12/elec/preset/active", 0);
+        int done = elec_native_int("a380x/xp12/elec/preset/done", 0);
+        int count = elec_native_int("a380x/xp12/elec/preset/step_count", 0);
+        int dc = elec_native_int("a380x/xp12/elec/bus/dc_ess_powered", 0);
+        XPLMDataRef text = XPLMFindDataRef("a380x/xp12/elec/preset/step_name");
+        step[0] = 0;
+        if (text != NULL) { int n = XPLMGetDatab(text, step, 0, (int)sizeof(step) - 1); step[n > 0 ? n : 0] = 0; }
+        efb_group(170, "AIRCRAFT STATE PRESET");
+        efb_pair(170, 843, "PRESET", names[active >= 1 && active <= 5 ? active : (done >= 1 && done <= 5 ? done : 0)]);
+        if (active) snprintf(value, sizeof(value), "%d / %d", elec_native_int("a380x/xp12/elec/preset/step", 0), count);
+        else snprintf(value, sizeof(value), "%s", done ? "COMPLETE" : "IDLE");
+        efb_pair(170, 811, "PROGRESS", value);
+        efb_pair(170, 779, "STEP", step[0] ? step : "-");
+        efb_group(524, "CURRENT AIRCRAFT");
+        efb_pair(524, 843, "POSITION", on_ground() ? "ON GROUND" : "AIRBORNE");
+        efb_pair(524, 811, "ELECTRICAL", electrical_power_available() ? "AC POWERED" : dc ? "BATTERIES" : "COLD & DARK");
+        efb_pair(524, 779, "MODE", elec_native_int("a380x/xp12/elec/preset/expedited", 0) ? "EXPEDITED" : "NORMAL");
+        efb_note(706, "TAP A RUNNING PRESET AGAIN TO STOP IT. GROUND ONLY.");
+        return;
+    }
     efb_group(170, "AIRCRAFT SITUATIONS");
     efb_pair(170, 843, "COLD & DARK", "PARKED");
     efb_pair(170, 811, "TURNAROUND", "PARKED");
@@ -344,7 +372,8 @@ static void efb_render_shared(void)
         float x = 170.0f + (i % 3) * 230.0f;
         float y = i < 3 ? 594.0f : 538.0f;
         efb_box(x, y, x + 220, y + 44, EFB_HIGHLIGHT);
-        efb_label(x + 12, y + 16, efb_action_names[active_page][i], EFB_BODY);
+        efb_label(x + 12, y + 16, active_page == PAGE_PRESETS && elec_network_active()
+                  ? efb_native_preset_names[i] : efb_action_names[active_page][i], EFB_BODY);
     }
     efb_rule(170, 526, 858, 526, EFB_STATUS);
     efb_label(170, 518, "NATIVE A380 / X-PLANE 12", EFB_GREEN);

@@ -40,6 +40,27 @@ from avionics_provider import EFIS_COMMANDS, FCU_COMMANDS, KCCU_COMMANDS, KCCU_K
 
 
 class CockpitControlTests(unittest.TestCase):
+    def test_fcu_dimming_keeps_other_efis_and_glareshield_lamp_gates(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = self.make_gltf(Path(directory))
+            binary = Path(directory) / 'mesh.bin'
+            binary.write_bytes(struct.pack('<9f', 0, 0, 0, 1, 0, 0, 0, .938, .347)
+                               + binary.read_bytes()[36:])
+            document = json.loads(source.read_text())
+            document['nodes'].extend([
+                {'name': 'PUSH_EFIS_CS_LS', 'mesh': 0},
+                {'name': 'PUSH_GLARESHIELD_CS_ATCMSG_SEQ1', 'mesh': 0},
+            ])
+            source.write_text(json.dumps(document))
+            encoded, _ = build_obj(source, [Control('PUSH_TEST', 'sim/test/button', 'TEST')],
+                                   {'sim/test/button'}, fcu_overlay=True)
+            for node, ref in [('PUSH_EFIS_CS_LS_SEQ2', 'a380x/xp12/efis/captain/ls'),
+                              ('PUSH_GLARESHIELD_CS_ATCMSG_SEQ1', 'a380x/xp12/glareshield/atc_lit')]:
+                block = encoded.split(f'# FCU ANNUNCIATOR {node}\n', 1)[1].split('ATTR_light_level_reset', 1)[0]
+                self.assertIn('ATTR_light_level\t0\t1\tsim/cockpit2/switches/avionics_power_on', block)
+                self.assertIn('ANIM_hide\t0\t0\tsim/cockpit2/switches/avionics_power_on', block)
+                self.assertIn(f'ANIM_hide\t-0.5\t0.5\t{ref}', block)
+
     def test_nd_surface_bounds_match_the_authored_cockpit_faces(self):
         self.assertEqual(ND_SCREEN_SURFACES, (
             (0.28937626, 0.44796520, 2.59150696, 32.89669418, 2.78888965, 32.96720886),
@@ -126,14 +147,14 @@ class CockpitControlTests(unittest.TestCase):
                 encoded,
             )
             self.assertEqual(report['fcu_label_quads'], 0)
-            self.assertEqual(report['fcu_screen_quads'], 4)
+            self.assertEqual(report['fcu_screen_quads'], 2)
             self.assertEqual(report['pfd_screen_quads'], 2)
             self.assertEqual(report['nd_screen_quads'], 2)
             self.assertEqual(report['ewd_screen_quads'], 1)
             self.assertEqual(report['efb_screen_quads'], 2)
             self.assertEqual(report['efb_touch_targets'], 34)
             self.assertEqual(report['efis_screen_quads'], 22)
-            self.assertEqual(report['triangles'], 155)
+            self.assertEqual(report['triangles'], 151)
             self.assertEqual(report['mfd_device_touch_quads'], 2)
             self.assertEqual(report['mfd_devices'], list(MFD_DEVICE_IDS))
             self.assertEqual(report['kccu_targets'], 0)
@@ -165,8 +186,11 @@ class CockpitControlTests(unittest.TestCase):
                 quad = overlay[screen_index * 4:(screen_index + 1) * 4]
                 self.assertAlmostEqual(float(quad[0][1]), x0)
                 self.assertAlmostEqual(float(quad[1][1]), x1)
-                self.assertAlmostEqual(float(quad[0][7]), u1 * 1024 / 2048)
-                self.assertAlmostEqual(float(quad[1][7]), u0 * 1024 / 2048)
+                fcu_left, _, fcu_right, _ = FCU_PANEL_RECT
+                self.assertAlmostEqual(float(quad[0][7]),
+                                       (fcu_left + u1 * (fcu_right - fcu_left)) / PANEL_SIZE[0])
+                self.assertAlmostEqual(float(quad[1][7]),
+                                       (fcu_left + u0 * (fcu_right - fcu_left)) / PANEL_SIZE[0])
                 self.assertAlmostEqual(float(quad[0][8]), FCU_PANEL_RECT[1] / PANEL_SIZE[1])
                 self.assertAlmostEqual(float(quad[2][8]), FCU_PANEL_RECT[3] / PANEL_SIZE[1])
                 self.assertLess(float(quad[0][8]), float(quad[2][8]))
@@ -296,17 +320,19 @@ class CockpitControlTests(unittest.TestCase):
             encoded, report = build_obj(source, [Control('PUSH_TEST', 'sim/test/button', 'TEST')],
                                         {'sim/test/button'}, fcu_overlay=True)
             self.assertEqual(report['fcu_annunciator_quads'], 7)
-            self.assertEqual(report['triangles'], 169)
+            self.assertEqual(report['triangles'], 165)
             self.assertEqual(len(report['fcu_annunciators']), 7)
-            self.assertIn('ATTR_light_level\t0\t1\tsim/cockpit2/switches/avionics_power_on', encoded)
             vertices = [line.split('\t') for line in encoded.splitlines() if line.startswith('VT\t')]
             # The gear arrow follows the seven FCU bars; the two MFD touch quads come last.
             lamp_vertices = vertices[-40:-12]
             for index, (_label, node, dataref) in enumerate(FCU_ANNUNCIATORS):
                 self.assertIn(f'# FCU ANNUNCIATOR {node}', encoded)
-                self.assertIn(f'ANIM_hide\t-0.5\t0.5\t{dataref}', encoded)
+                self.assertIn(f'ATTR_light_level\t0\t1\t{dataref}', encoded)
+                self.assertIn(f'ANIM_hide\t-0.0001\t0.0001\t{dataref}', encoded)
+                self.assertNotIn(f'ANIM_hide\t-0.5\t0.5\t{dataref}', encoded)
                 self.assertNotIn(f'ANIM_show\t0.5\t1.5\t{dataref}', encoded)
-                self.assertIn('ANIM_hide\t0\t0\tsim/cockpit2/switches/avionics_power_on', encoded)
+                block = encoded.split(f'# FCU ANNUNCIATOR {node}\n', 1)[1].split('ATTR_light_level_reset', 1)[0]
+                self.assertNotIn('sim/cockpit2/switches/avionics_power_on', block)
                 quad = lamp_vertices[index * 4:(index + 1) * 4]
                 # Thin bar is centred on the body and lies in its upper quarter.
                 self.assertAlmostEqual(float(quad[0][1]), index * 2 + .014 * .185)
@@ -673,7 +699,7 @@ class CockpitControlTests(unittest.TestCase):
         self.assertFalse(any(line.startswith(('ANIM_', 'ATTR_cockpit_region')) for line in device_block))
         self.assertEqual(encoded.count('ATTR_manip_device'), 2)
 
-    def test_mfd_touch_quads_use_upright_device_uvs_raised_one_millimetre(self):
+    def test_mfd_touch_quads_use_upright_device_uvs_raised_three_millimetres(self):
         encoded, _report = self.overlay_build()
         vertices = [tuple(map(float, line.split('\t')[1:])) for line in encoded.splitlines()
                     if line.startswith('VT\t')][-8:]
@@ -685,7 +711,7 @@ class CockpitControlTests(unittest.TestCase):
                              [(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0)])
             for vertex, corner in zip(quad, corners):
                 for axis in range(3):
-                    self.assertAlmostEqual(vertex[axis], corner[axis] + 0.001 * normal[axis], places=6)
+                    self.assertAlmostEqual(vertex[axis], corner[axis] + 0.003 * normal[axis], places=6)
                     self.assertAlmostEqual(vertex[3 + axis], normal[axis], places=7)
             # Physical up equals texture up; crew-left (larger source X) is u = 0.
             self.assertGreater(quad[1][1], quad[0][1])
@@ -733,9 +759,10 @@ class CockpitControlTests(unittest.TestCase):
                 self.assertEqual(screen[3:], hit[3:])   # same normal and UV
                 for axis in range(3):
                     # VT prints 9 significant digits (0.1 um at z = 32 m).
-                    # Visible quad 2 mm above the dark face, touch twin 1 mm.
+                    # Visible quad 2 mm above the dark face; the hit surface must
+                    # be nearer the crew, not hidden behind that visible quad.
                     self.assertAlmostEqual(screen[axis], corners[index][axis] + 0.002 * normal[axis], places=6)
-                    self.assertAlmostEqual(hit[axis] - screen[axis], -0.001 * normal[axis], places=6)
+                    self.assertAlmostEqual(hit[axis] - screen[axis], 0.001 * normal[axis], places=6)
         block = lines[lines.index('ATTR_poly_os\t2'):]
         self.assertEqual(block, [
             'ATTR_poly_os\t2',
@@ -755,6 +782,26 @@ class CockpitControlTests(unittest.TestCase):
         idat_length = struct.unpack('>I', png[33:37])[0]
         self.assertEqual(png[37:41], b'IDAT')
         self.assertEqual(zlib.decompress(png[41:41 + idat_length]), b'\0' * (8 * (1 + 8 * 3)))
+
+    def test_mfd_touch_refresh_is_precise_and_idempotent(self):
+        from mfd_cockpit_devices import refresh_touch_geometry
+        from build_cockpit_controls import mfd_device_quads
+        encoded, _report = self.overlay_build()
+        legacy = encoded
+        for (_, _, old), (_, _, new) in zip(mfd_device_quads(.001), mfd_device_quads(.003)):
+            for old_vertex, new_vertex in zip(old, new):
+                old_line = 'VT\t' + '\t'.join(f'{v:.9g}' for v in old_vertex)
+                new_line = 'VT\t' + '\t'.join(f'{v:.9g}' for v in new_vertex)
+                self.assertEqual(legacy.count(new_line), 1)
+                legacy = legacy.replace(new_line, old_line)
+        refreshed = refresh_touch_geometry(legacy)
+        self.assertEqual(refreshed, encoded)
+        self.assertEqual(refresh_touch_geometry(refreshed), refreshed)
+        self.assertEqual(sum(a != b for a, b in zip(legacy.splitlines(), refreshed.splitlines())), 8)
+        with self.assertRaises(ValueError):
+            refresh_touch_geometry(legacy.replace('ATTR_manip_device', 'ATTR_manip_none', 1))
+        with self.assertRaises(ValueError):
+            refresh_touch_geometry(legacy.replace('TRIS\t', 'LINES\t'))
 
     def test_kccu_controls_route_each_key_to_its_own_side(self):
         config = Path(__file__).resolve().parents[1] / 'config' / 'cockpit_controls.json'
@@ -868,7 +915,8 @@ class CockpitControlTests(unittest.TestCase):
                 len(matches), 1,
                 f'{control.node} must have one unambiguous visible-state animation mapping',
             )
-            expected_prefix = 'a380x/xp12/adirs/' if '_ADIRS_' in control.node else 'sim/'
+            expected_prefix = ('a380x/xp12/adirs/' if '_ADIRS_' in control.node else
+                               'a380x/xp12/elec/pb/' if '_OVHD_ELEC_' in control.node else 'sim/')
             self.assertTrue(matches[0]['dataref'].startswith(expected_prefix))
             self.assertLess(matches[0]['value_min'], matches[0]['value_max'])
 

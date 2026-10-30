@@ -9,19 +9,21 @@ static const Color EWD_AMBER={230.0f/255.0f,128.0f/255.0f,0}, EWD_RED={1,0,0};
 static const Color EWD_BLACK={0,0,0}, EWD_GREY={79.0f/255.0f,84.0f/255.0f,103.0f/255.0f};
 static const Color EWD_LIGHT_GREY={196.0f/255.0f,198.0f/255.0f,207.0f/255.0f};
 typedef struct { float x,y; } EwdCanvas;
+static float ewd_brightness=1;
+static Color ewd_dim(Color c) {c.r*=ewd_brightness;c.g*=ewd_brightness;c.b*=ewd_brightness;return c;}
 static float ewd_clamp(float value,float low,float high) { return fmaxf(low,fminf(high,value)); }
 static void ewd_line(const EwdCanvas *p,float x1,float y1,float x2,float y2,Color color,float width)
 {
-    glLineWidth(width); line(p->x+x1,p->y+1024-y1,p->x+x2,p->y+1024-y2,color);
+    glLineWidth(width); line(p->x+x1,p->y+1024-y1,p->x+x2,p->y+1024-y2,ewd_dim(color));
 }
 static void ewd_rect(const EwdCanvas *p,float x,float y,float w,float h,Color color)
-{ rectangle(p->x+x,p->y+1024-y-h,p->x+x+w,p->y+1024-y,color); }
+{ rectangle(p->x+x,p->y+1024-y-h,p->x+x+w,p->y+1024-y,ewd_dim(color)); }
 static void ewd_text(const EwdCanvas *p,float x,float y,const char *s,float size,Color color,int anchor)
-{ ewd_font_draw(p->x+x,p->y+1024-y,s,size,color,0,anchor); }
+{ ewd_font_draw(p->x+x,p->y+1024-y,s,size,ewd_dim(color),0,anchor); }
 static void ewd_memo_text(const EwdCanvas *p,float x,float y,const char *s,float size,Color color)
-{ ewd_font_draw(p->x+x,p->y+1024-y,s,size,color,1.75f,0); }
+{ ewd_font_draw(p->x+x,p->y+1024-y,s,size,ewd_dim(color),1.75f,0); }
 static void ewd_spread_text(const EwdCanvas *p,float x,float y,const char *s,Color color,int anchor)
-{ ewd_font_draw(p->x+x,p->y+1024-y,s,26,color,1.6f,anchor); }
+{ ewd_font_draw(p->x+x,p->y+1024-y,s,26,ewd_dim(color),1.6f,anchor); }
 static void ewd_box(const EwdCanvas *p,float x,float y,float w,float h,int fill)
 {
     if(fill) ewd_rect(p,x,y,w,h,EWD_BLACK);
@@ -58,7 +60,7 @@ static void ewd_pie(const EwdCanvas *p,float cx,float cy,float radius,float star
 {
     int i,segments=(int)ceilf(fabsf(end-start)/2.0f);
     if(segments<1) return;
-    glColor3f(EWD_GREY.r,EWD_GREY.g,EWD_GREY.b);
+    glColor3f(EWD_GREY.r*ewd_brightness,EWD_GREY.g*ewd_brightness,EWD_GREY.b*ewd_brightness);
     glBegin(GL_TRIANGLE_FAN);
     glVertex2f(p->x+cx,p->y+1024-cy);
     for(i=0;i<=segments;++i) {
@@ -81,7 +83,7 @@ static void ewd_egt_marker(const EwdCanvas *p,float cx,float cy,float r)
     float angle=333*(float)M_PI/180,c=cosf(angle),s=sinf(angle);
     float x=cx+c*r,y=cy+s*r,px[4],py[4];int i;
     for(i=0;i<4;++i) { px[i]=x+vx[i]*c-vy[i]*s;py[i]=y+vx[i]*s+vy[i]*c; }
-    glColor3f(EWD_AMBER.r,EWD_AMBER.g,EWD_AMBER.b);glBegin(GL_TRIANGLE_FAN);
+    glColor3f(EWD_AMBER.r*ewd_brightness,EWD_AMBER.g*ewd_brightness,EWD_AMBER.b*ewd_brightness);glBegin(GL_TRIANGLE_FAN);
     for(i=0;i<4;++i) glVertex2f(p->x+px[i],p->y+1024-py[i]);
     glEnd();
     for(i=0;i<4;++i) ewd_line(p,px[i],py[i],px[(i+1)%4],py[(i+1)%4],EWD_AMBER,3);
@@ -93,7 +95,7 @@ static void ewd_attention(const EwdCanvas *p,float x,Color color)
     ewd_line(p,x-74,294,x-74,366,color,2);ewd_line(p,x-74,366,x+88,366,color,2);
     ewd_line(p,x+88,366,x+88,294,color,2);
 }
-static void ewd_engine(const EwdCanvas *p,const EwdEngine *e,float x,int number,int athr_engaged)
+static void ewd_engine(const EwdCanvas *p,const EwdEngine *e,float x,int number,int athr_engaged,int native_attention)
 {
     float cx=x+2,cy=123,r=64;int i;
     int thr_valid=e->active&&!e->n1_degraded&&e->thrust_valid&&isfinite(e->thrust);
@@ -175,9 +177,20 @@ static void ewd_engine(const EwdCanvas *p,const EwdEngine *e,float x,int number,
         snprintf(text,sizeof(text),"%.0f",e->egt);
         ewd_text(p,cx+33,349.7f,text,23,color,2);
     }
+    if(!native_attention) return;
     if(e->active&&(e->fire||(e->egt_valid&&e->egt>=900))) ewd_attention(p,x,EWD_AMBER);
     else if(e->active&&e->starting) ewd_attention(p,x,EWD_WHITE);
 }
+/* FWS attention getters (AttentionGetter.tsx through EngineGauge): amber abnormal over white. */
+static void ewd_fws_attention(const EwdCanvas *p,const EwdData *d,const float *engine_x)
+{
+    int i;
+    for(i=0;i<4;++i) {
+        if(d->attention_abnormal[i]) ewd_attention(p,engine_x[i],EWD_AMBER);
+        else if(d->attention_normal[i]) ewd_attention(p,engine_x[i],EWD_WHITE);
+    }
+}
+#include "a380x_ewd_wd.inc"
 static Color ewd_message_color(int color)
 {
     switch(color) {
@@ -193,7 +206,7 @@ static void draw_ewd(const EwdData *d,float x,float y)
     ewd_rect(&p,0,0,768,1024,EWD_BLACK);
     if(!d->powered) return;
     for(i=0;i<4;++i) { any_active|=d->engine[i].active;if(i==1||i==2) reverse|=d->engine[i].reverse; }
-    if(!reverse) {
+    if(!reverse&&!d->thr_lk) {
         if(any_active&&d->thrust_limit_valid&&isfinite(d->thrust_limit)) {
             ewd_text(&p,330,30,d->thrust_mode,30,EWD_CYAN,2);
             char whole[16],fraction[4];int tenths=(int)lroundf(d->thrust_limit*10);
@@ -206,7 +219,8 @@ static void draw_ewd(const EwdData *d,float x,float y)
         ewd_text(&p,750,30,d->bleed,26,EWD_GREEN,2);
     }
     if(d->idle) ewd_text(&p,386,90,"IDLE",26,EWD_GREEN,1);
-    for(i=0;i<4;++i) ewd_engine(&p,&d->engine[i],engine_x[i],i+1,d->athr_engaged);
+    for(i=0;i<4;++i) ewd_engine(&p,&d->engine[i],engine_x[i],i+1,d->athr_engaged,!d->attention_valid);
+    if(d->attention_valid) ewd_fws_attention(&p,d,engine_x);
     ewd_text(&p,386,121,"THR",26,EWD_WHITE,1);ewd_text(&p,386,142,"%",20,EWD_CYAN,1);
     ewd_text(&p,386,220,"N1",26,EWD_WHITE,1);ewd_text(&p,386,243,"%",20,EWD_CYAN,1);
     ewd_text(&p,384,316,"EGT",26,EWD_WHITE,1);ewd_text(&p,384,339,"\xc2\xb0" "C",20,EWD_CYAN,1);
@@ -215,7 +229,10 @@ static void draw_ewd(const EwdData *d,float x,float y)
     if(d->engine[2].thrust_valid) ewd_line(&p,416,216,436,218,EWD_LIGHT_GREY,3);
     if(d->engine[2].thrust_valid&&d->engine[3].thrust_valid) ewd_line(&p,576,226,600,228,EWD_LIGHT_GREY,3);
     ewd_rect(&p,8,379,752,4,EWD_LIGHT_GREY);
-    if(d->warning_count>0) {
+    if(d->a_floor) ewd_text(&p,20,30,"A.FLOOR",26,EWD_AMBER,0);
+    if(d->thr_lk) ewd_text(&p,387,30,"THR LK",30,EWD_AMBER,2);
+    if(d->wd.valid) ewd_wd_draw(&p,&d->wd);
+    else if(d->warning_count>0) {
         for(i=0;i<d->warning_count&&i<16;++i)
             ewd_memo_text(&p,30,419+i*34,d->warning[i].text,26,ewd_message_color(d->warning[i].color));
     } else {

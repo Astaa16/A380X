@@ -207,6 +207,9 @@ panels 7–8 currently reach 45 degrees, and full in-flight native speedbrake ma
 panels 1–2 to 31.5 degrees, not FBW's clean-wing 20-degree schedule. FBW's
 flap-dependent gains, hydraulics and exact ground-spoiler trigger logic remain
 unimplemented.
+Since docs/SPEED_BRAKE.md the plugin writes FBW's speed brake / ground spoiler
+order (flap-dependent gains, FBW ground-spoiler logic) into X-Plane's handle as the
+mean panel order; these native outputs then follow it.
 
 The local DataRefs description says positive spoiler deflection is trailing-edge
 down. Direct offline evaluation of shipped Laminar 737 and A330 geometry instead

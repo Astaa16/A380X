@@ -35,6 +35,7 @@ else
     --additional-source "$fuselage_source" "$project_dir/config/upper_deck_door_controls.json" \
     --fcu-overlay
 fi
+
 python3 "$project_dir/tools/build_development_aircraft.py" \
   --template "$reference_dir/747-400.acf" \
   --reference-license "$reference_dir/LICENSE" \
@@ -87,4 +88,32 @@ if [ "$engine_acf_only" = no ] && { [ "$has_refresh_groups" = no ] || [ "$engine
     --build-dir "$build_dir" --aircraft "$project_dir/output/A380X-XP12" --package-only \
     --backup "$project_dir/build/engine-material-backups" \
     --report "$project_dir/output/A380X-XP12/build/engine-materials.json"
+fi
+
+# Cargo materials are absent from the historical fuselage export manifest.
+# Restore those authored hold layers and the three door bindings after full
+# or fuselage-only refreshes; other focused cockpit/ACF updates stay untouched.
+cargo_refresh=no
+cargo_has_groups=no
+cargo_next_group=no
+cargo_acf_only=no
+for argument in "$@"; do
+  if [ "$cargo_next_group" = yes ]; then
+    cargo_has_groups=yes
+    [ "$argument" != fuselage ] || cargo_refresh=yes
+    cargo_next_group=no
+  fi
+  case "$argument" in
+    --refresh-group) cargo_next_group=yes ;;
+    --refresh-group=fuselage) cargo_has_groups=yes; cargo_refresh=yes ;;
+    --refresh-group=*) cargo_has_groups=yes ;;
+    --acf-only) cargo_acf_only=yes ;;
+  esac
+done
+if [ "$cargo_acf_only" = no ] && { [ "$cargo_has_groups" = no ] || [ "$cargo_refresh" = yes ]; }; then
+  python3 "$project_dir/tools/prepare_cargo.py" \
+    --source "$fuselage_source" \
+    --asset-root "$project_dir/../upstream-aircraft-large-files" \
+    --build-dir "$build_dir/cargo" \
+    --aircraft "$project_dir/output/A380X-XP12" --install
 fi

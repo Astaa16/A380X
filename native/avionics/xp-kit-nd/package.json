@@ -1,0 +1,31 @@
+{
+  "name": "a380-nd-preview-toolchain",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@flybywiresim/api-client": "0.16.2",
+    "@flybywiresim/tailwind-config": "0.5.0",
+    "@sentry/browser": "6.19.7",
+    "@sentry/integrations": "6.19.7",
+    "@sentry/tracing": "6.19.7",
+    "@turf/turf": "7.2.0",
+    "dotenv": "8.6.0",
+    "esbuild": "0.19.12",
+    "esbuild-plugin-inline-image": "0.0.8",
+    "esbuild-style-plugin-v2": "1.6.5",
+    "json5": "2.2.3",
+    "lodash": "4.17.21",
+    "mathjs": "12.4.3",
+    "msfs-geo": "0.1.0-alpha3",
+    "navigraph": "1.4.3",
+    "postcss-color-functional-notation": "4.2.4",
+    "postcss-inset": "1.0.0",
+    "safe-stable-stringify": "2.5.0",
+    "sass": "1.93.2",
+    "semver": "7.7.3",
+    "tailwindcss": "3.4.17",
+    "typescript": "6.0.2",
+    "typescript-strict-plugin": "2.4.4",
+    "uuid": "9.0.1"
+  }
+}

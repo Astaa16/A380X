@@ -8,9 +8,15 @@ PANEL_SIZE = (2048, 2048)
 # Preserve all existing display pixel positions in the first 1024 columns.
 # The EWD uses the full 768x1024 FBW canvas in the additional atlas space.
 # Each display is isolated so its pixels cannot bleed into neighboring regions.
-FCU_SCREEN_HEIGHT = 40
-FCU_PANEL_RECT = (0, 512 - FCU_SCREEN_HEIGHT, 1024, 512)
-FCU_INSTRUMENT_Y = 512 - FCU_SCREEN_HEIGHT + 1
+# AFS CP glass: one full-width 1024-texel slice per physical LCD. 1024 x 212 matches
+# the authored glass aspect (0.101 x 0.0206 m, 4.8:1), so the FBW FCU fonts are drawn
+# 1:1 at their rasterised size with no horizontal stretch. The slices use the
+# otherwise unused atlas band above the EWD; every other instrument stays fixed.
+FCU_SCREEN_HEIGHT = 212
+FCU_PANEL_RECT = (0, 1280, 2048, 1280 + FCU_SCREEN_HEIGHT)
+FCU_LCD_PANEL_RECTS = ((0, 1280, 1024, 1280 + FCU_SCREEN_HEIGHT),
+                       (1024, 1280, 2048, 1280 + FCU_SCREEN_HEIGHT))
+FCU_INSTRUMENT_Y = FCU_PANEL_RECT[1] + 1
 PFD_PANEL_RECTS = (
     (0, 32, 320, 448),
     (704, 32, 1024, 448),
@@ -35,20 +41,6 @@ CLOCK_SCREEN_SURFACES = (
 # One shared flyPad render target is mapped onto both authored tablet faces.
 EFB_PANEL_RECT = (152, 516, 872, 1016)
 
-# Both EFIS control panels use the otherwise unused margins beside the flyPad.
-# Allocate a full 144 pixels to every LCD label instead of reducing the entire
-# five-button strip to 144 pixels. Each atlas slice maps to its own physical
-# column; the two strips still look continuous in the cockpit.
-EFIS_BARO_PANEL_RECTS = ((4, 520, 148, 612), (876, 520, 1020, 612))
-EFIS_UPPER_PANEL_RECTS = tuple(
-    tuple((left, 624 + 36 * index, left + 144, 656 + 36 * index) for index in range(5))
-    for left in (4, 876)
-)
-EFIS_LOWER_PANEL_RECTS = tuple(
-    tuple((left, 812 + 36 * index, left + 144, 844 + 36 * index) for index in range(5))
-    for left in (4, 876)
-)
-
 # The source SCREEN_AUTOPILOT quad sits behind the FCU face. Its bounding box
 # includes the opaque EFIS divider bars, so copying that full face would paint
 # across the bezels. These inner opening bounds come from Plane.049 in the
@@ -70,6 +62,37 @@ EFIS_LOWER_SCREEN_X_BOUNDS = (
 )
 EFIS_UPPER_SCREEN_YZ = (2.99426, 32.75799, 3.00094, 32.76048)
 EFIS_LOWER_SCREEN_YZ = (2.98378, 32.75408, 2.99068, 32.75666)
+
+# EFIS CP LCDs, per side: one 1536 x 104 texel strip per legend row (the physical
+# rows are ~15:1) and a 384 x 244 baro window (1.58:1), in the free atlas band above
+# the AFS CP slices. Upper-row cells split their strip evenly; lower-row cells follow
+# the three physical lower LCD segments (VOR1 | WX TERR TRAF | VOR2) by source X.
+EFIS_ROW_W, EFIS_ROW_H = 1536, 104
+EFIS_BARO_W, EFIS_BARO_H = 384, 244
+EFIS_UPPER_ROW_RECTS = ((0, 1500, 1536, 1604), (0, 1724, 1536, 1828))
+EFIS_LOWER_ROW_RECTS = ((0, 1612, 1536, 1716), (0, 1836, 1536, 1940))
+EFIS_BARO_PANEL_RECTS = ((1544, 1500, 1928, 1744), (1544, 1752, 1928, 1996))
+
+
+def _efis_cells(row, fractions):
+    left, bottom, right, top = row
+    width = right - left
+    return tuple((left + round(a * width), bottom, left + round(b * width), top) for a, b in fractions)
+
+
+def _efis_lower_fractions(side):
+    columns = EFIS_LOWER_SCREEN_X_BOUNDS[side]
+    high = max(hi for _lo, hi in columns)
+    low = min(lo for lo, _hi in columns)
+    # Positive source X is screen-left after the attachment.
+    return tuple(((high - hi) / (high - low), (high - lo) / (high - low)) for lo, hi in columns)
+
+
+EFIS_UPPER_PANEL_RECTS = tuple(
+    _efis_cells(EFIS_UPPER_ROW_RECTS[side], tuple((i / 5, (i + 1) / 5) for i in range(5)))
+    for side in range(2))
+EFIS_LOWER_PANEL_RECTS = tuple(
+    _efis_cells(EFIS_LOWER_ROW_RECTS[side], _efis_lower_fractions(side)) for side in range(2))
 
 # Authored screen corners ordered bottom-left, top-left, top-right,
 # bottom-right as seen on each tablet. The FBW source uses opposite vertex
@@ -154,3 +177,13 @@ MFD_DEVICE_IDS = ("a380x.xp12.mfd.captain", "a380x.xp12.mfd.first_officer")
 MFD_DEVICE_BUS = 1                 # bitfield: bus 0
 MFD_LIGHTING_CHANNELS = (14, 15)   # instrument_brightness_ratio custom slots
 MFD_AUTO_ADJUST = 1
+
+# Exact authored SCREEN_ISIS_1 face (material SCREEN_ISIS_1 of DYN_SCREEN, vertices 0-3) in the
+# same source convention as PFD_SCREEN_SURFACES (tools/isis_cockpit_device.py --check re-measures
+# it and SCREEN_DU_PFDL). 65.8 x 64.7 mm, tilted 19.4 deg back like the main panel. ISIS 2 is not
+# fitted (FBW panel.cfg leaves SCREEN_ISIS_2 disabled).
+ISIS_SCREEN_SURFACE = (0.12583287, 0.19165216, 2.73086953, 32.94198859, 2.79184201, 32.96387410)
+ISIS_SCREEN_SIZE = (1024, 1024)   # device texels: FBW's 512-unit SVG at 2 texels per unit
+# Lower unit: SCREEN_ISIS_2 face (DYN_SCREEN vertices 4-7). FBW leaves its gauge disabled; this
+# port drives it as the second ISIS (standby navigation display by default).
+ISIS2_SCREEN_SURFACE = (0.12655064, 0.19165975, 2.64409503, 32.91099411, 2.7044096, 32.93264347)

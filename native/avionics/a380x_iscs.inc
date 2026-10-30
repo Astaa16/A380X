@@ -189,13 +189,13 @@ static void iscs_loading(void)
 static void iscs_ground(void)
 {
     char v[48];
-    float doors[17] = {0};
+    float doors[20] = {0};
     int row, side;
     static const int main_indices[5][2] = {{0,1},{2,3},{4,5},{6,7},{8,9}};
     static const int upper_indices[3][2] = {{10,11},{12,13},{14,15}};
-    if (refs.doors) XPLMGetDatavf(refs.doors, doors, 0, 17);
+    if (refs.doors) XPLMGetDatavf(refs.doors, doors, 0, 20);
     iscs_title(272, 891, "GROUND SUPPLIES");
-    iscs_switch(175, 853, "EXTERNAL POWER", get_int(refs.gpu), 40);
+    iscs_switch(175, 853, "EXTERNAL POWER", gpu_connected(), 40);
     iscs_label(175, 823, "HIGH PRESSURE AIR", EFB_WHITE);
     iscs_button(437, 819, 493, 838, "N/A", 0, 0);
     iscs_label(175, 795, "LOW PRESSURE AIR", EFB_WHITE);
@@ -208,7 +208,7 @@ static void iscs_ground(void)
     iscs_button(175, 637, 495, 665, "STOP PUSHBACK", 42, on_ground());
     iscs_button(175, 582, 325, 610, "JETWAY", 43, on_ground());
     iscs_button(336, 582, 495, 610, "SERVICES", 44, on_ground());
-    iscs_button(175, 547, 495, 575, "TOGGLE ALL 17 DOORS", 45, on_ground());
+    iscs_button(175, 547, 495, 575, "TOGGLE ALL 20 DOORS", 45, on_ground());
 
     iscs_title(641, 891, "AIRCRAFT DOORS");
     iscs_label(538, 864, "MAIN DECK", EFB_HIGHLIGHT);
@@ -225,7 +225,15 @@ static void iscs_ground(void)
         snprintf(v, sizeof(v), "U%d%c %s", row + 1, side ? 'R' : 'L', doors[index] > .5f ? "OPEN" : "CLOSED");
         iscs_button(x, y, x + 150, y + 22, v, 50 + index, on_ground());
     }
-    iscs_button(538, 549, 850, 573, doors[16] > .5f ? "COCKPIT DOOR OPEN" : "COCKPIT DOOR CLOSED", 66, on_ground());
+    iscs_button(538, 581, 850, 603, doors[16] > .5f ? "COCKPIT DOOR OPEN" : "COCKPIT DOOR CLOSED", 66, on_ground());
+    iscs_label(538, 568, "CARGO HOLDS", EFB_HIGHLIGHT);
+    for (row = 0; row < 3; ++row) {
+        static const char *const names[] = {"FWD", "AFT", "BULK"};
+        float x = 538.0f + row * 105.0f;
+        float ratio = doors[17 + row];
+        snprintf(v, sizeof(v), "%s %s", names[row], ratio > .99f ? "OPEN" : ratio < .01f ? "CLOSED" : "MOVING");
+        iscs_button(x, 540, x + 102, 562, v, 67 + row, on_ground());
+    }
 }
 
 static void iscs_faults(void)
@@ -345,7 +353,8 @@ static void a380x_iscs_click(float x, float y)
             action = iscs_hits[i].action; break;
         }
     if (action >= 100 && action < 108) { iscs_tab = action - 100; return; }
-    if (action >= 50 && action <= 66) {
+    if (action >= 50 && action <= 69) {
+        if (!on_ground()) { set_status("Door controls are ground-only"); return; }
         char name[64];
         snprintf(name, sizeof(name), "sim/flight_controls/door_toggle_%d", action - 49);
         run_command(name); return;
@@ -380,7 +389,14 @@ static void a380x_iscs_click(float x, float y)
         run_command("sim/starters/engage_starter_3");
         run_command("sim/starters/engage_starter_4");
         break;
-    case 4: run_command("sim/electrical/APU_start"); break;
+    case 4:
+        /* APU MASTER on, then START (the A380 network intercepts APU_start for its ECB). */
+        if (elec_network_active()) {
+            XPLMDataRef master = XPLMFindDataRef("sim/cockpit2/electrical/APU_starter_switch");
+            if (master != NULL && XPLMGetDatai(master) < 1) XPLMSetDatai(master, 1);
+        }
+        run_command("sim/electrical/APU_start");
+        break;
     case 5: run_command("a380x/xp12/adirs/window_toggle"); break;
     case 6: preset_cold_dark(); break;
     case 7: preset_turnaround(); break;
@@ -397,7 +413,7 @@ static void a380x_iscs_click(float x, float y)
     case 33: iscs_fuel_target = (int)(MAX_FUEL_KG * (x - 175) / 320); break;
     case 34: set_fuel((float)iscs_fuel_target); break;
     case 35: set_fuel(MAX_FUEL_KG); break;
-    case 40: run_command("sim/ground_ops/toggle_gpu_request"); break;
+    case 40: gpu_toggle(); break;
     case 41: run_command("sim/ground_ops/pushback_straight"); break;
     case 42: run_command("sim/ground_ops/pushback_stop"); break;
     case 43: run_command("sim/ground_ops/jetway"); break;

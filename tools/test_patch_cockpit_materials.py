@@ -33,6 +33,18 @@ TEXTURES = {"TEXTURE": "new.png", "TEXTURE_LIT": "new_LIT.png",
 
 
 class PatchTests(unittest.TestCase):
+    def test_fcu_refresh_retains_authored_material_detail_and_unit_master(self):
+        class Source:
+            def load(self, spec):
+                return Image.new('RGBA',(8,8),(80,64,128,255))
+        mat={'name':'A380_COCKPIT_FCU_4k','pbrMetallicRoughness':{
+            'baseColorTexture':{'index':0},'metallicRoughnessTexture':{'index':1}}}
+        self.assertEqual(next(kind for _,name,kind in p.TARGETS if name==mat['name']),'fcu')
+        image=p.make_materials(Source(),mat,'fcu')['material_gloss']
+        self.assertEqual(image.size,(8,8))
+        self.assertEqual(image.getpixel((0,0)),(128,191,0,255))
+        self.assertIn('ATTR_shiny_rat 1.0\n',p.patch_obj(OBJ,TEXTURES,'fcu',None))
+
     def test_mapping_animation_and_repeated_patch(self):
         for kind in ("labels", "mip", "matte"):
             with self.subTest(kind=kind):

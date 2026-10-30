@@ -38,5 +38,8 @@ venv/
 !/output/A380X-XP12/
 !/output/A380X-XP12/**
 /output/A380X-XP12/.cockpit-material-backups/
+/output/A380X-XP12/.acf-backups/
+/output/A380X-XP12/.flightmodel-backups/
+/output/A380X-XP12/.windows-avionics-backups/
 /output/A380X-XP12/**/._*
 /output/A380X-XP12/**/.DS_Store

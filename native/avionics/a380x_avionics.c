@@ -51,6 +51,7 @@
 #include "a380x_fms.h"
 #include "a380x_navdata.h"
 #include "a380x_fms_fpln.h"
+#include "a380x_elec_power.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -93,7 +94,10 @@ typedef struct {
     int nd_mode;
     int air_valid, altitude_valid, vertical_speed_valid, attitude_valid;
     int heading_valid, radio_altitude_valid, display_valid, navigation_valid;
+    int nd_valid; /* ND display unit On (the PFD uses display_valid) */
 } Side;
+/* draw_nd follows the ND display unit, draw_pfd the PFD unit (a380x_pfd_render.inc). */
+#define SIDE_ND_VALID(side) ((side)->nd_valid)
 
 typedef struct {
     XPLMDataRef avionics_power, on_ground, agl_m, ground_speed, ground_track;
@@ -257,14 +261,30 @@ static void read_side(Side *side, int powered)
 #include "a380x_glareshield.inc"
 #include "a380x_clock.inc"
 #include "a380x_center_right.inc"
+#include "a380x_lg_grvty.inc"     /* L/G GRVTY panel: owns the crew lever while the hydraulics are isolated */
 #include "a380x_cockpit_door.inc"
+#include "a380x_elec_panel.inc"
+#include "a380x_elec_adapter.inc"
+#include "a380x_ovhd_lamps.inc"
 #include "a380x_ewd_data.inc"
+#include "a380x_thrust.inc"      /* thrust/reverse levers, FADEC rating + FLEX, instinctive disconnect */
+#include "a380x_flaps.inc"       /* FLAPS lever (pull-out, gates 1/3), FBW SFCC, flap/slat FPPU drives */
+#include "a380x_speedbrake.inc"  /* SPEED BRAKE lever (push down, 1/2 notch, ARM), FBW speed brake + ground spoilers */
 #ifndef GL_CLAMP_TO_EDGE
 #define GL_CLAMP_TO_EDGE 0x812F /* OpenGL 1.2; absent from the Windows GL 1.1 header */
 #endif
 #include "a380x_mfd_render.inc"
+static int xpkit_draw_mfd(int side,float x,float y,float scale);
+static int xpkit_draw_sd(void);
+#define MFDA_CDS_OVERLAY(side) cds_overlay((side) ? A380X_ELN_DU_FO_MFD : A380X_ELN_DU_CAPT_MFD, 0, 0, 768, 1024)
+#define SDA_CDS_OVERLAY() cds_overlay(A380X_ELN_DU_SD, 0, 0, 768, 1024)
 #include "a380x_mfd_adapter.inc"
+#include "a380x_sd_adapter.inc"
 #include "a380x_fms_adapter.inc"
+#include "a380x_isis_adapter.inc"
+#include "a380x_fws_adapter.inc"
+#define XPKIT_ND_OVERLAY(side) (plugin_enabled && cds_overlay((side) ? A380X_ELN_DU_FO_ND : A380X_ELN_DU_CAPT_ND, 0, 0, 768, 1024))
+#include "a380x_xpkit_adapter.inc"
 
 static float flight_loop(float elapsed_since_last_call, float elapsed_since_last_loop,
                          int counter, void *refcon)
@@ -276,21 +296,53 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
     (void)counter;
     (void)refcon;
     if (!plugin_enabled) return -1.0f;
+    /* The A380 network runs first (spec 9.5.6): every consumer below reads its per-bus power.
+     * The ELEC pbs (wall-time press animation) are stepped just before it. */
+    elec_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
+    {
+        float du_brightness[A380X_ELN_DU_COUNT];
+        du_brightness[A380X_ELN_DU_CAPT_PFD] = du_channels[DU_PFD].level;
+        du_brightness[A380X_ELN_DU_CAPT_ND] = du_channels[DU_ND].level;
+        du_brightness[A380X_ELN_DU_CAPT_MFD] = mfda_du_knob(0);
+        du_brightness[A380X_ELN_DU_FO_PFD] = du_channels[DU_CHANNELS_PER_SIDE + DU_PFD].level;
+        du_brightness[A380X_ELN_DU_FO_ND] = du_channels[DU_CHANNELS_PER_SIDE + DU_ND].level;
+        du_brightness[A380X_ELN_DU_FO_MFD] = mfda_du_knob(1);
+        du_brightness[A380X_ELN_DU_EWD] = sda.initialized ? sda.ewd_brightness : 1.0f;
+        du_brightness[A380X_ELN_DU_SD] = sda.initialized ? sda.brightness : 1.0f;
+        du_brightness[A380X_ELN_DU_CAPT_OIT] = du_brightness[A380X_ELN_DU_FO_OIT] = 1.0f;
+        eln_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt, du_brightness);
+    }
+    /* Thrust levers first: cockpit drags, hardware adoption and interlocks are in X-Plane's
+     * handles before anything below reads them (docs/THRUST_LEVERS.md). */
+    thrust_levers_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
+    /* FLAPS lever and SFCC: X-Plane's flap handle carries the configuration, the feed (PFD, FWS, xp-kit)
+     * the lever and the FBW surface positions (docs/FLAPS_LEVER.md). */
+    flaps_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
+    /* SPEED BRAKE lever and FBW PRIM speed brake / ground spoilers (TLA and flap index from the two above):
+     * X-Plane's speedbrake handle carries the surface order, the feed the lever (docs/SPEED_BRAKE.md). */
+    speedbrake_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
+    /* Legacy single criterion, used only while the native network is unavailable. */
     powered = XPLMGetDatai(refs.avionics_power) != 0;
     XPLMGetDatavf(refs.throttle, throttle_values, 0, 4);
     XPLMGetDatavf(refs.n1, n1_values, 0, 4);
     XPLMGetDatavf(refs.gear, gear_values, 0, 5);
-    flap_value = XPLMGetDataf(refs.flap_handle);
+    /* Lever position as a 0..1 handle (X-Plane's handle now carries the SFCC configuration). */
+    flap_value = flaps_feed.ready ? (float)flaps_feed.handle_index / 4.0f : XPLMGetDataf(refs.flap_handle);
     ground_speed_knots = XPLMGetDataf(refs.ground_speed) * 1.94384449f;
     ground_track_degrees = XPLMGetDataf(refs.ground_track);
     for (i = 0; i < 4; ++i) {
         if (n1_values[i] > 15.0f) ++running;
-        if (throttle_values[i] >= 0.85f) ++takeoff;
+        if (throttle_values[i] >= 0.85f || thrust_takeoff_power(i)) ++takeoff;
     }
-    read_side(&refs.side[0], powered);
-    read_side(&refs.side[1], powered);
+    read_side(&refs.side[0], a380x_power_du_on(A380X_ELN_DU_CAPT_PFD, powered));
+    read_side(&refs.side[1], a380x_power_du_on(A380X_ELN_DU_FO_PFD, powered));
+    refs.side[0].nd_valid = a380x_power_du_on(A380X_ELN_DU_CAPT_ND, powered) && !failed(refs.side[0].fail_efis);
+    refs.side[1].nd_valid = a380x_power_du_on(A380X_ELN_DU_FO_ND, powered) && !failed(refs.side[1].fail_efis);
     adirs_update(dt);
-    fmsa_update(dt, powered); /* native FMS, before guidance (spec 07 section 1.4) */
+    ovhd_update(dt); /* overhead annunciators (after the network power and the ADIRS lamps) */
+    /* FMC: any CDS supply (assumption, docs/ELEC_SYSTEM.md). */
+    fmsa_update(dt, a380x_power_any(A380X_ELN_BIT(A380X_ELN_DC_ESS) | A380X_ELN_BIT(A380X_ELN_DC1) |
+                                    A380X_ELN_BIT(A380X_ELN_DC2), powered)); /* native FMS, before guidance */
     memset(&phase_inputs, 0, sizeof(phase_inputs));
     phase_inputs.on_ground = XPLMGetDatai(refs.on_ground) != 0;
     phase_inputs.running_engines = running;
@@ -303,17 +355,35 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
     published.captain_valid = refs.side[0].display_valid;
     published.first_officer_valid = refs.side[1].display_valid;
     update_guidance(dt);
+    /* FADEC N1 command to the engines unless A/THR (just decided above) drives them. */
+    thrust_engines_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
     efis_update(dt);
     efis_nd_update(dt);
     efis_airport_update(dt);
     glare_update(dt);
     clock_update(dt);
+    /* L/G GRVTY handle and X-Plane gear-handle ownership, before the lever is read. The FBW handle
+     * timing (7.2 s per turn) uses this callback's own elapsed wall time (see sda_update below). */
+    lgg_update(elapsed_since_last_call > 0.0f ? elapsed_since_last_call : dt);
     center_right_update(dt);
-    ewd_update(dt, powered);
-    if(adirs.on_batt && powered) ewd_add_message(ewd.memo,&ewd.memo_count,"ADIRS ON BATT",EWD_COLOR_AMBER);
+    ewd_update(dt, a380x_power_du_on(A380X_ELN_DU_EWD, powered));
+    if(adirs.on_batt && ewd.powered) ewd_add_message(ewd.memo,&ewd.memo_count,"ADIRS ON BATT",EWD_COLOR_AMBER);
+    /* EWD.tsx: A.FLOOR for A/THR modes A.FLOOR and TOGA LK; THR LK for the thrust-lock message. */
+    if(ewd.powered) {
+        ewd.a_floor=guidance.thrust_mode==A380X_A1A2_A_FLOOR || guidance.thrust_mode==A380X_A1A2_TOGA_LK;
+        ewd.thr_lk=published.fma_a3==A380X_A3_THR_LK;
+    }
+    /* Native FWS: alerts, memos, ECL and master lights; it replaces the legacy EWD lists. */
+    fwsa_update(dt, a380x_power_du_on(A380X_ELN_DU_EWD, powered));
+    fwsa_publish_ewd();
     cockpit_door_update();
     mfda_update(dt, powered);
+    /* SDK elapsedSinceLastLoop is since ANY plugin callback, not this one.
+     * Mechanical ENG motion uses our own callback's elapsed wall time. */
+    sda_update(elapsed_since_last_call, a380x_power_du_on(A380X_ELN_DU_SD, powered), &ewd);
+    isis_adapter_update(dt);
     a380x_efb_update(dt);
+    xpkit_update();
     return -1.0f;
 }
 
@@ -321,8 +391,49 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
 #include "a380x_ewd_font.inc"
 #include "a380x_ewd_render.inc"
 #include "a380x_fcu_render.inc"
+#include "a380x_fcu_font.inc"
 #include "a380x_efis_render.inc"
 #include "a380x_clock_render.inc"
+
+/* FBW CdsDisplayUnit boot screens (CDS:260-276), drawn over a DU area in its 768x1024
+ * layout: Thales boot = white bar with a blue square, self-test = green text. Returns 1
+ * when the unit is booting or self-testing. */
+static int cds_overlay(int du, float x, float y, float w, float h)
+{
+    static const Color boot_blue = {77.0f / 255.0f, 77.0f / 255.0f, 1.0f};
+    int state = a380x_power_du_state(du);
+    float saved = ewd_brightness;
+    EwdCanvas p = {0.0f, 0.0f};
+    if (state != A380X_ELN_DU_BOOT && state != A380X_ELN_DU_SELFTEST) return 0;
+    glPushMatrix();
+    glTranslatef(x, y, 0.0f);
+    glScalef(w / 768.0f, h / 1024.0f, 1.0f);
+    XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
+    ewd_brightness = 1.0f;
+    ewd_rect(&p, 0, 0, 768, 1024, BLACK);
+    if (state == A380X_ELN_DU_BOOT) {
+        ewd_rect(&p, 84, 880, 600, 70, WHITE);
+        ewd_rect(&p, 89, 885, 35, 60, boot_blue);
+    } else {
+        ewd_text(&p, 384, 512, "SAFETY TEST IN PROGRESS", 28, GREEN, 1);
+        ewd_text(&p, 384, 553, "(MAX 30 SECONDS)", 28, GREEN, 1);
+    }
+    ewd_brightness = saved;
+    XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
+    glPopMatrix();
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+    return 1;
+}
+
+/* Late READY spawn (engines found running after the load message): re-initialise the
+ * consumers that depend on the spawn type. */
+static void elec_spawn_changed(void)
+{
+    adirs_reset();
+    isis_adapter_plane_loaded();
+    fmsa_cold_and_dark = 0;
+    survh_defaults(0);
+}
 
 static void du_dim_display(int side, int unit, float x, float y, float width, float height)
 {
@@ -360,16 +471,28 @@ static int draw_panel(XPLMDrawingPhase phase, int before, void *refcon)
     }
     XPLMSetGraphicsState(0, 0, 0, 0, 1, 0, 0);
     glLineWidth(1.0f);
-    draw_pfd(&refs.side[0], 0.0f, 32.0f, "CAPT");
-    du_dim_display(0, DU_PFD, 0.0f, 32.0f, 320.0f, 416.0f);
-    draw_pfd(&refs.side[1], 704.0f, 32.0f, "F/O");
-    du_dim_display(1, DU_PFD, 704.0f, 32.0f, 320.0f, 416.0f);
-    draw_nd(&refs.side[0], 328.0f, 230.0f, "CAPT");
+    /* With a bound 768x1024 PFD cockpit device (xp-kit builds) the device
+     * presents the PFD and covers this atlas region: skip the atlas work. */
+    if (xpkit_pfd_atlas_needed(0)) {
+        if (!xpkit_draw(0, 0.0f, 32.0f)) draw_pfd(&refs.side[0], 0.0f, 32.0f, "CAPT");
+        cds_overlay(A380X_ELN_DU_CAPT_PFD, 0.0f, 32.0f, 320.0f, 416.0f);
+        du_dim_display(0, DU_PFD, 0.0f, 32.0f, 320.0f, 416.0f);
+    }
+    if (xpkit_pfd_atlas_needed(1)) {
+        if (!xpkit_draw(1, 704.0f, 32.0f)) draw_pfd(&refs.side[1], 704.0f, 32.0f, "F/O");
+        cds_overlay(A380X_ELN_DU_FO_PFD, 704.0f, 32.0f, 320.0f, 416.0f);
+        du_dim_display(1, DU_PFD, 704.0f, 32.0f, 320.0f, 416.0f);
+    }
+    if (!xpkit_draw_nd(0,328.0f,230.0f)) draw_nd(&refs.side[0], 328.0f, 230.0f, "CAPT");
+    cds_overlay(A380X_ELN_DU_CAPT_ND, 328.0f, 230.0f, 180.0f, 234.0f);
     du_dim_display(0, DU_ND, 328.0f, 230.0f, 180.0f, 234.0f);
-    draw_nd(&refs.side[1], 516.0f, 230.0f, "F/O");
+    if (!xpkit_draw_nd(1,516.0f,230.0f)) draw_nd(&refs.side[1], 516.0f, 230.0f, "F/O");
+    cds_overlay(A380X_ELN_DU_FO_ND, 516.0f, 230.0f, 180.0f, 234.0f);
     du_dim_display(1, DU_ND, 516.0f, 230.0f, 180.0f, 234.0f);
-    draw_ewd(&ewd, 1024.0f, 0.0f);
-    fcu_integral_level = lighting[1].value;
+    EwdData filtered_ewd;sda_filter_ewd(&filtered_ewd,&ewd);
+    ewd_brightness=sda.ewd_brightness;
+    draw_ewd(&filtered_ewd, 1024.0f, 0.0f);
+    cds_overlay(A380X_ELN_DU_EWD, 1024.0f, 0.0f, 768.0f, 1024.0f);
     fcu_lcd_level = lighting[2].value;
     draw_fcu();
     draw_efis_cp();
@@ -487,7 +610,33 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
     /* Create the MFD cockpit devices now, before X-Plane loads the aircraft OBJs that
      * reference them (ATTR_cockpit_device / ATTR_manip_device). */
     mfda_devices_enable();
+    isis_adapter_init(); /* ISIS 1 cockpit device, also before the aircraft OBJs */
+    if (!elec_init()) XPLMDebugString("A380X ELEC panel: registration failed; existing avionics remain available\n");
+    else if (!eln_init()) XPLMDebugString("A380X ELEC network: unavailable; displays keep the stock avionics-master power\n");
+    /* Overhead annunciator lamp datarefs before the aircraft OBJs bind them (ATTR_light_level). */
+    if (!ovhd_init()) XPLMDebugString("A380X OVHD lamps: registration failed; overhead legends stay dark\n");
+    if (fwsa_init()) {
+        char fws_line[160];
+        snprintf(fws_line, sizeof(fws_line), "A380X FWS: native flight warning system ready (%d alert definitions, "
+                 "%d ECAM procedures)\n", fws_signals_alert_count(), FWS_ABNORMAL_PROCEDURE_COUNT);
+        XPLMDebugString(fws_line);
+    }
+    if (!sda_init()) XPLMDebugString("A380X ECAM SD: registration failed; existing avionics remain available\n");
+    /* L/G GRVTY panel datarefs before the aircraft OBJs bind them (cover, guards, switch). */
+    if (!lgg_init()) XPLMDebugString("A380X L/G GRVTY: registration failed; gravity extension unavailable, the lever drives the gear\n");
+    /* Thrust-lever manipulator datarefs before the aircraft OBJs bind them; needs the FCU commands. */
+    if (!thrust_init()) XPLMDebugString("A380X thrust levers: registration failed; X-Plane's handles drive the engines directly\n");
+    /* FLAPS lever manipulator / animation datarefs before the aircraft OBJs bind them. */
+    if (!flaps_init()) XPLMDebugString("A380X flaps lever: registration failed; X-Plane's flap handle drives the flaps directly\n");
+    /* SPEED BRAKE lever manipulator / animation datarefs before the aircraft OBJs bind them. */
+    if (!speedbrake_init()) XPLMDebugString("A380X speed brake lever: registration failed; X-Plane's speedbrake handle drives the spoilers directly\n");
     if (!XPLMRegisterDrawCallback(draw_panel, xplm_Phase_Gauges, 0, NULL)) {
+        speedbrake_shutdown();
+        flaps_shutdown();
+        thrust_shutdown();
+        lgg_shutdown();
+        isis_adapter_shutdown();
+        sda_shutdown();
         mfda_shutdown(); fmsa_shutdown();
         adirs_window_shutdown(); adirs_shutdown();
         a380x_efb_shutdown();
@@ -505,6 +654,7 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
         return 0;
     }
     XPLMRegisterFlightLoopCallback(flight_loop, -1.0f, NULL);
+    xpkit_init();
     XPLMDebugString("A380X Avionics: Imported FBW A380 guidance, PFD/FCU, MFD/FMS and physical flyPad registered.\n");
     return 1;
 }
@@ -512,17 +662,29 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
 PLUGIN_API void XPluginStop(void)
 {
     plugin_enabled = 0;
+    xpkit_shutdown();
     XPLMUnregisterFlightLoopCallback(flight_loop, NULL);
+    ovhd_shutdown();
+    fwsa_shutdown();
+    eln_shutdown();
+    elec_shutdown();
     XPLMUnregisterDrawCallback(draw_panel, xplm_Phase_Gauges, 0, NULL);
+    isis_adapter_shutdown();
+    sda_shutdown();
     mfda_shutdown(); fmsa_shutdown();
     adirs_window_shutdown(); adirs_shutdown();
     ewd_font_shutdown();
+    fcu_font_shutdown();
     mfd_gl_shutdown();
     a380x_efb_shutdown();
     efis_airport_shutdown();
     efis_nd_shutdown();
     efis_shutdown();
     cockpit_door_shutdown();
+    speedbrake_shutdown();
+    flaps_shutdown();
+    thrust_shutdown();
+    lgg_shutdown();
     center_right_shutdown();
     clock_shutdown();
     glare_shutdown();
@@ -537,16 +699,27 @@ PLUGIN_API int XPluginEnable(void)
     plugin_enabled = 1;
     fmsa_enable();
     mfda_devices_enable();
+    sda.force = 1;
+    xpkit_start();
     return 1;
 }
 
 PLUGIN_API void XPluginDisable(void)
 {
+    xpkit_stop();
+    isis_adapter_disable();
+    sda_disable();
     mfda_devices_disable();
     if ((glare.ptt[0] || glare.ptt[1]) && glare.radio_ptt) XPLMCommandEnd(glare.radio_ptt);
     glare.ptt[0]=glare.ptt[1]=0;
     adirs_window_set_visible(0); adirs_release_controls();
     glare_stop_audio();
+    eln_disable();
+    elec_release_controls();
+    lgg_release_controls();   /* X-Plane's gear handle back at the crew lever, override released */
+    thrust_release_controls(); /* engines back on X-Plane's handles, disconnect buttons released */
+    flaps_release_controls();  /* a lever drag ends; X-Plane keeps the configuration in its handle */
+    speedbrake_release_controls(); /* a lever drag ends; X-Plane's auto speedbrake setting restored */
     center_right_release_controls();
     clock_release_controls();
     release_guidance_controls();
@@ -565,15 +738,28 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, int message, void *para
 {
     (void)from;
     if (message == XPLM_MSG_PLANE_LOADED && (intptr_t)param == 0) {
+        /* Panel reset, then the network decides the spawn (cold & dark / ready) before the
+         * consumers re-initialise from it. */
+        elec_plane_loaded();
+        eln_plane_loaded();
+        ovhd_plane_loaded();
+        fwsa_plane_loaded();
         fmsa_plane_loaded();
         mfda_plane_loaded();
+        sda_plane_loaded();
+        isis_adapter_plane_loaded();
+        lgg_plane_loaded();   /* L/G GRVTY cold & dark: covers/guards closed, switch OFF, handle at rest */
+        thrust_plane_loaded(); /* levers re-read from X-Plane, FADEC reset, A/THR disable cleared */
+        flaps_plane_loaded();  /* lever, SFCC and surfaces re-read from X-Plane's flap handle */
+        speedbrake_plane_loaded(); /* lever re-read from X-Plane's speedbrake handle (ARMED = ARM) */
     }
     if (message == XPLM_MSG_PLANE_LOADED && (intptr_t)param == 0 && guidance.initialized) {
         adirs_reset();
         release_guidance_controls();
+        fcu_thrust_init(); /* Re-read the actual aircraft's detent calibration. */
         a380x_guidance_destroy(&guidance);
-        read_side(&refs.side[0], XPLMGetDatai(refs.avionics_power));
-        read_side(&refs.side[1], XPLMGetDatai(refs.avionics_power));
+        read_side(&refs.side[0], a380x_power_du_on(A380X_ELN_DU_CAPT_PFD, XPLMGetDatai(refs.avionics_power)));
+        read_side(&refs.side[1], a380x_power_du_on(A380X_ELN_DU_FO_PFD, XPLMGetDatai(refs.avionics_power)));
         adirs_update(0);
         read_guidance_inputs(0);
         a380x_guidance_init(&guidance, &guidance_inputs);

@@ -34,6 +34,21 @@ int a380x_ewd_fadec_limits(double temp_c,
                            int wing_anti_ice,
                            A380xEwdFadecLimits *out);
 
+/* FLEX N1 of EngineControl_A380X::updateThrustLimits: ThrustLimits_A380X::limitN1 for TO (type 0)
+ * and GA (type 1) with the latched FLEX temperature (CN1 from the table's FLEX column, corrected by
+ * the actual ambient theta2 and bleed), blended by the same (mach - 0.04) / 0.04 factor, at
+ * min(16600 ft, pressure altitude). flex_temp_c uses the FMS encoding (0.1 = FLEX 0 C) and must be
+ * > 0 as upstream requires. Returns 1 with *out, or 0 with *out = 0 for invalid inputs/domain. */
+int a380x_ewd_fadec_flex_n1(double temp_c,
+                            double pressure_hpa,
+                            double pressure_altitude_ft,
+                            double mach,
+                            int pack_count,
+                            int engine_anti_ice,
+                            int wing_anti_ice,
+                            double flex_temp_c,
+                            double *out);
+
 #ifdef __cplusplus
 }
 #endif

@@ -91,7 +91,7 @@ port exposes equivalent local state rather than MSFS SimConnect variables.
 
 | Overhead group | Interactive controls | Native development action |
 | --- | --- | --- |
-| ELEC | BAT 1/2; GEN 1-4 | Toggle the corresponding native battery or generator |
+| ELEC + EMER ELEC PWR | All 26 pushbuttons and 6 guards | Native ELEC panel module (`a380x/xp12/elec/...`); see [ELEC_PANEL.md](ELEC_PANEL.md) |
 | APU | MASTER; START | Switch native APU power on/off, then start the native APU |
 | ANTI ICE | ENG 1-4; WING; PROBES/WINDOW | Toggle native engine, wing bleed-air, or window heat |
 | AIR | ENG 1-4 BLEED; PACK 1/2; APU BLEED | Toggle the corresponding native bleed or pack |
@@ -109,9 +109,10 @@ rather than a separate cosmetic variable, authoritative.
 
 | Throttle control | Native development action |
 | --- | --- |
-| THRUST LEVER 1-4 | Drag each engine independently from idle to full forward thrust |
-| REVERSE 2/3 | Drag the A380's two inboard-engine reverse handles through the native jet reverse range |
-| A/THR DISCONNECT, left/right | Disengage the active native autothrottle mode while leaving it armed |
+| THRUST LEVER 1-4 | Superseded by [THRUST_LEVERS.md](THRUST_LEVERS.md): animated click-hold-drag levers with sticky CL/FLX detents |
+| REVERSE 2/3 | Superseded by [THRUST_LEVERS.md](THRUST_LEVERS.md): animated reverse levers, IDLE REV / MAX REV, interlocked with IDLE |
+| A/THR DISCONNECT, left/right | Superseded by [THRUST_LEVERS.md](THRUST_LEVERS.md): animated instinctive-disconnect buttons, 15 s inhibit |
+| FLAPS lever | [FLAPS_LEVER.md](FLAPS_LEVER.md): pull-out lift-detent lever, gates at 1 and 3, FBW SFCC (1 / 1+F, relief, baulk, alpha lock) |
 | ENG MASTER 1-4 | Toggle the corresponding native engine fuel cutoff between OFF and RUN |
 
 The ten FCU and EFIS rotary selector meshes use X-Plane command-knob manipulators, so mouse-wheel
@@ -130,11 +131,12 @@ These are X-Plane-native development mappings, not a port of the FBW flight
 guidance, electrical, pneumatic, fuel, warning, or display systems. A click
 changes the native simulator state and the mapped control now moves, but
 annunciator lamps, Airbus mode logic, display feedback, and failure behavior
-are not implemented by this pass. BAT ESS, BAT APU, APU MASTER, APU GEN 1/2, transfer
+are not implemented by this pass (the ELEC panel is the exception, see ELEC_PANEL.md). APU MASTER, transfer
 and standby pumps, and the remaining light controls stay non-interactive until
-they have unambiguous simulator-side behavior. Thrust and reverse dragging
-writes the correct per-engine native datarefs; visible lever movement and Airbus
-detent logic still require a dedicated animated high-detail throttle object.
+they have unambiguous simulator-side behavior. The generated thrust and reverse
+drag axes listed in `config/cockpit_controls.json` are retired in the installed
+object by `tools/thrust_lever_cockpit.py`, which adds the animated levers, Airbus
+detents and the disconnect buttons ([THRUST_LEVERS.md](THRUST_LEVERS.md)).
 
 `tools/build_local_mac.sh` regenerates the click object from the pinned cockpit,
 LOD00 cabin, and exterior fuselage glTFs and validates every configured command against the installed X-Plane
@@ -222,3 +224,48 @@ The six blank caps per side, the `_SEQ1` legend decals, the KCCU body and the
 trackball cover are not mapped. The KBD/CCD levers and key caps do not animate.
 `a380x/xp12/mfd/<side>/popout` is bindable but has no cockpit target. The
 pull-out OIT keyboards are not mapped to the MFD.
+
+## Control motion (FCU, EFIS, ISIS, ECAM brightness)
+
+Every clickable FCU, EFIS and ISIS button and knob now moves with its authored FBW clip
+(pivot, axis, travel, and the cap's legend decal). Momentary keys use eased ~80 ms travel
+datarefs from `native/avionics/a380x_control_motion.h`: they go in on command Begin (mouse
+down), stay in while held, and spring back on End; a click shorter than a frame still shows
+a full press. Knob rotations accumulate detents. The panel OBJs are patched in place by
+`tools/patch_fcu_animations.py` (FCU, earlier), `tools/patch_efis_animations.py` (EFIS
+selectors, earlier) and `tools/patch_controls_animations.py` (this pass): only draw commands
+change, vertex/UV/texture payloads are byte-identical, reruns are no-ops.
+`tools/preview_control_motion.py` evaluates the installed OBJs offline and measures every
+moving draw (see `docs/control-anim-previews/`).
+
+| Panel | Control | Motion | Dataref |
+| --- | --- | --- | --- |
+| FCU | AP1, AP2, FD, A/THR, LOC, ALT, APPR, SPD/MACH, HDG/TRK, TRUE/MAG, METER (+ legends) | 1.35 mm press | `a380x/xp12/fcu/<key>_pressed` |
+| FCU | SPD, HDG, ALT, V/S knobs | push 0.8–1.4 mm / pull, 10° per detent | `fcu/<knob>_knob_axial`, `fcu/<knob>_knob_rotation` |
+| FCU | ALT 100/1000 ring (+ light) | rotates to its two stops | `fcu/altitude_selector` |
+| EFIS (both) | CSTR, WPT, VOR.D, NDB, ARPT, VOR1, VOR2, WX, TERR, TRAF, TAXI, LS, VV (+ legends) | 0.61 mm momentary press | `efis/<side>/<key>_pressed` |
+| EFIS (both) | BARO knob | rotates with the preset; push 1.3 mm (CAPT) / 0.9 mm (F/O) for STD, pull for QNH | `efis/<side>/baro_preset_hpa`, `efis/<side>/baro_knob_axial` |
+| EFIS (both) | hPa/inHg ring (knob + light) | rotates between units | `efis/<side>/baro_inhg` |
+| EFIS (both) | ND mode and range selectors | rotate to the selected stop | `efis/<side>/mode`, `efis/<side>/range_index` |
+| EFIS (both) | PFD, ND, WX/TERR, MFD brightness knobs | rotate with the DU level | `du/<side>_<unit>` |
+| ISIS 1 / 2 | MODE, LS/D, +, −, MENU (+ legends) | 1.0 mm momentary press | `isis[2]/<key>_pressed` |
+| ISIS 1 / 2 | SET/SEL | cap push 1.5 mm; knob 10° clockwise per detent, endless | `isis[2]/set_sel_axial`, `isis[2]/set_sel_rotation` |
+| ECAM CP | SD and EWD brightness knobs | rotate 0–270° with the brightness | `ecam/sd/brightness`, `ecam/sd/ewd_brightness` |
+
+The EFIS keys CSTR…TRAF used to move with the latched filter state (in while ON); they are now
+momentary like the real keys. The PFD/RECONF pushbuttons, the blank caps and the OIT knobs have
+no function or click target in this port and stay still. FBW does not model an EXPED key.
+
+## Mouse cursors (October 21 audit)
+
+X-Plane shows the manipulator's cursor word: `button` is the pointing index finger,
+`hand` the grabbing hand. Every pushbutton, pb-switch, key and knob PUSH zone now uses
+`button` (FCU, EFIS, glareshield, clock, RTO, ECAM control panel, ISIS 1/2, anti-ice, bleed,
+packs, fuel pumps, APU START, A/THR disconnect, the whole ELEC panel). `hand` remains on
+levers and toggle switches (gear, anti-skid, exterior lights, signs, ALT increment), doors,
+knob PULL zones, the KCCU trackball, screen pop-up regions, and the six ELEC guards, which
+the user grabs and moves. Knobs keep their rotate cursors and the thrust/reverse levers
+their drag manipulators. `tools/patch_cockpit_cursors.py` applies the classification to the
+installed `a380x_cockpit_controls.obj` (120 existing `hand` click targets changed) and to
+`config/cockpit_controls.json` (73 entries); the ISIS and ECAM generators emit `button` for
+keys. Report: `build/reports/cursor-audit-20261021.json`.

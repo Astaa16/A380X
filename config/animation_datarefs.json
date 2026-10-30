@@ -1649,16 +1649,18 @@
     },
     {
       "pattern": "(?i)[lr]_flap_percent_key",
-      "dataref": "sim/flightmodel2/controls/flap1_deploy_ratio",
+      "dataref": "a380x/xp12/flaps/flap_anim_ratio",
       "priority": 100,
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "FBW A380_WINGS.xml keys the flap clips on L:A32NX_*_FLAPS_ANIMATION_POSITION = FPPU synchro angle / 338.99 (translation before rotation), published by the native FLAPS module (docs/FLAPS_LEVER.md); X-Plane's flap1_deploy_ratio is the surface angle ratio and would mis-pose the Fowler travel."
     },
     {
       "pattern": "(?i)[lr]_slat_percent_key",
-      "dataref": "sim/flightmodel2/controls/slat1_deploy_ratio",
+      "dataref": "a380x/xp12/flaps/slat_anim_ratio",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "FBW L:A32NX_*_SLATS_ANIMATION_POSITION = slat FPPU / 327.39, from the native FLAPS module (docs/FLAPS_LEVER.md)."
     },
     {
       "pattern": "(?i)l_spoiler[12]_key",
@@ -1734,15 +1736,27 @@
     },
     {
       "pattern": "(?i)flaps_lever",
-      "dataref": "sim/cockpit2/controls/flap_handle_request_ratio",
+      "dataref": "a380x/xp12/flaps/lever_anim",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 4,
+      "note": "Lever position 0 / 1 / 2 / 3 / FULL = 0..4 (FBW L:A32NX_FLAPS_HANDLE_PERCENT x 4) from the native FLAPS module; X-Plane's flap_handle_request_ratio carries the SFCC configuration (docs/FLAPS_LEVER.md)."
+    },
+    {
+      "pattern": "(?i)lock_flaps",
+      "dataref": "a380x/xp12/flaps/lock_anim",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "FLAPS lever pull-out sleeve (FBW lock_flaps while the lever is held out of its detent)."
     },
     {
       "pattern": "(?i)lever_speed_brake",
-      "dataref": "sim/cockpit2/controls/speedbrake_ratio",
+      "dataref": "a380x/xp12/speedbrake/lever_anim",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "source_start": 0.47368421052631576,
+      "source_end": 1,
+      "clamp": true,
+      "note": "SPEED BRAKE lever RET (clip key 9) .. FULL (key 19), 1/2 = key 14. Keys 0..1 are the 13.7 mm ARM pull-up, which tools/speedbrake_lever_cockpit.py binds to a380x/xp12/speedbrake/lift_anim (+1 ARM, 0 normal, -1 pushed down); X-Plane's speedbrake_ratio now carries the FBW surface order (docs/SPEED_BRAKE.md)."
     },
     {
       "pattern": "(?i)lever_landing_gear",
@@ -1753,41 +1767,45 @@
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_BAT1",
-      "dataref": "sim/cockpit2/electrical/battery_on[0]",
+      "dataref": "a380x/xp12/elec/pb/bat1_press_ratio",
       "value_min": 0,
       "value_max": 1,
-      "note": "Animate the FBW overhead pushbutton from the native battery 1 state used by its click command."
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_BAT2",
-      "dataref": "sim/cockpit2/electrical/battery_on[1]",
+      "dataref": "a380x/xp12/elec/pb/bat2_press_ratio",
       "value_min": 0,
       "value_max": 1,
-      "note": "Animate the FBW overhead pushbutton from the native battery 2 state used by its click command."
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_GEN1",
-      "dataref": "sim/cockpit2/electrical/generator_on[0]",
+      "dataref": "a380x/xp12/elec/pb/gen1_press_ratio",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_GEN2",
-      "dataref": "sim/cockpit2/electrical/generator_on[1]",
+      "dataref": "a380x/xp12/elec/pb/gen2_press_ratio",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_GEN3",
-      "dataref": "sim/cockpit2/electrical/generator_on[2]",
+      "dataref": "a380x/xp12/elec/pb/gen3_press_ratio",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_ELEC_GEN4",
-      "dataref": "sim/cockpit2/electrical/generator_on[3]",
+      "dataref": "a380x/xp12/elec/pb/gen4_press_ratio",
       "value_min": 0,
-      "value_max": 1
+      "value_max": 1,
+      "note": "Momentary press travel of the native ELEC panel module (docs/ELEC_PANEL.md)."
     },
     {
       "pattern": "(?i)PUSH_OVHD_APU_MASTERSW",
@@ -2127,9 +2145,23 @@
       "note": "The authored cockpit-door clip follows native X-Plane door 17."
     },
     {
-      "pattern": "(?i)(fwd_door_cargo|aft_door_cargo|door_cargo)",
+      "pattern": "(?i)fwd_door_cargo",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[17]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Forward cargo door 18, authored 21-key hinge clip."
+    },
+    {
+      "pattern": "(?i)aft_door_cargo",
+      "dataref": "sim/flightmodel2/misc/door_open_ratio[18]",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "Aft cargo door 19, authored 21-key hinge clip."
+    },
+    {
+      "pattern": "(?i)door_cargo",
       "static_fraction": 0,
-      "note": "Keep unimplemented cargo doors closed."
+      "note": "Unused legacy channels target meshless nodes; actual forward/aft hinges have independent clips."
     },
     {
       "pattern": "(?i)(CPT|FO)_SLIDING_WINDOW_ANIM",
@@ -2455,6 +2487,34 @@
       "value_min": 0,
       "value_max": 1,
       "note": "Authored center-right control or gauge endpoints; retain continuous OBJ interpolation between source poses."
+    },
+    {
+      "pattern": "(?i)GRVTY_LDG",
+      "dataref": "a380x/xp12/gear/grvty_switch_anim",
+      "value_min": 0,
+      "value_max": 2,
+      "note": "L/G GRVTY switch: source keys RESET (rest pose), OFF, DOWN; native wall-time throw (docs/LG_GRVTY.md)."
+    },
+    {
+      "pattern": "(?i)GRVTY_LDG_LOCK1",
+      "dataref": "a380x/xp12/gear/grvty_master_guard_anim",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "L/G GRVTY striped master cover (STEP clip in the source); native 0.22 s swing (docs/LG_GRVTY.md)."
+    },
+    {
+      "pattern": "(?i)GRVTY_LDG_LOCK2",
+      "dataref": "a380x/xp12/gear/grvty_guard_1_anim",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "L/G GRVTY switch guard 1 (crew left; STEP clip in the source); native 0.22 s swing."
+    },
+    {
+      "pattern": "(?i)GRVTY_LDG_LOCK3",
+      "dataref": "a380x/xp12/gear/grvty_guard_2_anim",
+      "value_min": 0,
+      "value_max": 1,
+      "note": "L/G GRVTY switch guard 2 (crew right; STEP clip in the source); native 0.22 s swing."
     },
     {
       "pattern": "(?i)PUSH_RTO_ARM",

@@ -33,6 +33,10 @@ typedef struct {
     double flap_ratio, slat_ratio, spoiler_ratio, flap_target_ratio, slat_target_ratio;
     /* T.O V2 from the native FMS (0 = none). V1/VR above come from the FMS as well. */
     double v2_knots;
+    /* FBW SFCC configuration display (LowerArea.tsx), valid with sfcc_valid (docs/FLAPS_LEVER.md):
+     * FPPU synchro angles, target markers (-1 = none), F RELIEF and A LOCK. */
+    int sfcc_valid, flap_relief, alpha_lock, slat_target_index, flap_target_index;
+    double flap_fppu, slat_fppu;
 } A380XPfdGuidance;
 
 /* Native FMS outputs consumed by the existing PFD/guidance boundary (spec 07 section 10.2).

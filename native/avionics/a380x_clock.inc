@@ -3,6 +3,7 @@
  * independently from its last setting; SET permits manual calendar editing.
  */
 #include <time.h>
+#include "a380x_elec_power.h"
 
 typedef struct {
     int mode, et_selector, date_held, set_field;
@@ -19,6 +20,8 @@ static int clock_has_power(void)
 {
     float battery[8]={0}, bus[6]={0};
     int i;
+    /* A380 network: the clock is on the HOT 1 bus (spec 6.4, assumption). */
+    if (a380x_power.available) return a380x_power_bus(A380X_ELN_HOT1, 0);
     /* The native electrical model has no separate hot-bus dataref. Actual
      * battery voltage models the direct feed even with battery contactors
      * and the avionics master off; either DC supply can sustain the clock. */

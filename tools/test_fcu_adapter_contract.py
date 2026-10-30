@@ -2,9 +2,10 @@
 import re
 import unittest
 from pathlib import Path
-from avionics_provider import (FCU_COMMANDS, FCU_DATAREFS, KCCU_ACTIONS, KCCU_COMMANDS, KCCU_KEYS,
+from avionics_provider import (AVIONICS_DATAREFS, FCU_COMMANDS, FCU_DATAREFS,
+                               FCU_LIGHT_DATAREFS, FCU_MOTION_DATAREFS, KCCU_ACTIONS, KCCU_COMMANDS, KCCU_KEYS,
                                MFD_COMMANDS)
-from build_cockpit_controls import load_controls
+from build_cockpit_controls import FCU_ANNUNCIATORS, load_controls
 
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -18,6 +19,21 @@ def configured_commands(prefixes: tuple[str, ...]) -> set[str]:
 
 
 class FcuAdapterContractTests(unittest.TestCase):
+    def test_mechanical_and_light_outputs_have_separate_provider_contracts(self):
+        source = (PROJECT / 'native/avionics/a380x_fcu_motion.inc').read_text()
+        buttons = tuple('a380x/xp12/fcu/' + name + '_pressed'
+                        for name in re.findall(r'FM_BUTTON\("([^"]+)"', source))
+        knobs = tuple('a380x/xp12/fcu/' + name + '_knob_' + axis
+                      for name in re.findall(r'FM_KNOB\("([^"]+)"', source)
+                      for axis in ('rotation', 'axial'))
+        self.assertEqual((*buttons, *knobs, 'a380x/xp12/fcu/altitude_selector'), FCU_MOTION_DATAREFS)
+        self.assertEqual(tuple(row[2] for row in FCU_ANNUNCIATORS), FCU_LIGHT_DATAREFS)
+        self.assertTrue(set(FCU_DATAREFS).isdisjoint(FCU_MOTION_DATAREFS))
+        self.assertTrue(set(FCU_DATAREFS).isdisjoint(FCU_LIGHT_DATAREFS))
+        self.assertTrue(set(FCU_MOTION_DATAREFS).isdisjoint(FCU_LIGHT_DATAREFS))
+        for name in (*FCU_MOTION_DATAREFS, *FCU_LIGHT_DATAREFS):
+            self.assertEqual(AVIONICS_DATAREFS.count(name), 1)
+
     def test_native_registration_tables_match_packaged_provider(self):
         adapter = (PROJECT / 'native/avionics/a380x_fcu_adapter.inc').read_text()
         self.assertEqual(tuple('a380x/xp12/fcu/' + name for name in re.findall(r'FCUC\("([^"]+)"', adapter)), FCU_COMMANDS)

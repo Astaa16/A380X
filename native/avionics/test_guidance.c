@@ -9,10 +9,16 @@ static A380XGuidanceInputs fixture(void) {
     A380XGuidanceInputs i;
     memset(&i,0,sizeof(i));
     i.powered=i.attitude_valid=i.airdata_valid=1;
+    i.athr_speed_valid=1;
     i.ias_knots=250; i.tas_knots=i.ground_speed_knots=300; i.mach=.45;
     i.altitude_ft=i.pressure_altitude_ft=10000; i.radio_height_ft=7000;
     i.pitch_deg=3; i.weight_kg=450000; i.vls_knots=140; i.vmax_knots=340;
     i.throttle_ratio=.5;
+    i.throttle_levers_valid=1;
+    i.idle_detent_ratio=.01; i.cl_detent_ratio=25.0/45.0;
+    i.mct_detent_ratio=35.0/45.0; i.toga_detent_ratio=1;
+    i.detent_tolerance_ratio=.02;
+    for(int n=0;n<4;n++) i.throttle_lever_ratio[n]=i.cl_detent_ratio;
     i.ils[0].course_deg=i.ils[1].course_deg=0;
     i.ils[0].gs_angle_deg=i.ils[1].gs_angle_deg=3;
     i.ils[0].distance_nm=i.ils[1].distance_nm=10;
@@ -81,6 +87,147 @@ static void test_actual_fbw_demands(void) {
     cmd(&s,&i,A380X_FCU_AP_DISCONNECT,0); assert(!s.ap1 && s.pitch_servo==0 && s.roll_servo==0);
     cmd(&s,&i,A380X_FCU_ATHR_DISCONNECT,0); run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
     a380x_guidance_destroy(&s);
+}
+static void test_manual_ap_timing_and_fd_powerup(void) {
+    A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
+    i.on_ground=1; i.radio_height_ft=0;
+    a380x_guidance_init(&s,&i);
+    run(&s,&i,10); cmd(&s,&i,A380X_FCU_AP1,0); assert(!s.ap1 && s.airborne_seconds==0);
+    i.on_ground=0; i.radio_height_ft=1000;
+    run(&s,&i,4.98); cmd(&s,&i,A380X_FCU_AP1,0); assert(!s.ap1);
+    run(&s,&i,.02); cmd(&s,&i,A380X_FCU_AP1,0); assert(s.ap1);
+    cmd(&s,&i,A380X_FCU_AP2,0); assert(!s.ap1 && s.ap2);
+    cmd(&s,&i,A380X_FCU_AP1,0); assert(s.ap1 && !s.ap2);
+    cmd(&s,&i,A380X_FCU_APPR,0); cmd(&s,&i,A380X_FCU_AP2,0); assert(s.ap1 && s.ap2);
+    a380x_guidance_destroy(&s);
+    i.on_ground=1; i.radio_height_ft=0;
+    a380x_guidance_init(&s,&i);
+    assert(s.fd1 && s.fd2 && !s.guidance_valid);
+    cmd(&s,&i,A380X_FCU_FD1,0); cmd(&s,&i,A380X_FCU_FD2,0); assert(!s.fd1 && !s.fd2);
+    i.powered=0; run(&s,&i,.1); assert(!s.fd1 && !s.fd2);
+    i.powered=1; run(&s,&i,.1);
+    assert(s.fd1 && s.fd2 && !s.guidance_valid && s.vertical_mode==A380X_B1_NONE);
+    a380x_guidance_destroy(&s);
+}
+static void pilot_levers(A380XGuidanceInputs *i,double ratio) {
+    for(int n=0;n<4;n++) i->throttle_lever_ratio[n]=ratio;
+    i->throttle_ratio=ratio;
+}
+static void test_manual_athr_detents_and_disconnects(void) {
+    A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
+    i.on_ground=1; pilot_levers(&i,0);
+    a380x_guidance_init(&s,&i);
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1);
+    assert(s.athr_armed && !s.athr_active); /* Ground IDLE permits manual arming. */
+    pilot_levers(&i,i.toga_detent_ratio); run(&s,&i,.1);
+    assert(s.athr_armed && !s.athr_active && s.thrust_mode==A380X_A1A2_MAN_TOGA);
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,1); assert(!s.athr_armed);
+    pilot_levers(&i,i.cl_detent_ratio); run(&s,&i,.1); assert(!s.athr_armed);
+    pilot_levers(&i,i.toga_detent_ratio); run(&s,&i,.1); assert(s.athr_armed);
+    i.on_ground=0; run(&s,&i,.1); assert(s.athr_armed && !s.athr_active);
+    pilot_levers(&i,i.cl_detent_ratio); run(&s,&i,.1);
+    assert(s.athr_armed && s.athr_active && s.thrust_mode==A380X_A1A2_SPEED);
+    pilot_levers(&i,0); run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    pilot_levers(&i,i.cl_detent_ratio); cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1);
+    assert(s.athr_active);
+    i.reverse_selected[1]=1; run(&s,&i,.1); assert(s.athr_active);
+    i.reverse_selected[2]=1; run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    i.reverse_selected[1]=i.reverse_selected[2]=0;
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1); assert(s.athr_active);
+    cmd(&s,&i,A380X_FCU_ATHR_DISCONNECT,0); run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    a380x_guidance_destroy(&s);
+
+    i=fixture(); i.on_ground=1;
+    a380x_guidance_init(&s,&i);
+    pilot_levers(&i,i.mct_detent_ratio); run(&s,&i,.1);
+    assert(!s.athr_armed && s.thrust_mode==A380X_A1A2_MAN_MCT);
+    i.flex_valid=1; run(&s,&i,.1);
+    assert(s.athr_armed && !s.athr_active && s.thrust_mode==A380X_A1A2_MAN_FLEX);
+    a380x_guidance_destroy(&s);
+}
+static void test_athr_validation_envelope_and_alpha_floor(void) {
+    A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
+    a380x_guidance_init(&s,&i);
+    s.selected_speed_knots=399; run(&s,&i,.1);
+    assert(s.selected_speed_knots==399 && s.speed_target_knots==340);
+    s.selected_speed_knots=100; run(&s,&i,.1);
+    assert(s.selected_speed_knots==100 && s.speed_target_knots==140);
+    s.selected_speed_knots=399;
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,20);
+    assert(s.athr_active && s.throttle_command<=.88);
+    i.attitude_valid=0; i.airdata_valid=0; run(&s,&i,.1);
+    assert(!s.guidance_valid && s.athr_active); /* ADR and IR operate independently. */
+    i.athr_speed_valid=0; run(&s,&i,.1); assert(!s.athr_active);
+    i.athr_speed_valid=1; run(&s,&i,.1); assert(s.athr_active);
+    i.attitude_valid=i.airdata_valid=1;
+    pilot_levers(&i,i.cl_detent_ratio*.25); run(&s,&i,.1);
+    assert(s.athr_active && s.throttle_command<=.22000001);
+    i.throttle_levers_valid=0; run(&s,&i,.1); assert(!s.athr_active);
+    i.throttle_levers_valid=1; i.throttle_lever_ratio[2]=NAN;
+    run(&s,&i,.1); assert(!s.athr_active);
+    pilot_levers(&i,i.cl_detent_ratio); i.cl_detent_ratio=i.mct_detent_ratio+.1;
+    run(&s,&i,.1); assert(!s.athr_active);
+    i.cl_detent_ratio=25.0/45.0;
+    cmd(&s,&i,A380X_FCU_ATHR_DISCONNECT,0);
+    i.alpha_floor_request=1; run(&s,&i,.1);
+    assert(!s.athr_active && !s.alpha_floor_latched); /* No qualified FE source. */
+    i.alpha_floor_valid=1; run(&s,&i,.1);
+    assert(s.athr_active && s.thrust_mode==A380X_A1A2_A_FLOOR && s.throttle_command==1);
+    pilot_levers(&i,0); run(&s,&i,.1);
+    assert(s.athr_active && s.throttle_command==1); /* FE demand overrides handle position. */
+    i.alpha_floor_request=0; run(&s,&i,.1);
+    assert(s.athr_active && s.thrust_mode==A380X_A1A2_TOGA_LK);
+    i.alpha_floor_request=1; cmd(&s,&i,A380X_FCU_ATHR_DISCONNECT,0);
+    assert(s.thrust_mode==A380X_A1A2_NONE); /* Immediate authority-guard publishing. */
+    run(&s,&i,1);
+    assert(!s.athr_armed && !s.athr_active && !s.alpha_floor_latched);
+    i.alpha_floor_request=0; run(&s,&i,.1);
+    i.alpha_floor_request=1; run(&s,&i,.1);
+    assert(s.athr_active && s.thrust_mode==A380X_A1A2_A_FLOOR);
+    i.powered=0; run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    a380x_guidance_destroy(&s);
+}
+/* Thrust-lever / FADEC module inputs (docs/THRUST_LEVERS.md): FBW FADEC ATHR_disabled after a
+ * 15 s instinctive disconnect, and the A/THR authority from the lever's FADEC N1. */
+static void test_athr_inhibit_and_fadec_ceiling(void) {
+    A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
+    a380x_guidance_init(&s,&i);
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1); assert(s.athr_active);
+    i.athr_inhibited=1; run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1); assert(!s.athr_armed && !s.athr_active);
+    i.alpha_floor_valid=i.alpha_floor_request=1; run(&s,&i,.1);
+    assert(!s.athr_active && !s.alpha_floor_latched && s.thrust_mode!=A380X_A1A2_A_FLOOR);
+    i.alpha_floor_request=0; i.on_ground=1; pilot_levers(&i,i.toga_detent_ratio); run(&s,&i,.1);
+    assert(!s.athr_armed && s.thrust_mode==A380X_A1A2_MAN_TOGA); /* take-off detent cannot arm */
+    i.athr_inhibited=0; i.on_ground=0; pilot_levers(&i,i.cl_detent_ratio); run(&s,&i,.1);
+    cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1); assert(s.athr_active);
+    i.athr_ceiling_valid=1; i.athr_ceiling=.97; s.selected_speed_knots=399; run(&s,&i,20);
+    assert(s.athr_active && s.throttle_command>.88 && s.throttle_command<=.97+1e-9);
+    i.athr_ceiling=.6; run(&s,&i,5); assert(s.throttle_command<=.6+1e-9);
+    a380x_guidance_destroy(&s);
+}
+static void test_open_altitude_capture_paths(void) {
+    /* Sensor-replay mode transitions, not an aircraft performance claim. The
+     * imported speed-on-pitch laws remain authoritative for OP CLB/OP DES. */
+    for(int direction=-1;direction<=1;direction+=2) {
+        A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
+        double target=10000+direction*2000;
+        a380x_guidance_init(&s,&i); engage(&s,&i);
+        s.selected_altitude_ft=target;
+        cmd(&s,&i,A380X_FCU_ALT_PULL,0); cmd(&s,&i,A380X_FCU_ATHR,0); run(&s,&i,.1);
+        assert(s.vertical_mode==(direction>0?A380X_B1_OP_CLB:A380X_B1_OP_DES));
+        assert(s.thrust_mode==(direction>0?A380X_A1A2_THR_CLB:A380X_A1A2_THR_IDLE));
+        i.altitude_ft=i.pressure_altitude_ft=target-direction*200;
+        i.vertical_speed_fpm=direction*1500; run(&s,&i,.1);
+        assert(s.vertical_mode==A380X_B1_ALT_STAR && s.ap1);
+        i.altitude_ft=i.pressure_altitude_ft=target-direction*10;
+        i.vertical_speed_fpm=direction*20; run(&s,&i,1.2);
+        assert(s.vertical_mode==A380X_B1_ALT && s.held_altitude_ft==target && s.ap1);
+        assert(s.thrust_mode==A380X_A1A2_SPEED);
+        cmd(&s,&i,A380X_FCU_ALT_ROTATE,direction*10); run(&s,&i,.1);
+        assert(s.altitude_target_ft==target && s.selected_altitude_ft==target+direction*1000);
+        a380x_guidance_destroy(&s);
+    }
 }
 static void test_capture_and_failures(void) {
     A380XGuidanceInputs i=fixture(); A380XGuidanceState s;
@@ -256,7 +403,10 @@ static void test_gs_sign(void) {
 }
 int main(void) {
     test_controls_and_gating(); test_actual_fbw_demands(); test_capture_and_failures(); test_ils(); test_gs_sign(); test_vertical_and_fpa_signs(); test_ils_magnetic_reference();
-    test_closed_loop_plant(); test_frame_timing_and_invalid_data(); test_ground_initialization_standby();
-    puts("A380 guidance: controls, imported FBW laws, captures, sensor guards and disconnects passed");
+    test_closed_loop_plant(); test_frame_timing_and_invalid_data(); test_ground_initialization_standby(); test_manual_ap_timing_and_fd_powerup();
+    test_manual_athr_detents_and_disconnects(); test_athr_validation_envelope_and_alpha_floor();
+    test_athr_inhibit_and_fadec_ceiling();
+    test_open_altitude_capture_paths();
+    puts("A380 guidance: controls, imported FBW laws, captures, sensor guards, manual AP/FD and A/THR detents/envelope/disconnects passed");
     return 0;
 }

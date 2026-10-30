@@ -8,7 +8,10 @@ plugin. The aircraft installed as `Aircraft/A380X-XP12` points at this project's
 
 ## Gear indications and lever
 
-The lever commands X-Plane's gear handle. Five independent native deploy
+The lever commands X-Plane's gear handle, except while the L/G GRVTY gravity
+extension isolates the gear hydraulics (one or more handle turns): the lever
+then moves without commanding the gear and `gear_lever` follows the crew lever,
+see [LG_GRVTY.md](LG_GRVTY.md). Five independent native deploy
 ratios drive nose, left/right wing and left/right body indications. Each lamp
 is green when downlocked with the lever DOWN, dark when uplocked with the lever
 UP, and red UNLK in transit or when its lock state disagrees with the lever.

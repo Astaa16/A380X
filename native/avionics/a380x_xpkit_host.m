@@ -1,0 +1,319 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * WebKit runs in this aircraft-local helper process, never on X-Plane's render thread.
+ */
+#import <Cocoa/Cocoa.h>
+#import <WebKit/WebKit.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <time.h>
+#include "a380x_xpkit_shared.h"
+
+static A380XXpKitShared *shared;
+static NSString *assetsDirectory, *simulatorDirectory;
+static dispatch_queue_t airportQueue;
+static NSMutableDictionary *airportResults;
+static id displayActivity;
+static double monotonic_seconds(void) {
+    struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t);
+    return (double)t.tv_sec + t.tv_nsec * 1e-9;
+}
+static void maintain_display_activity(void) {
+    BOOL fresh=atomic_load_explicit(&shared->state_seq,memory_order_acquire)>0 &&
+        monotonic_seconds()-shared->state_time<1.5;
+    if(fresh && !displayActivity) {
+        /* Offscreen WebKit windows still serve an active cockpit. Keep App Nap
+         * from treating this renderer as idle; ordinary system sleep remains
+         * allowed. The token exists only while the aircraft supplies input. */
+        displayActivity=[[NSProcessInfo processInfo] beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
+            reason:@"Render active A380X cockpit displays"];
+    } else if(!fresh && displayActivity) {
+        [[NSProcessInfo processInfo] endActivity:displayActivity];displayActivity=nil;
+    }
+}
+static void report_error(NSString *text) {
+    snprintf(shared->error, sizeof(shared->error), "%s", text.UTF8String ?: "WebKit error");
+    atomic_fetch_add_explicit(&shared->errors, 1, memory_order_release);
+}
+
+/* The native page controller owns validation, focus and all aircraft writes.
+ * Only bounded drawing primitives cross this boundary. No JS FMC is started.
+ */
+static NSDictionary *mfd_frame(const A380XXpKitMfd *frame) {
+    const MfdDrawList *dl=&frame->list;
+    if(dl->overflowed || dl->cmd_count>MFD_DRAW_MAX_CMDS || dl->point_count>MFD_DRAW_MAX_POINTS ||
+       dl->text_len>MFD_DRAW_MAX_TEXT || !dl->clip_count || dl->clip_count>MFD_DRAW_MAX_CLIPS) return nil;
+    NSMutableArray *commands=[NSMutableArray arrayWithCapacity:dl->cmd_count];
+    for(uint32_t i=0;i<dl->cmd_count;++i) {
+        const MfdCmd *c=&dl->cmds[i];
+        if(c->clip>=dl->clip_count || c->color>=MFD_COL_COUNT || c->kind>MFD_CMD_TEXT) return nil;
+        const MfdRect *clip=&dl->clips[c->clip];
+        for(int n=0;n<4;++n) if(!isfinite(c->a[n])) return nil;
+        if(!isfinite(c->width)||!isfinite(c->size)||!isfinite(clip->x)||!isfinite(clip->y)||
+           !isfinite(clip->w)||!isfinite(clip->h)) return nil;
+        id payload=[NSNull null];
+        if(c->kind==MFD_CMD_TEXT) {
+            if(c->first>dl->text_len || c->count>dl->text_len-c->first) return nil;
+            payload=[[NSString alloc] initWithBytes:dl->text+c->first length:c->count encoding:NSUTF8StringEncoding];
+            if(!payload) return nil;
+        } else if(c->kind>=MFD_CMD_POLYLINE) {
+            if(c->first>dl->point_count || c->count>dl->point_count-c->first) return nil;
+            NSMutableArray *points=[NSMutableArray arrayWithCapacity:c->count*2];
+            for(uint32_t p=c->first;p<c->first+c->count;++p) {
+                if(!isfinite(dl->points[p].x)||!isfinite(dl->points[p].y)) return nil;
+                [points addObject:@(dl->points[p].x)];[points addObject:@(dl->points[p].y)];
+            }
+            payload=points;
+        }
+        [commands addObject:@[@(c->kind),@(mfd_color_rgb((MfdColor)c->color)),@(c->font),@(c->anchor),
+            @(c->width),@(c->size),@(c->a[0]),@(c->a[1]),@(c->a[2]),@(c->a[3]),payload,
+            @[@(clip->x),@(clip->y),@(clip->w),@(clip->h)],@(c->layer),@(c->closed)]];
+    }
+    NSString *uri=[[NSString alloc] initWithBytes:frame->uri length:strnlen(frame->uri,sizeof(frame->uri)) encoding:NSUTF8StringEncoding];
+    return @{@"sequence":@(atomic_load(&frame->sequence)),@"powered":@(frame->powered!=0),
+             @"uri":uri?:@"",@"commands":commands};
+}
+
+@interface A380XLibraryView : NSObject <WKScriptMessageHandler, WKNavigationDelegate>
+@property(nonatomic) WKWebView *view;
+@property(nonatomic) NSWindow *window;
+@property(nonatomic) NSInteger side;
+@property(nonatomic) BOOL loaded;
+@property(nonatomic) BOOL busy;
+@property(nonatomic) NSTimer *timer;
+@property(nonatomic) BOOL diagnosed;
+@property(nonatomic) uint32_t lastMfdSequence;
+@property(nonatomic) BOOL lastInputValid;
+@property(nonatomic) NSMutableData *bitmap;
+@property(nonatomic) CGContextRef bitmapContext;
+@end
+
+@implementation A380XLibraryView
+- (void)dealloc {
+    if (self.bitmapContext) CGContextRelease(self.bitmapContext);
+}
+- (void)userContentController:(WKUserContentController *)controller didReceiveScriptMessage:(WKScriptMessage *)message {
+    (void)controller;
+    if (![message.body isKindOfClass:[NSDictionary class]]) return;
+    NSDictionary *data = message.body;
+    if ([data[@"type"] isEqual:@"a380x-loaded"]) {
+        self.loaded = [data[@"ok"] boolValue];
+        atomic_store_explicit(&shared->ready[self.side], self.loaded, memory_order_release);
+    } else if ([data[@"type"] isEqual:@"a380x-error"]) report_error([data[@"text"] description]);
+    else if ([data[@"type"] isEqual:@"a380x-nd-command"] && self.side>=2 && self.side<4) {
+        int delta=[data[@"action"] isEqual:@"zoom_in"]?-1:[data[@"action"] isEqual:@"zoom_out"]?1:0;
+        atomic_fetch_add(&shared->zoom_delta[self.side-2],delta);
+    } else if ([data[@"type"] isEqual:@"a380x-nd-status"] && self.side>=2 && self.side<4) {
+        NSArray *values=data[@"values"];
+        if([values isKindOfClass:[NSArray class]] && values.count==8)
+            for(int n=0;n<8;++n)atomic_store(&shared->nd_status[self.side-2][n],[values[n] unsignedIntValue]);
+    } else if ([data[@"type"] isEqual:@"a380x-airport"] && self.side>=2 && self.side<4) {
+        NSString *icao=data[@"icao"];NSNumber *request=data[@"id"];
+        NSCharacterSet *invalid=[[NSCharacterSet characterSetWithCharactersInString:@"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"] invertedSet];
+        if(![icao isKindOfClass:[NSString class]]||icao.length<2||icao.length>16||[icao rangeOfCharacterFromSet:invalid].location!=NSNotFound||![request isKindOfClass:[NSNumber class]])return;
+        dispatch_async(airportQueue, ^{
+            NSString *result=airportResults[icao];NSString *problem=nil;
+            if(!result) {
+                NSTask *task=[NSTask new];task.executableURL=[NSURL fileURLWithPath:@"/usr/bin/python3"];
+                task.arguments=@[[assetsDirectory stringByAppendingPathComponent:@"airport_worker.py"],simulatorDirectory,icao];
+                NSPipe *out=[NSPipe pipe],*err=[NSPipe pipe];task.standardOutput=out;task.standardError=err;
+                NSError *launch=nil;
+                if([task launchAndReturnError:&launch]) {
+                    NSData *bytes=[out.fileHandleForReading readDataToEndOfFile];
+                    NSData *errorBytes=[err.fileHandleForReading readDataToEndOfFile];[task waitUntilExit];
+                    if(task.terminationStatus==0&&bytes.length<16*1024*1024&&[NSJSONSerialization JSONObjectWithData:bytes options:0 error:nil]) {
+                        result=[[NSString alloc] initWithData:bytes encoding:NSUTF8StringEncoding];
+                        if(airportResults.count>=4)[airportResults removeObjectForKey:airportResults.allKeys.firstObject];
+                        airportResults[icao]=result;
+                    } else problem=[[NSString alloc] initWithData:errorBytes encoding:NSUTF8StringEncoding]?:@"Airport scenery unavailable";
+                } else problem=launch.localizedDescription;
+            }
+            NSData *quoted=[NSJSONSerialization dataWithJSONObject:@[problem?:[NSNull null]] options:0 error:nil];
+            NSString *errorJson=[[NSString alloc] initWithData:quoted encoding:NSUTF8StringEncoding];
+            NSString *script=[NSString stringWithFormat:@"window.__a380Nd.airportResult(%@,(%@)[0],%@);true",request,errorJson,result?:@"null"];
+            dispatch_async(dispatch_get_main_queue(), ^{[self.view evaluateJavaScript:script completionHandler:nil];});
+        });
+    }
+}
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
+    (void)webView; (void)navigation; report_error(error.localizedDescription);
+}
+- (void)webViewWebContentProcessDidTerminate:(WKWebView *)webView {
+    (void)webView; self.loaded = NO;
+    atomic_store_explicit(&shared->ready[self.side], 0, memory_order_release);
+    report_error(@"WebKit display process terminated");
+}
+- (void)tick {
+    if (getppid() == 1) { [NSApp terminate:nil]; return; }
+    maintain_display_activity();
+    if (!self.loaded || self.busy) return;
+    uint32_t before = atomic_load_explicit(&shared->state_seq, memory_order_acquire);
+    if ((before & 1) || !before || !shared->state_size || shared->state_size >= XPKIT_JSON_CAP) return;
+    NSData *data = self.side<4?[NSData dataWithBytes:shared->state length:shared->state_size]:nil;
+    double sent = shared->state_time;
+    atomic_thread_fence(memory_order_acquire);
+    if (atomic_load_explicit(&shared->state_seq, memory_order_acquire) != before) return;
+    BOOL inputValid=monotonic_seconds()-sent<1.5;
+    if(self.side>=4) {
+        uint32_t seq=self.side<6?atomic_load_explicit(&shared->mfd[self.side-4].sequence,memory_order_acquire):atomic_load_explicit(&shared->sd.sequence,memory_order_acquire);
+        if(!seq || (seq&1))return;
+        if(seq==self.lastMfdSequence && inputValid==self.lastInputValid &&
+           atomic_load_explicit(&shared->frame_seq[self.side],memory_order_acquire)) {
+            /* The texture is unchanged, not dead. Heartbeat without snapshots
+             * or frame-sequence bumps; a stopped helper cannot renew this. */
+            shared->frame_time[self.side]=monotonic_seconds();
+            return;
+        }
+    }
+    NSString *json = self.side>=4?@"{}":inputValid ? [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] : @"{\"ok\":false,\"mode\":\"native\"}";
+    if (!json) return;
+    self.busy = YES;
+    BOOL nd=self.side>=2 && self.side<4;
+    double applyStarted=monotonic_seconds();
+    NSString *script = self.side>=4?[NSString stringWithFormat:@"window.__a380xTrial.apply({ok:%@});true",inputValid?@"true":@"false"]:
+        [NSString stringWithFormat:@"window.__a380xTrial.apply(%@); window.__a380NativeFrame(); true", json];
+    if(nd) script=[script stringByAppendingString:@";window.__a380Nd?.needsSnapshot?.()!==false"];
+    uint32_t mfdSequence=0;
+    if(self.side>=4 && self.side<6) {
+        A380XXpKitMfd *source=&shared->mfd[self.side-4];
+        uint32_t seq=atomic_load_explicit(&source->sequence,memory_order_acquire);
+        if(seq && !(seq&1) && seq!=self.lastMfdSequence) {
+            NSData *copy=[NSData dataWithBytes:source length:sizeof(*source)];
+            atomic_thread_fence(memory_order_acquire);
+            if(atomic_load_explicit(&source->sequence,memory_order_acquire)==seq) {
+                NSDictionary *frame=mfd_frame(copy.bytes);
+                NSData *encoded=frame?[NSJSONSerialization dataWithJSONObject:frame options:0 error:nil]:nil;
+                if(encoded) {
+                    script=[script stringByAppendingFormat:@";window.__a380Mfd.apply(%@);true",[[NSString alloc] initWithData:encoded encoding:NSUTF8StringEncoding]];
+                    mfdSequence=seq;
+                } else report_error(@"Invalid native MFD display list");
+            }
+        }
+    }
+    if(self.side==6) {
+        A380XXpKitSd *source=&shared->sd;
+        uint32_t seq=atomic_load_explicit(&source->sequence,memory_order_acquire);
+        if(seq&&!(seq&1)&&source->size>0&&source->size<XPKIT_SD_CAP) {
+            NSData *copy=[NSData dataWithBytes:source->json length:source->size];
+            atomic_thread_fence(memory_order_acquire);
+            if(atomic_load_explicit(&source->sequence,memory_order_acquire)==seq) {
+                NSString *encoded=inputValid?[[NSString alloc] initWithData:copy encoding:NSUTF8StringEncoding]:@"{\"powered\":false,\"page\":0,\"vars\":{}}";
+                if(encoded&&[NSJSONSerialization JSONObjectWithData:copy options:0 error:nil]) {
+                    script=[NSString stringWithFormat:@"window.__a380Sd.apply(%@);true",encoded];mfdSequence=seq;
+                } else report_error(@"Invalid native ECAM payload");
+            }
+        }
+    }
+    [self.view evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+        if (error) { report_error(error.localizedDescription); self.busy = NO; return; }
+        if(nd) {
+            A380XXpKitNdProfile *profile=&shared->nd_profile[self.side-2];
+            atomic_fetch_add_explicit(&profile->apply_count,1,memory_order_relaxed);
+            atomic_fetch_add_explicit(&profile->apply_ns,(uint64_t)((monotonic_seconds()-applyStarted)*1e9),memory_order_relaxed);
+            if([result isKindOfClass:[NSNumber class]] && ![result boolValue] &&
+               inputValid==self.lastInputValid && atomic_load_explicit(&shared->frame_seq[self.side],memory_order_acquire)) {
+                /* Cursor-only/unchanged content keeps its completed texture and
+                 * liveness heartbeat. Actual pointer paint is native geometry. */
+                shared->frame_time[self.side]=monotonic_seconds();
+                atomic_fetch_add_explicit(&profile->skipped_count,1,memory_order_relaxed);
+                self.busy=NO; return;
+            }
+        }
+        if (!self.diagnosed && getenv("A380X_DISPLAY_DEBUG")) {
+            self.diagnosed = YES;
+            [self.view evaluateJavaScript:@"JSON.stringify({frames:document.querySelector('a380x-pfd,a380x-nd')?.frameCount,visible:document.visibilityState,body:document.body.innerText})" completionHandler:^(id value, NSError *problem) {
+                fprintf(stderr, "display %ld: %s %s\n", (long)self.side, [value description].UTF8String, problem.localizedDescription.UTF8String ?: "");
+            }];
+        }
+        WKSnapshotConfiguration *config = [WKSnapshotConfiguration new];
+        config.rect = CGRectMake(0, 0, 768, 1024);
+        int width=xpkit_view_width((int)self.side),height=xpkit_view_height((int)self.side);
+        size_t bytes=xpkit_view_bytes((int)self.side);
+        if(!self.bitmapContext) {
+            self.bitmap=[NSMutableData dataWithLength:bytes];
+            CGColorSpaceRef color=CGColorSpaceCreateWithName(kCGColorSpaceSRGB);
+            self.bitmapContext=CGBitmapContextCreate(self.bitmap.mutableBytes,width,height,8,width*4,
+                color,kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big);
+            CGColorSpaceRelease(color);
+            if(!self.bitmapContext) {report_error(@"Unable to allocate display bitmap");self.busy=NO;return;}
+            CGContextSetBlendMode(self.bitmapContext,kCGBlendModeCopy);
+        }
+        config.snapshotWidth = @(width);
+        config.afterScreenUpdates = YES;
+        double captureStarted=monotonic_seconds();
+        [self.view takeSnapshotWithConfiguration:config completionHandler:^(NSImage *image, NSError *captureError) {
+            if (captureError || !image) {
+                report_error(captureError.localizedDescription ?: @"No WebKit snapshot");
+                self.busy = NO; return;
+            }
+            CGImageRef cg = [image CGImageForProposedRect:NULL context:nil hints:nil];
+            CGContextRef ctx=self.bitmapContext;
+            if (ctx && cg) {
+                /* A 1:1 capture needs no filtering. Retina WebKit can return a
+                 * larger CGImage; resolve those vector samples once here. */
+                if(self.side<4)CGContextSetInterpolationQuality(ctx,CGImageGetWidth(cg)==(size_t)width &&
+                    CGImageGetHeight(cg)==(size_t)height?kCGInterpolationNone:kCGInterpolationHigh);
+                CGContextDrawImage(ctx, CGRectMake(0, 0, width, height), cg);
+                uint32_t sequence = atomic_load_explicit(&shared->frame_seq[self.side], memory_order_relaxed);
+                atomic_store_explicit(&shared->frame_seq[self.side], sequence + 1, memory_order_release);
+                memcpy(xpkit_view_pixels(shared,(int)self.side), self.bitmap.bytes, bytes);
+                shared->frame_time[self.side] = monotonic_seconds();
+                atomic_store_explicit(&shared->frame_seq[self.side], sequence + 2, memory_order_release);
+                if(mfdSequence)self.lastMfdSequence=mfdSequence;
+                self.lastInputValid=inputValid;
+                if(nd) {
+                    A380XXpKitNdProfile *profile=&shared->nd_profile[self.side-2];
+                    atomic_fetch_add_explicit(&profile->snapshot_count,1,memory_order_relaxed);
+                    atomic_fetch_add_explicit(&profile->snapshot_ns,(uint64_t)((monotonic_seconds()-captureStarted)*1e9),memory_order_relaxed);
+                }
+            }
+            self.busy = NO;
+        }];
+    }];
+}
+@end
+
+int main(int argc, const char **argv) {
+    @autoreleasepool {
+        if (argc != 4) { fprintf(stderr, "usage: A380XDisplayHost shared-file assets-directory X-Plane-directory\n"); return 2; }
+        int fd = open(argv[1], O_RDWR | O_NOFOLLOW);
+        struct stat st;
+        if (fd < 0 || fstat(fd, &st) || st.st_size != sizeof(A380XXpKitShared)) return 3;
+        shared = mmap(NULL, sizeof(*shared), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        close(fd);
+        if (shared == MAP_FAILED || shared->magic != XPKIT_MAGIC || shared->version != XPKIT_VERSION) return 4;
+        [NSApplication sharedApplication];
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+        NSMutableArray *views = [NSMutableArray new];
+        NSString *root = [NSString stringWithUTF8String:argv[2]];
+        assetsDirectory=root;simulatorDirectory=[NSString stringWithUTF8String:argv[3]];
+        airportQueue=dispatch_queue_create("org.a380x.scenery-reader",DISPATCH_QUEUE_SERIAL);
+        airportResults=[NSMutableDictionary new];
+        for (NSInteger side = 0; side < XPKIT_VIEWS; side++) {
+            A380XLibraryView *owner = [A380XLibraryView new];
+            owner.side = side;
+            WKWebViewConfiguration *configuration = [WKWebViewConfiguration new];
+            configuration.websiteDataStore = [WKWebsiteDataStore nonPersistentDataStore];
+            [configuration.userContentController addScriptMessageHandler:owner name:@"a380"];
+            owner.view = [[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 768, 1024) configuration:configuration];
+            owner.view.navigationDelegate = owner;
+            owner.window = [[NSWindow alloc] initWithContentRect:NSMakeRect(-20000 - side * 1000, -20000, 768, 1024)
+                styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered defer:NO];
+            owner.window.releasedWhenClosed = NO;
+            owner.window.ignoresMouseEvents = YES;
+            owner.window.contentView = owner.view;
+            [owner.window orderBack:nil];
+            NSURLComponents *url = [NSURLComponents componentsWithURL:[NSURL fileURLWithPath:[root stringByAppendingPathComponent:side<2?@"pfd.html":side<4?@"nd.html":side<6?@"mfd.html":@"sd.html"]] resolvingAgainstBaseURL:NO];
+            url.query = side == 0 ? @"index=1&duID=0" : side==1?@"index=2&duID=3":side==2?@"index=1&duID=1":side==3?@"index=2&duID=4":side==4?@"index=1&duID=2":@"index=2&duID=5";
+            [owner.view loadFileURL:url.URL allowingReadAccessToURL:[NSURL fileURLWithPath:root]];
+            /* PFDs move continuously (attitude, tapes): 30 Hz. Event-driven views keep 20 Hz. */
+            owner.timer = [NSTimer scheduledTimerWithTimeInterval:side<2?1.0/30.0:0.05 target:owner selector:@selector(tick) userInfo:nil repeats:YES];
+            owner.timer.tolerance = side<2?0.004:0.01;
+            [views addObject:owner];
+        }
+        [NSApp run];
+        (void)views;
+    }
+    return 0;
+}

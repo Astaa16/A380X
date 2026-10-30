@@ -28,7 +28,7 @@ class FcuPanelTests(unittest.TestCase):
     def test_ewd_uses_full_fbw_canvas_without_moving_other_displays(self):
         self.assertEqual(PANEL_SIZE, (2048, 2048))
         self.assertEqual(EWD_PANEL_RECT, (1024, 0, 1792, 1024))
-        self.assertEqual(FCU_PANEL_RECT, (0, 472, 1024, 512))
+        self.assertEqual(FCU_PANEL_RECT, (0, 1280, 2048, 1492))
         self.assertEqual(PFD_PANEL_RECTS, ((0, 32, 320, 448), (704, 32, 1024, 448)))
         self.assertEqual(ND_PANEL_RECTS, ((328, 230, 508, 464), (516, 230, 696, 464)))
         self.assertEqual(EFB_PANEL_RECT, (152, 516, 872, 1016))
@@ -63,11 +63,16 @@ class FcuPanelTests(unittest.TestCase):
                     left, bottom, _right, top = rect
                     self.assertEqual(image.getpixel((left + 10, PANEL_SIZE[1] - top + 10))[3], 255)
                 self.assertEqual(image.getpixel((1, 100))[3], 0)
-                self.assertEqual(image.getpixel((10, PANEL_SIZE[1] - 530)), (1, 3, 6, 255))
-                self.assertEqual(image.getpixel((10, PANEL_SIZE[1] - 500)), (1, 3, 6, 255))
-                self.assertEqual(image.getpixel((990, PANEL_SIZE[1] - 480)), (1, 3, 6, 255))
-                # The FCU must stop at x=1024 rather than filling the new atlas width.
-                self.assertEqual(image.getpixel((1900, PANEL_SIZE[1] - 480))[3], 0)
+                # EFIS CP: baro window and upper legend row beds (new 1536 x 104 / 384 x 244 slices).
+                self.assertEqual(image.getpixel((1550, PANEL_SIZE[1] - 1510)), (1, 3, 6, 255))
+                self.assertEqual(image.getpixel((10, PANEL_SIZE[1] - 1510)), (1, 3, 6, 255))
+                self.assertEqual(image.getpixel((10, PANEL_SIZE[1] - 530))[3], 0)  # old 144 x 92 baro cell unused
+                # Both 1024 x 212 AFS CP LCD slices have an opaque dark bed.
+                self.assertEqual(image.getpixel((40, PANEL_SIZE[1] - 1300)), (1, 3, 6, 255))
+                self.assertEqual(image.getpixel((2020, PANEL_SIZE[1] - 1480)), (1, 3, 6, 255))
+                # The former 512 x 128 FCU slices and the older strip stay unused.
+                self.assertEqual(image.getpixel((1040, PANEL_SIZE[1] - 1150))[3], 0)
+                self.assertEqual(image.getpixel((990, PANEL_SIZE[1] - 480))[3], 0)
             with Image.open(root / 'fcu_labels.png') as image:
                 self.assertEqual(image.size, (1024, 512))
             self.assertFalse((root / 'generic/pfd').exists())

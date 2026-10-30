@@ -31,10 +31,14 @@ from avionics_panel_layout import (
 from build_cockpit_controls import (FCU_LABEL_COLUMNS, FCU_LABEL_ROWS, FCU_LABELS,
                                     FCU_ANNUNCIATORS, FCU_ANNUNCIATOR_FIRST_CELL,
                                     GLARE_ANNUNCIATORS, GLARE_ANNUNCIATOR_FIRST_CELL,
-                                    ADIRS_ANNUNCIATORS, ADIRS_ANNUNCIATOR_FIRST_CELL)
+                                    ADIRS_ANNUNCIATORS, ADIRS_ANNUNCIATOR_FIRST_CELL,
+                                    ELEC_LEGEND_CELLS)
 
 
 LABEL_COLOR = (220, 226, 235, 255)
+# FCU daylight-label cells now holding overhead lamp legends (no geometry samples the labels).
+from ovhd_lamps_contract import NEW_LEGEND_CELLS as _OVHD_LEGEND_CELLS  # noqa: E402
+OVHD_CELLS = frozenset(_OVHD_LEGEND_CELLS.values())
 
 
 def font(size: int) -> ImageFont.ImageFont:
@@ -87,6 +91,35 @@ def gear_triangle(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int],
     draw.line([*points,points[0]],fill=color,width=5,joint='curve')
 
 
+def elec_legends(draw, cell_width: int, cell_height: int) -> None:
+    """ELEC overhead ALTN / DISC / AVAIL / ON cells (FAULT and OFF reuse the ADIRS cells)."""
+    from elec_panel_contract import LEGEND_COLORS, LEGEND_TEXT
+    if max(ELEC_LEGEND_CELLS.values()) >= FCU_LABEL_COLUMNS * FCU_LABEL_ROWS:
+        raise ValueError('Annunciator atlas capacity exceeded')
+    for legend, index in ELEC_LEGEND_CELLS.items():
+        column, row = index % FCU_LABEL_COLUMNS, index // FCU_LABEL_COLUMNS
+        box = (column * cell_width + 2, row * cell_height + 2,
+               (column + 1) * cell_width - 2, (row + 1) * cell_height - 2)
+        centered_text(draw, box, LEGEND_TEXT[legend], LEGEND_COLORS[legend], 34)
+
+
+def ovhd_legend_cell(legend: str, size: tuple[int, int]) -> Image.Image:
+    """One overhead lamp legend cell (tools/ovhd_lamps_contract.py LEGENDS), ELEC style."""
+    from ovhd_lamps_contract import LEGENDS
+    text, rgba, _cell = LEGENDS[legend]
+    image = Image.new('RGBA', size, (0, 0, 0, 0))
+    centered_text(ImageDraw.Draw(image), (2, 2, size[0] - 2, size[1] - 2), text, rgba, 34)
+    return image
+
+
+def ovhd_legends(atlas: Image.Image, cell_width: int, cell_height: int) -> None:
+    """Overhead lamp legend cells on the unused FCU daylight-label cells (tools/ovhd_cockpit_lamps.py)."""
+    from ovhd_lamps_contract import NEW_LEGEND_CELLS
+    for legend, index in NEW_LEGEND_CELLS.items():
+        column, row = index % FCU_LABEL_COLUMNS, index // FCU_LABEL_COLUMNS
+        atlas.paste(ovhd_legend_cell(legend, (cell_width, cell_height)), (column * cell_width, row * cell_height))
+
+
 def build_label_atlas(output: Path) -> None:
     size = (1024, 512)
     atlas = Image.new('RGBA', size, (0, 0, 0, 0))
@@ -94,6 +127,8 @@ def build_label_atlas(output: Path) -> None:
     cell_width = size[0] // FCU_LABEL_COLUMNS
     cell_height = size[1] // FCU_LABEL_ROWS
     for index, (label, *_placement) in enumerate(FCU_LABELS):
+        if index in OVHD_CELLS:
+            continue
         column, row = index % FCU_LABEL_COLUMNS, index // FCU_LABEL_COLUMNS
         box = (
             column * cell_width + 3,
@@ -127,11 +162,15 @@ def build_label_atlas(output: Path) -> None:
         box = (column * cell_width + 2, row * cell_height + 2,
                (column + 1) * cell_width - 2, (row + 1) * cell_height - 2)
         centered_text(draw, box, label, color, 34)
+    elec_legends(draw, cell_width, cell_height)
+    ovhd_legends(atlas, cell_width, cell_height)
     atlas.save(output / 'fcu_labels.png')
 
     lit = Image.new('RGBA', size, (0, 0, 0, 0))
     lit_draw = ImageDraw.Draw(lit)
     for index, (label, *_placement) in enumerate(FCU_LABELS):
+        if index in OVHD_CELLS:
+            continue
         column, row = index % FCU_LABEL_COLUMNS, index // FCU_LABEL_COLUMNS
         box = (
             column * cell_width + 3,
@@ -161,6 +200,8 @@ def build_label_atlas(output: Path) -> None:
         box = (column * cell_width + 2, row * cell_height + 2,
                (column + 1) * cell_width - 2, (row + 1) * cell_height - 2)
         centered_text(lit_draw, box, label, color, 34)
+    elec_legends(lit_draw, cell_width, cell_height)
+    ovhd_legends(lit, cell_width, cell_height)
     lit.save(output / 'fcu_labels_LIT.png')
 
 

@@ -1,0 +1,9 @@
+{
+  "format": 1,
+  "doors": [
+    {"id":"FWD","index":17,"clip":"fwd_door_cargo","node":"FWD_CARGO_HINGE1"},
+    {"id":"AFT","index":18,"clip":"aft_door_cargo","node":"AFT_CARGO_HINGE1"},
+    {"id":"BULK","index":19,"node":"BULK_CARGO_DOOR","open_angle_degrees":90,
+     "note":"Source has no bulk clip. Provisional rigid inward/upward rotation about the measured upper edge; not a simulated latch/actuator mechanism."}
+  ]
+}

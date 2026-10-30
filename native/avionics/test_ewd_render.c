@@ -112,6 +112,24 @@ static void ewd_font_draw(float x, float y, const char *text, float size,
     strcpy(item->text, text);
 }
 
+/* Real embedded glyph advances (same as a380x_ewd_font.inc, without the GL texture). */
+#include "a380x_ewd_font.h"
+static const EwdGlyph *ewd_next_glyph(const unsigned char **cursor)
+{
+    unsigned int code = *(*cursor)++;
+    if (code == 0xc2 && **cursor == 0xb0) { ++*cursor; code = 176; }
+    if (code == 176) return &ewd_glyphs[95];
+    if (code < 32 || code > 126) code = '?';
+    return &ewd_glyphs[code - 32];
+}
+static float ewd_font_width(const char *text, float size, float tracking)
+{
+    const unsigned char *cursor = (const unsigned char *)text;
+    float width = 0.0f;
+    while (*cursor) { width += ewd_next_glyph(&cursor)->advance * size / EWD_FONT_SIZE + tracking; }
+    return width > 0.0f ? width - tracking : 0.0f;
+}
+
 #include "a380x_ewd_render.inc"
 
 static int close_to(float a, float b) { return fabsf(a - b) < .02f; }
@@ -501,6 +519,115 @@ static void test_dynamic_ecam_columns_and_warning_priority(void)
     assert(text_count("ENG 2 FIRE") == 0);
 }
 
+static void set_wd_line(FwsWdLine *l, const char *text, int style, int abnormal, int sensed,
+                        int checked, int first, int last)
+{
+    memset(l, 0, sizeof(*l));
+    snprintf(l->text, sizeof(l->text), "%s", text);
+    l->style = (unsigned char)style; l->special = FWS_SPECIAL_NONE; l->abnormal_procedure = (unsigned char)abnormal;
+    l->sensed = (unsigned char)sensed; l->checked = (unsigned char)checked;
+    l->first_line = (unsigned char)first; l->last_line = (unsigned char)last; l->active_procedure = 1;
+}
+
+static size_t line_count_at(float y, Color color, float width)
+{
+    size_t i, n = 0;
+    for (i = 0; i < capture_count; ++i)
+        if (captures[i].kind == CAPTURE_LINE && close_to(captures[i].y1, 1024 - y)
+                && same_color(captures[i].color, color) && close_to(captures[i].width, width)) ++n;
+    return n;
+}
+
+static EwdData procedure_data(void)
+{
+    EwdData data = inactive_data();
+    EwdWdView *v = &data.wd;
+    int i;
+    memset(v, 0, sizeof(*v));
+    v->valid = 1; v->mode = EWD_WD_PROCEDURES; v->selected_line = 2;
+    set_wd_line(&v->line[0], "\x1b<2m\x1b" "4mENG 1 FIRE\x1bm", FWS_STYLE_HEADLINE, 1, 1, 0, 1, 0);
+    set_wd_line(&v->line[1], "LAND ASAP", FWS_STYLE_LAND_ASAP, 1, 1, 0, 0, 0);
+    set_wd_line(&v->line[2], "ENG 1 THR LEVER..........IDLE", FWS_STYLE_STANDARD, 1, 0, 0, 0, 0);
+    set_wd_line(&v->line[3], "ENG 1 FIRE P/B..........PUSH", FWS_STYLE_STANDARD, 1, 1, 1, 0, 0);
+    set_wd_line(&v->line[4], "AGENT 1 AFTER 10 S.....DISCH", FWS_STYLE_STANDARD, 1, 1, 0, 0, 0);
+    set_wd_line(&v->line[5], "IF FIRE AFTER 30 S", FWS_STYLE_CHECKLIST_CONDITION, 1, 0, 0, 0, 0);
+    set_wd_line(&v->line[6], "", FWS_STYLE_SEPARATION_LINE, 1, 1, 0, 0, 0);
+    set_wd_line(&v->line[7], "CLEAR", FWS_STYLE_STANDARD, 1, 0, 0, 0, 1);
+    v->line[7].special = FWS_SPECIAL_CLEAR;
+    for (i = 8; i < FWS_WD_NUM_LINES; ++i) {
+        set_wd_line(&v->line[i], "", FWS_STYLE_CHECKLIST_ITEM, 0, 1, 0, 1, 1);
+        v->line[i].special = FWS_SPECIAL_EMPTY;
+    }
+    v->overflow_down = 1;
+    return data;
+}
+
+static void test_wd_memos_limitations_and_sts(void)
+{
+    EwdData data = inactive_data();
+    EwdWdView *v = &data.wd;
+    float space = ewd_font_width(" ", 24, 1.75f) + 1.75f;
+    memset(v, 0, sizeof(*v));
+    v->valid = 1; v->mode = EWD_WD_MEMOS;
+    v->memo_left[0] = " \x1b<7m\x1b" "4mT.O\x1bm";
+    v->memo_left[1] = "   \x1b<5m-SEAT BELTS ....ON";
+    v->memo_left_count = 2;
+    v->memo_right[0] = "\x1b<3mAPU AVAIL";
+    v->memo_right[1] = "\x1b<3mPARK BRK ON";
+    v->memo_right_count = 2;
+    render(&data);
+    /* Legacy memo text is replaced by the WD view. */
+    assert(text_count("APU BLEED") == 0);
+    require_text("T.O", 8 + space, 419, EWD_WHITE);
+    require_line(8 + 16, 423, 8 + 16 + 3 * 16 + 5, 423, EWD_WHITE, 2); /* closed by \x1bm */
+    require_text("-SEAT BELTS ....ON", 8 + 3 * space, 449, EWD_CYAN);
+    require_text("APU AVAIL", 392, 419, EWD_GREEN);
+    require_text("PARK BRK ON", 392, 449, EWD_GREEN);
+    require_rect(383, 395, 2, 63, (Color){211.f / 255, 211.f / 255, 211.f / 255});
+    /* FBW quirk: a trailing segment is never decorated (no closing escape). */
+    v->memo_right[0] = "\x1b<4m\x1b" "4mDEST EFOB";
+    v->memo_right_count = 1;
+    render(&data);
+    require_text("DEST EFOB", 392, 419, EWD_AMBER);
+    assert(line_count_at(423, EWD_AMBER, 2) == 0);
+    /* Limitations above the memos, then the STS box at the bottom. */
+    v->limit_all[0] = "\x1b<2mLAND ASAP"; v->limit_all_count = 1;
+    v->limit_appr_ldg[0] = "\x1b<5mFOR LDG : FLAP LVR 3"; v->limit_appr_ldg_count = 1;
+    v->sts_area_visible = 1; v->sts = 1;
+    render(&data);
+    assert(text_count("LIMITATIONS") == 1 && text_count("ALL PHASES") == 1 && text_count("APPR & LDG") == 1);
+    assert(text_count("LAND ASAP") == 1 && text_count("FOR LDG : FLAP LVR 3") == 1);
+    assert(text_count("STS") == 1 && text_count("ADV") == 0 && text_count("FAILURE PENDING") == 0);
+    require_canvas_bounds();
+}
+
+static void test_wd_procedure_lines(void)
+{
+    EwdData data = procedure_data();
+    size_t i, arrows = 0;
+    render(&data);
+    /* Abnormal headline: formatted, red, at checkbox-hidden x (51) + 10, baseline top + 24.5. */
+    require_text("ENG 1 FIRE", 61, 395 + 24.5f, EWD_RED);
+    /* LAND ASAP right aligned in red. */
+    {
+        const Capture *c = require_text("LAND ASAP", 734, 395 + 34 + 26, EWD_RED);
+        assert(c->anchor == 2 && close_to(c->size, 26));
+    }
+    /* Not-checked abnormal action: cyan text after the 24 + 20 px checkbox column. */
+    require_text("ENG 1 THR LEVER..........IDLE", 95, 395 + 68 + 26, EWD_CYAN);
+    /* Checked abnormal action: white. Condition: white. */
+    require_text("ENG 1 FIRE P/B..........PUSH", 95, 395 + 102 + 26, EWD_WHITE);
+    require_text("IF FIRE AFTER 30 S", 95, 395 + 170 + 26, EWD_WHITE);
+    /* Selection box on line 2: cyan 3 px top edge across the line. */
+    require_rect(48, 395 + 68, 689, 3, EWD_CYAN);
+    /* Separation line and the white end-marker bracket (first line top edge). */
+    require_rect(38, 395 + 204 + 14, 689, 2, EWD_WHITE);
+    require_rect(732, 395, 28, 3, EWD_WHITE);
+    for (i = 0; i < capture_count; ++i) if (captures[i].kind == CAPTURE_POLYGON) ++arrows;
+    assert(arrows == 2); /* one overflow-down arrow: stem + head */
+    require_canvas_bounds();
+}
+
 static void xml_text(FILE *file, const char *text)
 {
     const unsigned char *cursor = (const unsigned char *)text;
@@ -569,9 +696,12 @@ int main(int argc, char **argv)
     test_invalid_engine_values();
     test_reverse_only_on_inner_engines();
     test_dynamic_ecam_columns_and_warning_priority();
+    test_wd_memos_limitations_and_sts();
+    test_wd_procedure_lines();
     if (argc > 1) svg_preview(argv[1], &inactive);
     if (argc > 2) svg_preview(argv[2], &normal);
     if (argc > 3) svg_preview(argv[3], &warning);
-    puts("a380x EWD renderer tests passed (8 scenarios)");
+    if (argc > 4) { EwdData procedure = procedure_data(); svg_preview(argv[4], &procedure); }
+    puts("a380x EWD renderer tests passed (10 scenarios)");
     return 0;
 }

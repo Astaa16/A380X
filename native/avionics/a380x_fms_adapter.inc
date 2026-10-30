@@ -16,6 +16,7 @@
  * fmsa_. Raw simulator inputs are listed with FMSA_RAW("...") and the published datarefs with
  * FMSR(...): build.py scans both for its DataRefs.txt and provider contracts.
  */
+#include "a380x_elec_power.h"
 
 /* ---- Raw simulator inputs (spec 07 section 9.4, spec 06 section 12) ------------------------ */
 
@@ -829,7 +830,9 @@ static int fmsa_init(void)
     nav_hooks.airport_lookup = fmsa_nav ? fmsa_fms_airport : NULL;
     fmsa_plan_hooks(&plan_hooks);
     a380x_fms_init(&fmsa_fms, NULL, &nav_hooks, &plan_hooks);
-    fmsa_cold_and_dark = !fmsa_engines_running();
+    /* Spawn type: the A380 network decides it once per load (spec 7.2); legacy check otherwise. */
+    fmsa_cold_and_dark = a380x_power.available ? a380x_power.spawn_mode == A380X_ELN_SPAWN_COLD_DARK
+                                               : !fmsa_engines_running();
     fmsa_host_init();
     if (!sys_init()) {
         fmsa_unregister_refs();
@@ -871,7 +874,9 @@ static void fmsa_plane_loaded(void)
 {
     if (!fmsa_initialized) return;
     if (fmsa_fpln) a380x_fpln_reset(fmsa_fpln);
-    fmsa_cold_and_dark = !fmsa_engines_running();
+    /* Spawn type: the A380 network decides it once per load (spec 7.2); legacy check otherwise. */
+    fmsa_cold_and_dark = a380x_power.available ? a380x_power.spawn_mode == A380X_ELN_SPAWN_COLD_DARK
+                                               : !fmsa_engines_running();
     a380x_fms_reset(&fmsa_fms);
     fmsa_nav_seq = fmsa_fms.out.nav_request_seq;
     sys_fms_reset();

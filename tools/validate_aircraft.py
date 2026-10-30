@@ -2,14 +2,16 @@
 """Static package checks; these do not substitute for an X-Plane flight test."""
 from __future__ import annotations
 import argparse
+import hashlib
 import json
+import math
 import re
 import struct
 from pathlib import Path
 from aileron_visual_provider import validate_provider
 from avionics_provider import validate_avionics_provider
 from avionics_panel_layout import (
-    EFB_PANEL_RECT, EWD_PANEL_RECT, FCU_PANEL_RECT,
+    EFB_PANEL_RECT, EWD_PANEL_RECT, FCU_PANEL_RECT, FCU_LCD_PANEL_RECTS,
     MFD_AUTO_ADJUST, MFD_DEVICE_BUS, MFD_DEVICE_IDS, MFD_LIGHTING_CHANNELS,
     ND_PANEL_RECTS, PANEL_SIZE, PFD_PANEL_RECTS,
 )
@@ -62,6 +64,132 @@ def panel_group(panel: str, name: str) -> str | None:
         rf'^GROUP {re.escape(name)}\r?\n(.*?)^END_GROUP$', panel, re.M | re.S
     )
     return match.group(1) if match else None
+
+
+def native_panel_declaration(panel: str) -> bool:
+    marker = '# A380X FBW AVIONICS PLUGIN OWNS PFD, ND, EWD, FCU AND EFB REGIONS'
+    if marker in panel:
+        return True
+    # Saved ACF files can omit generator comments. Accept the existing hidden,
+    # empty native group as its semantic equivalent; registry, display meshes
+    # and absence of stock instruments are still checked independently below.
+    records = [line.strip() for line in panel.splitlines()
+               if line.strip() and not line.lstrip().startswith('#')]
+    return (len(records)==4 and records[0] in ('GROUP A380 NATIVE AVIONIC',
+            'GROUP A380 NATIVE AVIONICS') and records[1:]==['LOCKED','HIDE','END_GROUP'])
+
+
+# Native trim plugin (native/trim/plugin.c): commands, out_names datarefs and cockpit device.
+TRIM_PLUGIN = Path('plugins') / 'A380XTrim'
+TRIM_PREFIX = 'a380x/xp12/trim/'
+TRIM_COMMANDS = ('pitch_up', 'pitch_down', 'rudder_left', 'rudder_right', 'rudder_reset')
+TRIM_DATAREFS = ('pitch_switch', 'rudder_knob', 'reset_pressed', 'pitch_ratio', 'rudder_ratio',
+                 'rudder_degrees', 'powered', 'device_active', 'draw_count', 'control_law',
+                 'manual_pitch_available', 'auto_pitch_active', 'rudder_resetting',
+                 'device_bound', 'computer_active')
+TRIM_DEVICE = 'a380x.xp12.trim.rudder'
+
+
+def trim_provider(root: Path) -> dict | None:
+    """The packaged trim plugin, only when its binary matches its build report."""
+    report_path = root / TRIM_PLUGIN / 'build-report.json'
+    binary = root / TRIM_PLUGIN / 'mac_x64' / 'A380XTrim.xpl'
+    if not report_path.is_file() or not binary.is_file():
+        return None
+    try:
+        report = json.loads(report_path.read_text(encoding='utf-8'))
+    except ValueError:
+        return None
+    if hashlib.sha256(binary.read_bytes()).hexdigest() != report.get('sha256'):
+        return None
+    return {'commands': {TRIM_PREFIX + name for name in TRIM_COMMANDS},
+            'datarefs': {TRIM_PREFIX + name for name in TRIM_DATAREFS},
+            'device': TRIM_DEVICE}
+
+
+def acf_attachments(text: str) -> list[tuple[str,str]]:
+    # Plane Maker may serialize property keys lexically (0,1,10,100,...,2).
+    # Attachment/draw order follows the numeric property index, not file order.
+    rows = re.findall(r'^P _obja/(\d+)/_v10_att_file_stl (.+)$', text, re.M)
+    return sorted(rows,key=lambda row:int(row[0]))
+
+
+def cockpit_attachment_alignment_errors(text: str, controls: str) -> list[str]:
+    """The authored cockpit screen, backing and touch geometry share a datum."""
+    rows = {path: f'_obja/{index}/' for index, path in acf_attachments(text)}
+    if controls not in rows or MFD_SCREENS_ATTACHMENT not in rows:
+        return []  # Missing attachments are diagnosed by validate_native_panel.
+    props = dict(re.findall(r'^P ([^ ]+) (.*)$', text, re.M))
+    reference = MFD_SCREENS_ANCHOR if MFD_SCREENS_ANCHOR in rows else MFD_SCREENS_ATTACHMENT
+    targets = [controls, MFD_SCREENS_ATTACHMENT]
+    errors = []
+    angles = ('_v10_att_phi_ref', '_v10_att_the_ref', '_v10_att_psi_ref')
+    offsets = ('_v10_att_x_acf_prt_ref', '_v10_att_y_acf_prt_ref', '_v10_att_z_acf_prt_ref')
+    parents = ('_v10_att_body', '_v10_att_gear', '_v10_att_wing')
+    for target in targets:
+        if target == reference:
+            continue
+        for suffix in (*angles, *offsets, *parents):
+            default = '-1' if suffix in parents else '0'
+            try:
+                actual = float(props.get(rows[target] + suffix, default))
+                expected = float(props.get(rows[reference] + suffix, default))
+                if not math.isfinite(actual) or not math.isfinite(expected):
+                    raise ValueError('nonfinite attachment transform')
+            except ValueError:
+                errors.append(f'{target}: invalid cockpit attachment transform {suffix}')
+                continue
+            difference = (actual - expected + 180) % 360 - 180 if suffix in angles else actual - expected
+            if abs(difference) > 1e-5:
+                errors.append(f'{target}: cockpit attachment {suffix}={actual:g} does not match '
+                              f'{reference} ({expected:g}); displays and click targets are misaligned')
+    return errors
+
+
+def aerodynamic_wing_errors(text: str) -> list[str]:
+    """Extended enabled wing slots are valid; serialized disabled slots are not.
+
+    The old >=12 guard was specific to the 747 scaffold. A native A388 can
+    legitimately use those slots for outboard panels, center sections/pylons.
+    Preserve the actual safety check: no uninitialized disabled wing records.
+    """
+    rows = re.findall(r'^P _wing/(\d+)/([^ ]+) (.*)$', text, re.M)
+    slots: dict[str, dict[str, str]] = {}
+    for index, key, value in rows:
+        slots.setdefault(index, {})[key] = value
+    return [f'Inactive aerodynamic wing slot {index} is still serialized'
+            for index, fields in sorted(slots.items(), key=lambda row: int(row[0]))
+            if fields.get('_part_specs_eq') != '1']
+
+
+def trim_configuration_errors(text: str) -> list[str]:
+    """Reject the native XP12 flying-stabilizer/elevator-tab load conflict."""
+    props = dict(re.findall(r'^P ([^ ]+) (.*)$', text, re.M))
+    errors = []
+
+    def number(key: str) -> float:
+        try:
+            value = float(props.get(key, '0'))
+            if not math.isfinite(value):
+                raise ValueError('nonfinite')
+            return value
+        except ValueError:
+            errors.append(f'Invalid numeric trim property: {key}')
+            return 0.0
+
+    stabilizer_range = max(abs(number('acf/_stab_trim_up')), abs(number('acf/_stab_trim_dn')))
+    elevator_range = max(abs(number('acf/_ptch_acft_up_trim_rat')),
+                         abs(number('acf/_ptch_acft_dn_trim_rat')))
+    moving_stabilizer = False
+    for key in props:
+        match = re.fullmatch(r'_wing/(\d+)/_inc_trim/\d+', key)
+        if match and props.get(f'_wing/{match[1]}/_part_specs_eq') == '1':
+            moving_stabilizer = number(key) != 0.0 or moving_stabilizer
+    if moving_stabilizer and stabilizer_range > 0.0 and elevator_range > 0.0:
+        errors.append('Pitch trim drives BOTH the horizontal stabilizer and elevator trim tab; '
+                      'a trimmable stabilizer requires zero acf/_ptch_acft_up_trim_rat and '
+                      'acf/_ptch_acft_dn_trim_rat')
+    return errors
 
 
 def cockpit_region_quad_bounds(obj: str) -> list[tuple[float, float, float, float]]:
@@ -202,8 +330,7 @@ def validate_native_panel(
     panel = panel_match.group(1) if panel_match else ''
     if not panel_match:
         errors.append('A388 ACF has no native PANEL_3D definition')
-    marker = '# A380X FBW AVIONICS PLUGIN OWNS PFD, ND, EWD, FCU AND EFB REGIONS'
-    if marker not in panel:
+    if not native_panel_declaration(panel):
         errors.append('A388 panel does not delegate the PFD, ND, EWD, flyPad and FCU displays to the FBW avionics plugin')
     forbidden = (*PFD_EFIS_INSTRUMENTS, 'EFIS_map_s_GA',
                  'sim/cockpit2/autopilot/', 'gen_LED')
@@ -228,6 +355,7 @@ def validate_native_panel(
     if not controls_path.is_file():
         errors.append(f'Missing cockpit-controls object for live panel regions: {controls}')
         return errors, report
+    errors.extend(cockpit_attachment_alignment_errors(acf_text, controls))
     controls_text = controls_path.read_text(encoding='utf-8', errors='replace')
     for stock_route in ('sim/autopilot/', 'sim/aircraft/autopilot/', 'sim/cockpit2/autopilot/'):
         if stock_route in controls_text:
@@ -280,17 +408,14 @@ def validate_native_panel(
     report['cockpit_region_ewd_quads'] = matched_ewd
     if matched_ewd != 1:
         errors.append(f'{controls}: expected native EWD cockpit-region quad; found {matched_ewd}')
-    fcu_left, fcu_bottom, fcu_right, fcu_top = FCU_PANEL_RECT
-    fcu_slice_width = (fcu_right - fcu_left) / 4
-    expected_fcu = tuple(panel_uv((fcu_left + index * fcu_slice_width, fcu_bottom,
-                                  fcu_left + (index + 1) * fcu_slice_width, fcu_top))
-                         for index in range(4))
-    matched_fcu = sum(any(all(abs(a - b) <= 1e-6 for a, b in zip(bounds_item, target))
-                          for bounds_item in bounds) for target in expected_fcu)
+    expected_fcu = tuple(map(panel_uv, FCU_LCD_PANEL_RECTS))
+    fcu_matches = [sum(all(abs(a-b) <= 1e-6 for a,b in zip(bounds_item, target))
+                       for bounds_item in bounds) for target in expected_fcu]
+    matched_fcu = sum(count == 1 for count in fcu_matches)
     report['cockpit_region_fcu_quads'] = matched_fcu
-    if matched_fcu != 4:
-        errors.append(f'{controls}: expected four native FCU cockpit-region display quads; '
-                      f'found {matched_fcu} of 4')
+    if matched_fcu != 2:
+        errors.append(f'{controls}: expected two shared native FCU cockpit-region display quads '
+                      f'(SPD/HDG and ALT/V/S); found {matched_fcu} of 2; matches={fcu_matches}')
     expected_efb = panel_uv(EFB_PANEL_RECT)
     matched_efb = sum(
         1 for bounds_item in bounds
@@ -314,6 +439,24 @@ def validate_native_panel(
         device: {(str(MFD_DEVICE_BUS), str(channel), str(MFD_AUTO_ADJUST))}
         for device, channel in zip(MFD_DEVICE_IDS, MFD_LIGHTING_CHANNELS)
     }
+    if provider and provider.get('xpkit_nd'):
+        from nd_cockpit_devices import ND_DEVICES, ND_CHANNELS
+        expected_devices.extend(ND_DEVICES)
+        expected_attributes.update({device:{('1',str(channel),'1')} for device,channel in zip(ND_DEVICES,ND_CHANNELS)})
+    if provider and provider.get('xpkit_pfd'):
+        from pfd_cockpit_devices import PFD_DEVICES, PFD_CHANNELS
+        expected_devices.extend(PFD_DEVICES)
+        expected_attributes.update({device:{('1',str(channel),'1')} for device,channel in zip(PFD_DEVICES,PFD_CHANNELS)})
+    if provider and provider.get('isis'):
+        from isis_cockpit_device import ISIS_DEVICES, ISIS_CHANNELS, ISIS_COMMANDS
+        expected_devices.extend(device for device in ISIS_DEVICES if device in provider['isis'].get('cockpit_devices', ()))
+        expected_attributes.update({device:{('1',str(ISIS_CHANNELS[device]),'1')} for device in ISIS_DEVICES
+                                    if device in provider['isis'].get('cockpit_devices', ())})
+        for command in provider['isis'].get('commands', ()):  # every physical control; popup is screen only
+            if command.endswith('/popup'):
+                continue
+            if command not in controls_text:
+                errors.append(f'{controls}: missing physical ISIS {command} manipulator')
     full_uv = (0.0, 0.0, 1.0, 1.0)
     refresh_hint = ' (regenerate with build_cockpit_controls.py and the cockpit-controls refresh)'
 
@@ -346,6 +489,15 @@ def validate_native_panel(
     if not screens_path.is_file():
         errors.append(f'Missing visible MFD screen object: {MFD_SCREENS_ATTACHMENT}')
         return errors, report
+    # SD is not a touchscreen: its ENGINE/APU selection uses the physical ECP
+    # command meshes. Require a visible quad, not an ATTR_manip_device twin.
+    if provider and provider.get('ecam_sd'):
+        from sd_cockpit_device import SD_DEVICE, SD_CHANNEL, PAGE_ACTIONS, ACTION_NODES
+        expected_devices.append(SD_DEVICE)
+        expected_attributes[SD_DEVICE]={('1',str(SD_CHANNEL),'1')}
+        for action in (*PAGE_ACTIONS,*ACTION_NODES.values(),'brightness_up','brightness_down'):
+            if 'a380x/xp12/ecam/sd/'+action not in controls_text:
+                errors.append(f'{controls}: missing physical ECAM SD {action} command')
     screens_text = screens_path.read_text(encoding='utf-8', errors='replace')
     screen_counts = device_quad_counts(screens_text, False)
     report['cockpit_device_quads'] = screen_counts
@@ -356,11 +508,22 @@ def validate_native_panel(
     unexpected = sorted(set(screen_counts) - set(expected_devices))
     if unexpected:
         errors.append(f'{MFD_SCREENS_ATTACHMENT}: unexpected cockpit devices: ' + ', '.join(unexpected))
-    if cockpit_device_attributes(screens_text) != expected_attributes:
+    screen_attributes = cockpit_device_attributes(screens_text)
+    if trim_provider(root) is not None:
+        # The trim plugin's rudder trim display shares the screen object (trim_cockpit_panel.py).
+        screen_attributes.pop(TRIM_DEVICE, None)
+    if screen_attributes != expected_attributes:
         errors.append(f'{MFD_SCREENS_ATTACHMENT}: MFD ATTR_cockpit_device bus/channel/auto values differ '
                       'from avionics_panel_layout')
     if 'ATTR_manip_' in screens_text:
         errors.append(f'{MFD_SCREENS_ATTACHMENT}: visible screen object must not carry manipulators')
+    from mfd_cockpit_devices import refresh_touch_geometry
+    try:
+        if refresh_touch_geometry(controls_text) != controls_text:
+            errors.append(f'{controls}: MFD touch surfaces are not 1 mm in front of the visible screens'
+                          + refresh_hint)
+    except (ValueError, IndexError) as error:
+        errors.append(f'{controls}: invalid MFD touch geometry: {error}')
     return errors, report
 
 
@@ -413,7 +576,7 @@ def validate(root: Path, datarefs: Path | None = None, commands: Path | None = N
         warnings.append('Aileron dance requires global FlyWithLua visual driver; package validation does not prove runtime execution')
     acf = root / 'A380X-XP12.acf'
     text = acf.read_text(encoding='latin1')
-    attachments = re.findall(r'^P _obja/(\d+)/_v10_att_file_stl (.+)$', text, re.M)
+    attachments = acf_attachments(text)
     paths = [path for _index, path in attachments]
     errors.extend(cockpit_decal_order_errors(paths))
     native_panel_errors, native_panel = validate_native_panel(root, text, paths)
@@ -424,6 +587,25 @@ def validate(root: Path, datarefs: Path | None = None, commands: Path | None = N
         packaged_commands.update(avionics_provider.get('commands', ()))
         custom_refs.update(avionics_provider.get('datarefs', ()))
         packaged_devices.update(avionics_provider.get('cockpit_devices', ()))
+        if avionics_provider.get('xpkit_nd'):
+            packaged_devices.update(avionics_provider['xpkit_nd']['cockpit_devices'])
+            packaged_commands.update(avionics_provider['xpkit_nd']['commands'])
+            custom_refs.update(avionics_provider['xpkit_nd']['datarefs'])
+        if avionics_provider.get('xpkit_pfd'):
+            packaged_devices.update(avionics_provider['xpkit_pfd']['cockpit_devices'])
+            packaged_commands.update(avionics_provider['xpkit_pfd']['commands'])
+            custom_refs.update(avionics_provider['xpkit_pfd']['datarefs'])
+        if avionics_provider.get('ecam_sd'):
+            packaged_devices.update(avionics_provider['ecam_sd']['cockpit_devices'])
+        if avionics_provider.get('isis'):
+            packaged_devices.update(avionics_provider['isis']['cockpit_devices'])
+            packaged_commands.update(avionics_provider['isis']['commands'])
+            custom_refs.update(avionics_provider['isis']['datarefs'])
+    trim = trim_provider(root)
+    if trim is not None:
+        packaged_commands.update(trim['commands'])
+        custom_refs.update(trim['datarefs'])
+        packaged_devices.add(trim['device'])
     flags = {
         index: int(value)
         for index, value in re.findall(r'^P _obja/(\d+)/_obj_flags (-?\d+)$', text, re.M)
@@ -535,6 +717,22 @@ def validate(root: Path, datarefs: Path | None = None, commands: Path | None = N
                     errors.append(f'{relative}: malformed toggle manipulator')
                 else:
                     manipulator_refs.add(words[4])
+            elif command == 'ATTR_manip_drag_rotate':
+                # <cursor> <x y z> <dx dy dz> <angle1> <angle2> <lift> <v1min v1max> <v2min v2max>
+                # <dataref1> <dataref2|none> <tooltip>
+                if len(words) < 18:
+                    errors.append(f'{relative}: malformed drag-rotate manipulator')
+                else:
+                    try:
+                        numbers = [float(value) for value in words[2:15]]
+                    except ValueError:
+                        numbers = []
+                    if len(numbers) != 13 or not all(math.isfinite(value) for value in numbers) \
+                            or not any(numbers[3:6]):
+                        errors.append(f'{relative}: drag-rotate manipulator with invalid geometry')
+                    manipulator_refs.add(words[15])
+                    if words[16].lower() != 'none':
+                        manipulator_refs.add(words[16])
             elif command == 'ATTR_cockpit_device':
                 # <device> <bus bitfield> <lighting channel> <auto adjust>
                 if len(words) != 5:
@@ -627,8 +825,8 @@ def validate(root: Path, datarefs: Path | None = None, commands: Path | None = N
         warnings.append('Missing transparent custom panel; generic 2-D artwork may be shown')
     if len(paths) < 30:
         warnings.append('Partial asset build: check that detailed cockpit and all gear assemblies are included')
-    if re.search(r'^P _wing/(?:1[2-9]|[2-9]\d)/', text, re.M):
-        errors.append('Disabled scaffold wing slots are still serialized')
+    errors.extend(aerodynamic_wing_errors(text))
+    errors.extend(trim_configuration_errors(text))
     fmod_errors, fmod_warnings = validate_fmod_package(root)
     errors.extend(fmod_errors)
     warnings.extend(fmod_warnings)

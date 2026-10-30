@@ -14,6 +14,20 @@ static LightingChannel lighting[] = {
     {"first_officer_flood", 1.0f, NULL, NULL, NULL, "", ""},
 };
 static XPLMDataRef lighting_panel_brightness;
+#include "a380x_fcu_lighting.h"
+static const char *fcu_light_names[FCU_LIGHT_COUNT] = {
+    "ap1_light", "ap2_light", "fd_light", "athr_light", "loc_light",
+    "altitude_hold_light", "approach_light"
+};
+static XPLMDataRef fcu_light_handles[FCU_LIGHT_COUNT];
+static float lighting_fcu_get(void *refcon)
+{
+    float levels[FCU_LIGHT_COUNT];
+    a380x_fcu_light_levels(&guidance, plugin_enabled && guidance_inputs.powered,
+                           lighting[1].value, levels);
+    return levels[(intptr_t)refcon];
+}
+static int lighting_fcu_get_int(void *refcon) { return lighting_fcu_get(refcon) > 0; }
 
 static void lighting_sync_flood(int index)
 {
@@ -48,6 +62,10 @@ static int lighting_command(XPLMCommandRef command, XPLMCommandPhase phase, void
 static void lighting_shutdown(void)
 {
     int i;
+    for (i=0;i<FCU_LIGHT_COUNT;++i) {
+        if(fcu_light_handles[i]) XPLMUnregisterDataAccessor(fcu_light_handles[i]);
+        fcu_light_handles[i]=NULL;
+    }
     for (i = 0; i < ARRAY_LEN(lighting); ++i) {
         LightingChannel *channel = &lighting[i];
         if (channel->up) { XPLMUnregisterCommandHandler(channel->up, lighting_command, 1, NULL); channel->up = NULL; }
@@ -81,5 +99,13 @@ static int lighting_init(void)
     }
     lighting_sync_flood(0);
     lighting_sync_flood(3);
+    for(i=0;i<FCU_LIGHT_COUNT;++i) {
+        snprintf(name,sizeof(name),"a380x/xp12/fcu/%s",fcu_light_names[i]);
+        if(XPLMFindDataRef(name)) {lighting_shutdown();return 0;}
+        fcu_light_handles[i]=XPLMRegisterDataAccessor(name,xplmType_Int|xplmType_Float,0,
+            lighting_fcu_get_int,NULL,lighting_fcu_get,NULL,NULL,NULL,NULL,NULL,
+            NULL,NULL,NULL,NULL,(void *)(intptr_t)i,NULL);
+        if(!fcu_light_handles[i]) {lighting_shutdown();return 0;}
+    }
     return 1;
 }

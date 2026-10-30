@@ -20,6 +20,12 @@
 #error "MFD adapter needs -DXPLM400=1 -DXPLM410=1"
 #endif
 #include "XPLMMenus.h"
+#include "a380x_elec_power.h"
+/* CDS boot / self-test screen hook (a380x_avionics.c defines it before this include). */
+#ifndef MFDA_CDS_OVERLAY
+#define MFDA_CDS_OVERLAY(side) 0
+#endif
+#define MFDA_DU(side) ((side) ? A380X_ELN_DU_FO_MFD : A380X_ELN_DU_CAPT_MFD)
 
 void a380x_mfd_pages_register(void);
 int a380x_mfd_pages_linked(char *names, size_t n);
@@ -109,15 +115,21 @@ typedef struct {
     int keyboard_captured;
     int click_held;              /* KCCU LBUTTON held (button down sent) */
     int scissor_logged;
+    /* Read-only input diagnostics; never an alternative/synthetic input path. */
+    int device_bound, touch_down_count, touch_up_count;
+    int cursor_x, cursor_y, cursor_visible, menu_open, events_dropped;
+    int last_down_x, last_down_y, last_up_x, last_up_y;
+    int press_target, click_target, click_count, menu_open_count;
+    int trace_frames;
 } MfdaDevice;
 
 static MfdaDevice mfda_dev[MFD_SIDE_COUNT] = {
-    {MFD_CAPT, "a380x.xp12.mfd.captain", "A380X MFD CAPT", "CAPT", "captain",
-     "a380x/xp12/mfd/captain/popup", "a380x/xp12/mfd/captain/popout",
-     NULL, NULL, NULL, NULL, 0, -1, -1, 0, 0, 0, 0, 0.0f, -1.0f, 0, 1, 0, 0, 0, 0, 0, 0},
-    {MFD_FO, "a380x.xp12.mfd.first_officer", "A380X MFD F/O", "F/O", "first_officer",
-     "a380x/xp12/mfd/first_officer/popup", "a380x/xp12/mfd/first_officer/popout",
-     NULL, NULL, NULL, NULL, 0, -1, -1, 0, 0, 0, 0, 0.0f, -1.0f, 0, 1, 0, 0, 0, 0, 0, 0},
+    {.side=MFD_CAPT, .device_id="a380x.xp12.mfd.captain", .device_name="A380X MFD CAPT",
+     .seat="CAPT", .side_name="captain", .popup_name="a380x/xp12/mfd/captain/popup",
+     .popout_name="a380x/xp12/mfd/captain/popout", .last_x=-1, .last_y=-1, .last_knob=-1, .force_redraw=1},
+    {.side=MFD_FO, .device_id="a380x.xp12.mfd.first_officer", .device_name="A380X MFD F/O",
+     .seat="F/O", .side_name="first_officer", .popup_name="a380x/xp12/mfd/first_officer/popup",
+     .popout_name="a380x/xp12/mfd/first_officer/popout", .last_x=-1, .last_y=-1, .last_knob=-1, .force_redraw=1},
 };
 
 /* ---- Core state ------------------------------------------------------------------------------ */
@@ -210,8 +222,13 @@ static void mfda_screen_draw(void *refcon)
     glClear(GL_COLOR_BUFFER_BIT);                     /* X-Plane does not clear the device FBO */
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE); /* keep alpha = 1: the screen never blends */
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if (plugin_enabled && d && d->du_on)
-        mfd_gl_draw(a380x_mfd_display_list(&mfda_mfd, d->side), 0.0f, 0.0f, 1.0f, mfda_scissor_ok(d));
+    if (plugin_enabled && d && !d->du_on && MFDA_CDS_OVERLAY(d->side)) {
+        /* Thales boot / self-test (A380 network): nothing else on the screen */
+    } else if (plugin_enabled && d && d->du_on) {
+        const MfdDrawList *dl=a380x_mfd_display_list(&mfda_mfd,d->side);
+        if(xpkit_draw_mfd(d->side,0,0,1))mfd_gl_cursor(dl,0,0,1);
+        else mfd_gl_draw(dl,0,0,1,mfda_scissor_ok(d));
+    }
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     if (cull) glEnable(GL_CULL_FACE);
@@ -233,13 +250,45 @@ static void mfda_bezel_draw(float r, float g, float b, void *refcon)
 
 /* ---- Mouse callbacks (3D cockpit through ATTR_manip_device, and the popup) ------------------ */
 
+/* (0,0) or any texel outside the 768x1024 screen: the event carries no usable position. */
+static int mfda_positionless(int x, int y)
+{
+    return (x == 0 && y == 0) || x < 0 || y < 0 || x >= MFD_W || y >= MFD_H;
+}
+
 static int mfda_screen_touch(int x, int y, XPLMMouseStatus status, void *refcon)
 {
     MfdaDevice *d = (MfdaDevice *)refcon;
     float cx, cy;
+    int raw_x = x, raw_y = y;
     if (!plugin_enabled || !d) return 1;
+    if (status == xplm_MouseDown) ++d->touch_down_count;
+    else if (status == xplm_MouseUp) ++d->touch_up_count;
+    /* Real 3D cockpit releases can arrive with no position: the simulator
+     * supplies (0,0), or (since the X-Plane 12.x update) an off-screen sentinel
+     * such as (-16,-16), even after a press on a cyan field. Moving there first
+     * makes the last-frame hit test reject the click, so keyboard focus is
+     * never acquired. Keep the latest position of this held gesture. Drag
+     * callbacks/cursor tracking still update it, and on-screen release positions
+     * (including a release over a different widget) remain authoritative. */
+    if (status != xplm_MouseDown && d->touching && mfda_positionless(x, y) &&
+        d->last_x >= 0 && d->last_y >= 0) {
+        x = d->last_x;
+        y = d->last_y;
+    }
     mfda_to_canvas(x, y, &cx, &cy);
+    if (status == xplm_MouseDown || status == xplm_MouseUp) {
+        char line[256];
+        if (status == xplm_MouseDown) { d->last_down_x = (int)cx; d->last_down_y = (int)cy; }
+        else { d->last_up_x = (int)cx; d->last_up_y = (int)cy; }
+        d->trace_frames = 6;
+        snprintf(line, sizeof(line), "A380X MFD input %s %s texel=%d,%d canvas=%d,%d pending=%d power=%d\n",
+            d->seat, status == xplm_MouseDown ? "DOWN" : "UP", raw_x, raw_y, (int)cx, (int)cy,
+            mfda_mfd.sides[d->side].ui.ev_count, d->du_on);
+        XPLMDebugString(line);
+    }
     d->last_x = x; d->last_y = y;
+    d->cursor_seen = 1; /* A click is also direct evidence that the pointer is over this device. */
     if (!d->du_on) { d->touching = status == xplm_MouseDown ? 1 : status == xplm_MouseUp ? 0 : d->touching; return 1; }
     mfd_pointer_move(&mfda_mfd, d->side, cx, cy);
     d->pointer_inside = 1;
@@ -271,7 +320,7 @@ static XPLMCursorStatus mfda_screen_cursor(int x, int y, void *refcon)
     MfdaDevice *d = (MfdaDevice *)refcon;
     if (!plugin_enabled || !d) return xplm_CursorDefault;
     d->cursor_seen = 1;
-    if (d->du_on && (!d->pointer_inside || x != d->last_x || y != d->last_y)) {
+    if (d->du_on && !mfda_positionless(x, y) && (!d->pointer_inside || x != d->last_x || y != d->last_y)) {
         float cx, cy;
         mfda_to_canvas(x, y, &cx, &cy);
         mfd_pointer_move(&mfda_mfd, d->side, cx, cy);
@@ -312,6 +361,10 @@ static int mfda_map_key(char ch, char vkey_signed, MfdKey *key, char *out)
     if (vkey == XPLM_VK_BACK || vkey == XPLM_VK_DELETE) { *key = MFD_KEY_BACKSPACE; return 1; }
     if (vkey == XPLM_VK_RETURN || vkey == XPLM_VK_ENTER || vkey == XPLM_VK_NUMPAD_ENT) { *key = MFD_KEY_ENT; return 1; }
     if (vkey == XPLM_VK_ESCAPE) { *key = MFD_KEY_ESC; return 1; }
+    if (vkey == XPLM_VK_UP) { *key = MFD_KEY_UP; return 1; }
+    if (vkey == XPLM_VK_DOWN) { *key = MFD_KEY_DOWN; return 1; }
+    if (vkey == XPLM_VK_LEFT) { *key = MFD_KEY_LEFT; return 1; }
+    if (vkey == XPLM_VK_RIGHT) { *key = MFD_KEY_RIGHT; return 1; }
     if (vkey == XPLM_VK_DECIMAL) { *key = MFD_KEY_CHAR; *out = '.'; return 1; }
     if (vkey == XPLM_VK_ADD) { *key = MFD_KEY_CHAR; *out = '+'; return 1; }
     if (vkey == XPLM_VK_SUBTRACT) { *key = MFD_KEY_CHAR; *out = '-'; return 1; }
@@ -346,7 +399,7 @@ static int mfda_key_sniffer(char ch, XPLMKeyFlags flags, char vkey, void *refcon
     (void)refcon;
     if (!plugin_enabled || !mfda_side_ok(s)) return 1;             /* not capturing: pass */
     if (flags & (xplm_ControlFlag | xplm_OptionAltFlag)) return 1;  /* keep sim shortcuts */
-    if (!mfda_map_key(ch, vkey, &key, &out)) return 1;              /* F-keys, arrows, Tab: pass */
+    if (!mfda_map_key(ch, vkey, &key, &out)) return 1;              /* F-keys and Tab: pass */
     if (flags & xplm_DownFlag) {
         mfd_key(&mfda_mfd, (MfdSide)s, key, out);
         if (key == MFD_KEY_ENT || key == MFD_KEY_ESC) mfda_capture_release();
@@ -368,7 +421,7 @@ static float mfda_screen_brightness(float rheo, float ambient, float bus_ratio, 
     MfdaDevice *d = (MfdaDevice *)refcon;
     (void)rheo; (void)bus_ratio; /* MFD power is decided by the aircraft logic, not the XP bus */
     if (!d || !plugin_enabled) return 0.0f;
-    return mfda_brightness_law(d->du_on, mfda_du_knob(d->side), ambient);
+    return mfda_brightness_law(d->du_on || a380x_power_du_lit(MFDA_DU(d->side), 0), mfda_du_knob(d->side), ambient);
 }
 
 /* ---- F0 fallback: the MFD in a plain XPLM window (no device API) -------------------------- */
@@ -408,8 +461,11 @@ static void mfda_window_draw(XPLMWindowID window, void *refcon)
     glBegin(GL_QUADS);
     glVertex2i(l, b); glVertex2i(r, b); glVertex2i(r, t); glVertex2i(l, t);
     glEnd();
-    if (plugin_enabled && d->du_on && mfda_window_canvas(d, l, t, NULL, NULL, &scale, &ox, &oy))
-        mfd_gl_draw(a380x_mfd_display_list(&mfda_mfd, d->side), (float)ox, (float)oy, scale, 0);
+    if (plugin_enabled && d->du_on && mfda_window_canvas(d,l,t,NULL,NULL,&scale,&ox,&oy)) {
+        const MfdDrawList *dl=a380x_mfd_display_list(&mfda_mfd,d->side);
+        if(xpkit_draw_mfd(d->side,(float)ox,(float)oy,scale))mfd_gl_cursor(dl,(float)ox,(float)oy,scale);
+        else mfd_gl_draw(dl,(float)ox,(float)oy,scale,0);
+    }
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     if (cull) glEnable(GL_CULL_FACE);
 }
@@ -658,7 +714,7 @@ typedef struct {
     XPLMDataRef handle;
 } MfdaRef;
 
-#define MFDA_REF_COUNT 9
+#define MFDA_REF_COUNT 41
 static MfdaRef mfda_refs[MFDA_REF_COUNT];
 static int mfda_ref_count;
 
@@ -729,6 +785,21 @@ static int mfda_register_refs(void)
         mfda_add_ref(name, MFDA_REF_BYTES, NULL, 0, 0, s);
         snprintf(name, sizeof(name), "a380x/xp12/mfd/%s/keyboard_captured", mfda_dev[s].side_name);
         mfda_add_ref(name, MFDA_REF_INT_RO, &mfda_dev[s].keyboard_captured, 0, 1, s);
+        const char *const labels[] = {"device_bound", "touch_down_count", "touch_up_count",
+            "cursor_x", "cursor_y", "cursor_visible", "menu_open", "events_dropped",
+            "last_down_x", "last_down_y", "last_up_x", "last_up_y",
+            "press_target", "click_target", "click_count", "menu_open_count"};
+        int *values[] = {&mfda_dev[s].device_bound, &mfda_dev[s].touch_down_count,
+            &mfda_dev[s].touch_up_count, &mfda_dev[s].cursor_x, &mfda_dev[s].cursor_y,
+            &mfda_dev[s].cursor_visible, &mfda_dev[s].menu_open, &mfda_dev[s].events_dropped,
+            &mfda_dev[s].last_down_x, &mfda_dev[s].last_down_y,
+            &mfda_dev[s].last_up_x, &mfda_dev[s].last_up_y,
+            &mfda_dev[s].press_target, &mfda_dev[s].click_target,
+            &mfda_dev[s].click_count, &mfda_dev[s].menu_open_count};
+        for (int a=0; a<ARRAY_LEN(labels); ++a) {
+            snprintf(name, sizeof(name), "a380x/xp12/mfd/%s/%s", mfda_dev[s].side_name, labels[a]);
+            mfda_add_ref(name, MFDA_REF_INT_RO, values[a], 0, 0, s);
+        }
     }
     mfda_add_ref("a380x/xp12/mfd/pc_keyboard_capture", MFDA_REF_INT_RW, &mfda_pc_capture_pref, 0, 2, -1);
     for (i = 0; i < mfda_ref_count; ++i) {
@@ -906,6 +977,10 @@ static void mfda_devices_enable(void)
             break;
         }
         d->pointer_inside = 0; d->last_knob = -1.0f; d->since_create = 0.0f; d->bound_warned = 0;
+        d->touch_down_count = d->touch_up_count = 0;
+        d->device_bound = d->menu_open = d->cursor_visible = d->events_dropped = 0;
+        d->last_down_x = d->last_down_y = d->last_up_x = d->last_up_y = -1;
+        d->press_target = d->click_target = d->click_count = d->menu_open_count = d->trace_frames = 0;
         d->list_hash = 0; d->force_redraw = 1;
     }
     if (s < MFD_SIDE_COUNT) { mfda_devices_destroy(); return; }
@@ -927,12 +1002,10 @@ static void mfda_release_input(void)
     }
 }
 
-/* XPluginDisable: release keyboard capture and focus, end a held KCCU click, hide the cursor.
- * The devices themselves live from XPluginStart to XPluginStop: X-Plane resolves the
- * ATTR_cockpit_device / ATTR_manip_device directives when the aircraft OBJs load, which
- * happens right after XPluginStart and before XPluginEnable. A device created later is
- * re-bound for drawing only; its 3D touch manipulators stay dead ("not any of X-Plane's
- * glass cockpit devices" in Log.txt), so no click ever reached screenTouchCallback. */
+/* XPluginDisable releases input but retains devices until XPluginStop. Register early
+ * so the same handles are used for screen drawing and 3D manipulators. The SDK also
+ * supports retroactive mapping, so an OBJ parser warning alone does not prove that
+ * a custom device is unbound: use device_bound and the real touch counters to check. */
 static void mfda_devices_disable(void)
 {
     int s;
@@ -1031,7 +1104,8 @@ static void mfda_update(float dt, int powered)
     for (s = 0; s < MFD_SIDE_COUNT; ++s) {
         MfdaDevice *d = &mfda_dev[s];
         int x, y;
-        d->du_on = powered && mfda_du_knob(s) > 0.001f;
+        /* CAPT MFD: DC ESS or DC 1, F/O MFD: DC 1 or DC 2 (A380 network, CDS state On). */
+        d->du_on = a380x_power_du_on(MFDA_DU(s), powered) && mfda_du_knob(s) > 0.001f;
         mfda_inputs.du_on[s] = (unsigned char)d->du_on;
         /* Capture policy 1 (auto) requests capture regardless of the KCCU KBD switch; policy 2
          * (FBW) only in touchscreen mode (KBD OFF). Policy 0 never captures (routing below). */
@@ -1049,7 +1123,7 @@ static void mfda_update(float dt, int powered)
                 mfd_pointer_move(&mfda_mfd, d->side, cx, cy);
                 d->pointer_inside = 1; d->last_x = x; d->last_y = y;
             }
-        } else if (d->pointer_inside && !d->cursor_seen && !d->touching) {
+        } else if (d->pointer_inside && !d->cursor_seen && !d->touching && !d->click_held) {
             mfd_pointer_leave(&mfda_mfd, d->side);
             d->pointer_inside = 0;
         }
@@ -1061,7 +1135,30 @@ static void mfda_update(float dt, int powered)
 #endif
     for (s = 0; s < MFD_SIDE_COUNT; ++s) {
         MfdaDevice *d = &mfda_dev[s];
-        uint64_t h = mfda_list_hash(a380x_mfd_display_list(&mfda_mfd, (MfdSide)s), d->du_on);
+        const MfdUi *ui = &mfda_mfd.sides[s].ui;
+        d->device_bound = d->handle && mfda_av.loaded && mfda_av.is_bound(d->handle);
+        d->cursor_x = (int)ui->px; d->cursor_y = (int)ui->py;
+        d->cursor_visible = ui->cursor_visible;
+        if (ui->down_id) d->press_target = (int)ui->down_id;
+        if (ui->click_happened) {
+            d->click_target = (int)ui->click_id;
+            if (ui->click_id) ++d->click_count;
+        }
+        if (!d->menu_open && (ui->open_menu || ui->ctx_menu)) ++d->menu_open_count;
+        d->menu_open = ui->open_menu != 0 || ui->ctx_menu != 0;
+        d->events_dropped = (int)ui->ev_dropped;
+        if (d->trace_frames > 0) {
+            char line[320];
+            snprintf(line, sizeof(line), "A380X MFD resolve %s cursor=%d,%d inside=%d held=%d press=%08x down=%08x click=%08x released=%d menu=%08x pending=%d page=%s\n",
+                d->seat, d->cursor_x, d->cursor_y, ui->pointer_inside, ui->button_down,
+                (unsigned)ui->press_id, (unsigned)ui->down_id, (unsigned)ui->click_id,
+                ui->click_happened, (unsigned)ui->open_menu, ui->ev_count,
+                a380x_mfd_active_uri(&mfda_mfd, d->side));
+            XPLMDebugString(line);
+            --d->trace_frames;
+        }
+        uint64_t h = mfda_list_hash(a380x_mfd_display_list(&mfda_mfd, (MfdSide)s), d->du_on) +
+                     (uint64_t)(a380x_power_du_state(MFDA_DU(s)) + 2) * 0x9E3779B97F4A7C15ull;  /* CDS state redraw */
         mfda_keyboard_route(d);
         if (!d->handle || !mfda_av.loaded) { d->list_hash = h; continue; }
         if (h != d->list_hash || d->force_redraw) {

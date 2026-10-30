@@ -36,6 +36,47 @@ N2/N3, fuel flow, oil and vibration are separate SD ENGINE-page parameters in
 the reference. That page remains unported and those parameters are not added
 to the EWD layout.
 
+## Warning display (lower EWD) renderer
+
+`native/avionics/a380x_ewd_wd.inc` draws the lower area from an `EwdWdView` (`a380x_ewd_wd.h`)
+that the native FWS fills each frame; when no view is supplied the legacy memo/warning lists
+are drawn. It translates the pinned FBW components:
+
+* `FormattedFwcText.tsx`: escape codes `\x1b<1m`..`<7m` (yellow, red, green, amber, cyan,
+  magenta, white), `\x1b4m` underline, `\x1b'm` frame, `\x1bm` reset, `\r` = new 30 px line,
+  24 px text with 1.75 px letter spacing and decorations on FBW's 16 px letter grid. FBW quirks
+  are kept: a decoration is emitted only when its segment is closed by an escape or `\r`, and
+  only the Amber/Green/White/Red line classes have a stroke.
+* `WdLimitations` + `WdMemos`: LIMITATIONS / ALL PHASES / APPR & LDG headings, two columns of
+  `\r`-joined messages, light-grey divider, then the memo columns.
+* `WdAbstractChecklistComponent` / `EclLine`: 18 lines of 34 px, 24 px checkbox column (■/□ drawn
+  as squares; the embedded EIS font has no box glyphs), 26 px text truncated to 39 characters,
+  3 px cyan selection box open on the right, the white end-marker bracket that frames a
+  procedure (top on its first line, bottom on its last), separation lines, green tables, LAND
+  ASAP/ANSA right aligned, centred/underlined sub-headlines, green overflow arrows; line colours
+  follow the `style.scss` cascade (two-class rules in order, then `.ChecklistItem.Checked` /
+  `.AbnormalItem.Checked`, then the `!important` grey of inactive and completed lines).
+* STS area: FAILURE PENDING, STS (or STS & DEFRD PROC) and ADV boxes.
+
+The ECL soft keys are off by default in FBW (`CONFIG_A380X_SHOW_ECL_SOFTKEYS = 0`) and are not
+drawn. Upper area additions: A.FLOOR (A/THR mode A.FLOOR or TOGA LK), THR LK (FMA A3 thrust lock;
+also hides the rating like `n1LimitHidden`), and the FWS engine attention getters, which replace
+the native start/fire approximation when the FWS supplies them.
+
+## Thrust rating (N1 limit) producer
+
+While no `a380x/xp12/engine/thrust_limit_type` producer is registered, `a380x_ewd_data.inc`
+selects the rating like FBW's `A380FadecComputer.cpp` does for engine 1 (the EWD shows
+`fadecOutputs[0]`): lever 1 on the A380 TLA scale (idle 0, CL 25, FLX/MCT 35, TOGA 45 degrees,
+reverse negative; inside the aircraft-local detent calibration a lever is exactly in its
+detent), FLEX when the FMS FLEX temperature is above TAT
+(`sim/cockpit2/temperature/outside_air_LE_temp_degc`), FBW's FLEX latch (set on the ground in the
+FLX/MCT detent, cleared at CL or TOGA), and FBW's table: on the ground with the engine running
+TOGA or FLX (MREV in reverse); otherwise TOGA above 35 degrees, FLX/MCT above 25, CLB from 0, MREV
+below. Limits come from the vendored FADEC equations (CLB, MCT, TOGA, reverse). Port assumption:
+the FLX N1 is the TOGA limit computed at the FLEX temperature, never above TOGA, because the
+vendored equations have no FLEX table.
+
 ## Engine inputs and THR normalization
 
 `a380x_ewd_data.inc` reads typed raw X-Plane inputs. N1 comes from

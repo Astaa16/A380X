@@ -25,7 +25,7 @@ typedef struct {
     XPLMCommandCallback_f callback;
     void *refcon;
 } MockCommand;
-static MockRef mock_refs[400];
+static MockRef mock_refs[600];
 static MockCommand mock_commands[60];
 static int ref_count, command_count, plan_entry, plan_count = 3;
 static float mock_time = 1.0f;
@@ -312,6 +312,33 @@ int main(int argc, char **argv)
     assert(efis_init());
     assert(efis[1].mode == 2 && efis[1].range_index == 4 && efis[1].range_nm == 80);
     efis_shutdown();
-    puts("EFIS: independent sides, mode/range compensation, STD preset/baro units/limits, LS arming, unsupported selections, PLAN scrolling, reload cleanup passed");
+    /* Momentary key travel: rises while held, springs back after End; baro shaft push/pull. */
+    setup();
+    assert(efis_init());
+    {
+        MockCommand *c = XPLMFindCommand("a380x/xp12/efis/first_officer/vv_toggle");
+        int step;
+        assert(c && c->callback);
+        c->callback(c, xplm_CommandBegin, c->refcon);
+        for (step = 0; step < 10; ++step) { mock_time += 0.01f; efis_update(0.01f); }
+        assert(efis[1].pressed[EFIS_VV] == 1.0f && efis[0].pressed[EFIS_VV] == 0.0f);
+        c->callback(c, xplm_CommandEnd, c->refcon);
+        for (step = 0; step < 10; ++step) { mock_time += 0.01f; efis_update(0.01f); }
+        assert(efis[1].pressed[EFIS_VV] == 0.0f && efis[1].vv);
+        c = XPLMFindCommand("a380x/xp12/efis/captain/baro_qnh");
+        c->callback(c, xplm_CommandBegin, c->refcon);
+        for (step = 0; step < 10; ++step) { mock_time += 0.01f; efis_update(0.01f); }
+        assert(efis[0].pressed[EFIS_PRESS_BARO] == -1.0f);
+        c->callback(c, xplm_CommandEnd, c->refcon);
+        c = XPLMFindCommand("a380x/xp12/efis/captain/baro_std");
+        c->callback(c, xplm_CommandBegin, c->refcon);
+        c->callback(c, xplm_CommandEnd, c->refcon);   /* click: full 80 ms press */
+        for (step = 0; step < 8; ++step) { mock_time += 0.01f; efis_update(0.01f); }
+        assert(efis[0].pressed[EFIS_PRESS_BARO] > 0.95f);
+        for (step = 0; step < 12; ++step) { mock_time += 0.01f; efis_update(0.01f); }
+        assert(efis[0].pressed[EFIS_PRESS_BARO] == 0.0f);
+    }
+    efis_shutdown();
+    puts("EFIS: momentary key travel, baro push/pull shaft, independent sides, mode/range compensation, STD preset/baro units/limits, LS arming, unsupported selections, PLAN scrolling, reload cleanup passed");
     return 0;
 }

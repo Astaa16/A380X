@@ -37,7 +37,7 @@ MLW, 373,000 kg MZFW, 323,546 kg maximum fuel). The Ground page controls
 the modeled ten main-deck, six upper-deck, and one cockpit door independently.
 The six sound sliders use writable X-Plane engine, UI, interior, environment,
 ground, and warning-volume datarefs.
-Cargo doors are static in this model, so they are not shown as active controls.
+Forward, aft and bulk cargo doors now have independent ISCS Ground Services buttons. ALL 20 DOORS includes them; see [CARGO_DOORS.md](CARGO_DOORS.md).
 The FBW-derived flight and simulator functions remain underneath.
 Both cockpit tablet quads now use upright U/V mapping from their physically
 measured corners, and touch regions follow that same projection. Their OBJ8
@@ -82,7 +82,7 @@ The ISCS popup is a visual and native-control adaptation of the eight supplied
 screens. Startup presets, a session-local payload/fuel snapshot, engine starter
 commands, payload, nine-tank fuel, available ground services,
 passenger/cockpit doors, and selected X-Plane failures call native commands or
-datarefs. CG position, deicing, cargo doors, ADIRU alignment, random-fault
+datarefs. CG position, deicing, ADIRU alignment, random-fault
 scheduling, external account logins, and a full takeoff calculator lack a
 backing model and are labeled as unavailable. Simulator-configuration switches
 and startup preferences currently hold session-local UI state; they
