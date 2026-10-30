@@ -578,8 +578,27 @@ static void test_pfd_boundaries(void) {
     pfd_guidance.on_ground=1;
     clear_capture();draw_pfd(&refs.side[0],0,32,"CAPT");assert(!has_label("STALL"));
 }
+static void test_fms_flap_speeds(void) {
+    /* FBW PRIM rule: S in CONF 1 and 1+F, F in CONF 2 and 3, neither clean or FULL. */
+    const int expect_f[6]={0,0,0,1,1,0}, expect_s[6]={0,1,1,0,0,0};
+    A380XFmsFeed feed;
+    A380XPfdGuidance p;
+    memset(&feed,0,sizeof(feed));
+    feed.valid=1;feed.f_speed_knots=180;feed.s_speed_knots=210;
+    for(int config=0;config<=5;++config) {
+        memset(&p,0,sizeof(p));p.flap_config=config;
+        a380x_pfd_apply_fms_flap_speeds(&p,&feed);
+        assert((p.f_speed_knots==180)==expect_f[config] && (p.f_speed_knots==0)==!expect_f[config]);
+        assert((p.s_speed_knots==210)==expect_s[config] && (p.s_speed_knots==0)==!expect_s[config]);
+    }
+    /* Without FMS data a provider value is left alone. */
+    feed.valid=0;memset(&p,0,sizeof(p));p.flap_config=3;p.f_speed_knots=175;
+    a380x_pfd_apply_fms_flap_speeds(&p,&feed);
+    assert(p.f_speed_knots==175);
+}
 int main(int argc,char **argv) {
     PfdCanvas canvas=pfd_canvas(0,32);
+    test_fms_flap_speeds();
     test_rising_ground();
     test_pfd_bank_direction();
     test_pfd_boundaries();

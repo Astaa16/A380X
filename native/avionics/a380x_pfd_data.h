@@ -46,6 +46,20 @@ typedef struct {
     double v1_knots, vr_knots, v2_knots; /* 0 = none */
     int managed_speed_valid, managed_speed_is_mach;
     double managed_speed_knots, managed_mach;
+    double f_speed_knots, s_speed_knots; /* FMS F / S operating speeds, 0 = none */
 } A380XFmsFeed;
+
+/* FMS F/S speeds use the FBW A380 PRIM visibility rule (A380PrimComputerFe v_3/v_4_visible: F at
+ * general-logic flap_handle_index 3/4, S at 1/2, an index that counts 0, 1, 1+F, 2, 3, FULL), which
+ * is the native flap_config numbering (1 = CONF 1, 2 = 1+F, 3 = CONF 2, 4 = CONF 3, 5 = FULL).
+ * As for the T.O speeds, an FMS value replaces a provider value only while the FMS has one. */
+static inline void a380x_pfd_apply_fms_flap_speeds(A380XPfdGuidance *p, const A380XFmsFeed *feed)
+{
+    const int show_f = p->flap_config == 3 || p->flap_config == 4;
+    const int show_s = p->flap_config == 1 || p->flap_config == 2;
+    if (!feed->valid) return;
+    if (feed->f_speed_knots >= 40 && feed->f_speed_knots <= 450) p->f_speed_knots = show_f ? feed->f_speed_knots : 0;
+    if (feed->s_speed_knots >= 40 && feed->s_speed_knots <= 450) p->s_speed_knots = show_s ? feed->s_speed_knots : 0;
+}
 
 #endif
