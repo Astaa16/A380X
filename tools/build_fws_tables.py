@@ -1259,6 +1259,27 @@ def render_header(t: Tables) -> str:
     return '\n'.join(L)
 
 
+# How the revision was found (git, or the ATTRIBUTION.md pin and why) depends on the machine that
+# ran the generator, e.g. an unmounted volume path; --check compares everything else.
+MACHINE_FIELDS = ('upstream_commit_source',)
+
+
+def same_output(committed: str, generated: str) -> bool:
+    """True when a committed output matches the generated one, ignoring machine-specific fields."""
+    if committed == generated:
+        return True
+    try:
+        a, b = json.loads(committed), json.loads(generated)
+    except ValueError:
+        return False
+    if not isinstance(a, dict) or not isinstance(b, dict):
+        return False
+    for field in MACHINE_FIELDS:
+        a.pop(field, None)
+        b.pop(field, None)
+    return a == b
+
+
 def render_manifest(t: Tables) -> str:
     files = {}
     for path in t.source_paths:
@@ -1322,7 +1343,7 @@ def main(argv=None):
         print(f'build_fws_tables: WARNING: {tables.max_items_warning}', file=sys.stderr)
     if args.check:
         stale = [p for p, text in ((args.header, header), (args.manifest, manifest))
-                 if not p.is_file() or p.read_text(encoding='utf-8') != text]
+                 if not p.is_file() or not same_output(p.read_text(encoding='utf-8'), text)]
         if stale:
             print('build_fws_tables: stale: ' + ', '.join(str(p) for p in stale)
                   + ' (run tools/build_fws_tables.py)', file=sys.stderr)

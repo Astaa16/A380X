@@ -208,7 +208,17 @@ class CheckMode(unittest.TestCase):
         r = self.run_tool('--header', str(header), '--manifest', str(manifest))
         self.assertEqual(r.returncode, 0, r.stderr)
         self.assertEqual(header.read_text(encoding='utf-8'), HEADER.read_text(encoding='utf-8'))
-        self.assertEqual(manifest.read_text(encoding='utf-8'), MANIFEST.read_text(encoding='utf-8'))
+        self.assertTrue(gen.same_output(MANIFEST.read_text(encoding='utf-8'), manifest.read_text(encoding='utf-8')))
+
+    def test_check_ignores_machine_specific_fields(self):
+        committed = json.loads(MANIFEST.read_text(encoding='utf-8'))
+        moved = dict(committed, upstream_commit_source='git rev-parse HEAD')
+        self.assertTrue(gen.same_output(json.dumps(committed), json.dumps(moved)))
+        changed = dict(committed, upstream_commit='0' * 40)
+        self.assertFalse(gen.same_output(json.dumps(committed), json.dumps(changed)))
+        sources = dict(committed['upstream_sources_sha256'])
+        sources[next(iter(sources))] = '0' * 64
+        self.assertFalse(gen.same_output(json.dumps(committed), json.dumps(dict(committed, upstream_sources_sha256=sources))))
 
     def test_deterministic(self):
         t = gen.build(gen.DEFAULT_UPSTREAM)
