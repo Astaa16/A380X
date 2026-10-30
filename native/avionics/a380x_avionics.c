@@ -435,6 +435,8 @@ static void elec_spawn_changed(void)
     survh_defaults(0);
 }
 
+#include "a380x_native_displays.inc"
+
 static void du_dim_display(int side, int unit, float x, float y, float width, float height)
 {
     float darkness = 1.0f - du_channels[side * DU_CHANNELS_PER_SIDE + unit].level;
@@ -655,6 +657,7 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
     }
     XPLMRegisterFlightLoopCallback(flight_loop, -1.0f, NULL);
     xpkit_init();
+    native_displays_init();
     XPLMDebugString("A380X Avionics: Imported FBW A380 guidance, PFD/FCU, MFD/FMS and physical flyPad registered.\n");
     return 1;
 }
@@ -663,6 +666,7 @@ PLUGIN_API void XPluginStop(void)
 {
     plugin_enabled = 0;
     xpkit_shutdown();
+    native_displays_shutdown();
     XPLMUnregisterFlightLoopCallback(flight_loop, NULL);
     ovhd_shutdown();
     fwsa_shutdown();

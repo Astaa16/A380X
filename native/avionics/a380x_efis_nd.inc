@@ -9,6 +9,7 @@ static struct {
     XPLMDataRef latitude,longitude,true_heading,elevation;
     XPLMDataRef traffic_bearing,traffic_distance,traffic_altitude,traffic_count;
     XPLMDataRef nav_type;
+    XPLMDataRef tas,wind_dir,wind_speed,zulu,magvar;
     XPLMDataRef vor_id[2],vor_frequency[2],vor_bearing[2],vor_dme[2],vor_has_dme[2];
     XPLMDataRef vor_deviation[2],vor_course[2];
     XPLMNavRef cursor;
@@ -144,6 +145,77 @@ static void efis_nd_update_terrain(int side,float dt)
     }
 }
 
+/* VD terrain profile: drawn only by the native FlyByWire-layout ND (a380x_nd_fbw.inc), which xp-kit
+ * builds replace with the FlyByWire library ND. */
+#if !defined(A380X_XPKIT)
+/* Great-circle destination from (lat, lon) along true bearing `bearing_deg` for `distance_nm`. */
+static void efis_nd_destination(double lat_deg, double lon_deg, double bearing_deg, double distance_nm,
+                                double *out_lat, double *out_lon)
+{
+    double d = distance_nm / 3440.065, lat = lat_deg * M_PI / 180.0, lon = lon_deg * M_PI / 180.0;
+    double b = bearing_deg * M_PI / 180.0;
+    double lat2 = asin(sin(lat) * cos(d) + cos(lat) * sin(d) * cos(b));
+    *out_lat = lat2 * 180.0 / M_PI;
+    *out_lon = (lon + atan2(sin(b) * sin(d) * cos(lat), cos(d) - sin(lat) * sin(lat2))) * 180.0 / M_PI;
+}
+
+/* Terrain elevation (ft) and water flag at a point; 0 when the scenery there is not loaded. */
+static int efis_nd_probe_ground(double lat, double lon, float *elevation_ft, int *water)
+{
+    double local_x, local_y, local_z, hit_lat, hit_lon, hit_alt;
+    XPLMProbeInfo_t hit;
+    XPLMWorldToLocal(lat, lon, 20000.0, &local_x, &local_y, &local_z);
+    memset(&hit, 0, sizeof(hit)); hit.structSize = sizeof(hit);
+    if (XPLMProbeTerrainXYZ(nd_source.probe, (float)local_x, (float)local_y, (float)local_z, &hit) != xplm_ProbeHitTerrain)
+        return 0;
+    XPLMLocalToWorld(hit.locationX, hit.locationY, hit.locationZ, &hit_lat, &hit_lon, &hit_alt);
+    if (!isfinite(hit_alt)) return 0;
+    *elevation_ft = (float)(hit_alt * 3.280839895);
+    *water = hit.is_wet;
+    return 1;
+}
+
+/* Vertical display terrain (A380 VD): EFIS_VD_COLUMNS columns from the aircraft to the selected
+ * range along the VD axis (ground track; heading when slow). Each column keeps the highest terrain
+ * of three probes across a +-EFIS_VD_CORRIDOR_NM corridor and is water only if all three are wet.
+ * Six columns per side per frame refresh the whole profile about twice a second; a range change or
+ * an axis change of more than 5 degrees restarts it. Only displayed in ROSE NAV and ARC. */
+static void efis_nd_update_vd_terrain(int side)
+{
+    EfisVdTerrain *vd = &nd_data.vd[side];
+    float range = efis[side].range_nm, axis;
+    int n;
+    if ((efis[side].mode != 2 && efis[side].mode != 3) || efis[side].zoom || !nd_data.position_valid ||
+        !nd_source.probe || !isfinite(range) || range <= 0.0f) return;
+    axis = ground_speed_knots > 40.0f && isfinite(ground_track_degrees) ? ground_track_degrees : nd_data.true_heading;
+    if (!isfinite(axis)) return;
+    if (vd->range_nm != range || fabsf(remainderf(axis - vd->axis_true, 360.0f)) > 5.0f) {
+        memset(vd, 0, sizeof(*vd));
+        vd->range_nm = range;
+    }
+    vd->axis_true = axis;
+    for (n = 0; n < 6; ++n) {
+        int column = vd->next_column, k, hits = 0, wet = 0;
+        float distance = range * ((float)column + 0.5f) / (float)EFIS_VD_COLUMNS, highest = -1e9f;
+        double centre_lat, centre_lon;
+        vd->next_column = (column + 1) % EFIS_VD_COLUMNS;
+        efis_nd_destination(nd_data.lat, nd_data.lon, axis, distance, &centre_lat, &centre_lon);
+        for (k = -1; k <= 1; ++k) {
+            double lat = centre_lat, lon = centre_lon;
+            float elevation;
+            int water;
+            if (k) efis_nd_destination(centre_lat, centre_lon, axis + 90.0f * k, EFIS_VD_CORRIDOR_NM, &lat, &lon);
+            if (!efis_nd_probe_ground(lat, lon, &elevation, &water)) continue;
+            ++hits; wet += water != 0;
+            if (elevation > highest) highest = elevation;
+        }
+        vd->valid[column] = hits > 0;
+        vd->water[column] = hits > 0 && wet == hits;
+        vd->elevation_ft[column] = hits > 0 ? highest : 0.0f;
+    }
+}
+#endif
+
 static void efis_nd_init(void)
 {
     int i;
@@ -160,6 +232,11 @@ static void efis_nd_init(void)
     ND_REF(traffic_altitude,"sim/cockpit2/tcas/indicators/relative_altitude_mtrs");
     ND_REF(traffic_count,"sim/cockpit2/tcas/indicators/tcas_num_acf");
     ND_REF(nav_type,"sim/cockpit2/radios/indicators/nav_type");
+    ND_REF(tas,"sim/flightmodel/position/true_airspeed");
+    ND_REF(wind_dir,"sim/weather/aircraft/wind_now_direction_degt");
+    ND_REF(wind_speed,"sim/weather/aircraft/wind_now_speed_msc");
+    ND_REF(zulu,"sim/time/zulu_time_sec");
+    ND_REF(magvar,"sim/flightmodel/position/magnetic_variation");
 #undef ND_REF
     for (i=0;i<2;++i) {
 #define VOR_REF(field,section,stem) do { \
@@ -195,6 +272,11 @@ static void efis_nd_update(float dt)
     nd_data.lon=nd_source.longitude?XPLMGetDatad(nd_source.longitude):NAN;
     nd_data.true_heading=nd_source.true_heading?XPLMGetDataf(nd_source.true_heading):NAN;
     nd_data.altitude_ft=nd_source.elevation?(float)(XPLMGetDatad(nd_source.elevation)*3.280839895):NAN;
+    nd_data.tas_knots=nd_source.tas?XPLMGetDataf(nd_source.tas)*1.94384449f:NAN;
+    nd_data.wind_dir_true=nd_source.wind_dir?XPLMGetDataf(nd_source.wind_dir):NAN;
+    nd_data.wind_speed_kt=nd_source.wind_speed?XPLMGetDataf(nd_source.wind_speed)*1.94384449f:NAN;
+    nd_data.zulu_seconds=nd_source.zulu?XPLMGetDataf(nd_source.zulu):NAN;
+    nd_data.magnetic_variation=nd_source.magvar?XPLMGetDataf(nd_source.magvar):NAN;
     nd_data.position_valid=isfinite(nd_data.lat)&&isfinite(nd_data.lon)&&fabs(nd_data.lat)<=90.0&&
         isfinite(nd_data.true_heading)&&isfinite(nd_data.altitude_ft);
     if (!nd_data.position_valid) return;
@@ -222,4 +304,7 @@ static void efis_nd_update(float dt)
         }
     }
     efis_nd_update_terrain(0,dt); efis_nd_update_terrain(1,dt);
+#if !defined(A380X_XPKIT)
+    efis_nd_update_vd_terrain(0); efis_nd_update_vd_terrain(1);
+#endif
 }
