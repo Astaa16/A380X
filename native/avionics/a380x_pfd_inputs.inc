@@ -283,6 +283,7 @@ static void read_pfd_aircraft(void)
         if(fms_feed.vr_knots>=40&&fms_feed.vr_knots<=450)p->vr_knots=fms_feed.vr_knots;
         if(fms_feed.v2_knots>=40&&fms_feed.v2_knots<=450)p->v2_knots=fms_feed.v2_knots;
     }
+    a380x_pfd_apply_fms_flap_speeds(p,&fms_feed);
     /* Clean performance requires positively known retracted surfaces, no
      * speedbrake request/deployment, valid air data and bounded table inputs.
      * Arming the stowed spoilers is permitted; no extension penalty applies.

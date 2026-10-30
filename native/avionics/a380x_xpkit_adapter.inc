@@ -247,6 +247,10 @@ static void xpkit_guidance_words(XpKitJson *j) {
         XPW("V_LS",pfd_guidance.vls_knots,pfd_guidance.clean_performance_valid && pfd_guidance.vls_knots>0);
         XPW("V_MAN",pfd_guidance.green_dot_knots,pfd_guidance.clean_performance_valid && pfd_guidance.green_dot_knots>0);
         XPW("V_FE_NEXT",pfd_guidance.vfe_next_knots,pfd_guidance.envelope_valid && pfd_guidance.vfe_next_knots>0);
+        /* F (V_3) and S (V_4): the FMS speeds, already limited to the PRIM's visible configurations
+         * (a380x_pfd_apply_fms_flap_speeds), so a zero is "not shown" (NCD). */
+        XPW("V_3",pfd_guidance.f_speed_knots,pfd_guidance.f_speed_knots>0);
+        XPW("V_4",pfd_guidance.s_speed_knots,pfd_guidance.s_speed_knots>0);
 #undef XPW
     }
     for(int side=0;side<2;++side) {
