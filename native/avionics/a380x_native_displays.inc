@@ -178,6 +178,7 @@ static void native_displays_init(void)
         p.screenHeight = p.bezelHeight = NATIVE_DU_H;
         p.drawOnDemand = 0;   /* the native PFD/ND animate every frame */
         p.drawCallback = native_display_draw;
+        p.bezelDrawCallback = a380x_black_bezel;
         p.brightnessCallback = native_display_brightness;
         if (!d->is_nd) {
             p.screenTouchCallback = native_display_touch;

@@ -181,7 +181,7 @@ static void xpkit_nd_init(void) {
         if(mfda_av.loaded) {
             XPLMCreateAvionics_t p;memset(&p,0,sizeof(p));p.structSize=sizeof(p);
             p.screenWidth=p.bezelWidth=768;p.screenHeight=p.bezelHeight=1024;
-            p.drawOnDemand=1;p.drawCallback=xpkit_nd_draw_device;p.screenTouchCallback=xpkit_nd_touch;
+            p.drawOnDemand=1;p.drawCallback=xpkit_nd_draw_device;p.bezelDrawCallback=a380x_black_bezel;p.screenTouchCallback=xpkit_nd_touch;
             p.screenRightTouchCallback=xpkit_nd_right;p.screenScrollCallback=xpkit_nd_scroll;p.screenCursorCallback=xpkit_nd_cursor;
             p.brightnessCallback=xpkit_nd_brightness;p.refcon=d;
             p.deviceID=s?"a380x.xp12.nd.first_officer":"a380x.xp12.nd.captain";

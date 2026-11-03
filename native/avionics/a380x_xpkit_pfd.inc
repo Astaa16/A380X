@@ -176,6 +176,7 @@ static void xpkit_pfd_init(void) {
             p.screenHeight = p.bezelHeight = 1024;
             p.drawOnDemand = 1;
             p.drawCallback = xpkit_pfd_draw_device;
+            p.bezelDrawCallback = a380x_black_bezel;
             p.screenTouchCallback = xpkit_pfd_touch;
             p.screenRightTouchCallback = xpkit_pfd_right;
             p.brightnessCallback = xpkit_pfd_brightness;
