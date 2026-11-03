@@ -13,6 +13,7 @@
  * Unity-build include of a380x_xpkit_adapter.inc (needs xpkit_draw_view,
  * xpkit_uploaded, xpkit_health, mfda_av, refs, du_channels, draw_pfd).
  */
+#include "a380x_du_scale.h"
 typedef struct {
     int side, draw_live, draw_powered;
     unsigned presented_frame, draws, rendered_draws;
@@ -44,8 +45,11 @@ static void xpkit_pfd_draw_device(void *refcon) {
     glClearColor(0, 0, 0, 1);
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT);
+    glPushMatrix();
+    glScalef(A380X_PFD_SCALE, A380X_PFD_SCALE, 1);   /* 768x1024 logical units on the denser device */
     if (plugin_enabled && cds_overlay(d->side ? A380X_ELN_DU_FO_PFD : A380X_ELN_DU_CAPT_PFD, 0, 0, 768, 1024)) {
         d->presented_frame = 0; d->draws++;
+        glPopMatrix();
         if (cull) glEnable(GL_CULL_FACE);
         return;
     }
@@ -55,11 +59,12 @@ static void xpkit_pfd_draw_device(void *refcon) {
         /* Native fallback: the translated PFD renders its 320x416 layout. */
         glPushMatrix();
         glScalef(768.0f / 320.0f, 1024.0f / 416.0f, 1);
-        glLineWidth(1.0f);
+        glLineWidth(A380X_PFD_SCALE);
         draw_pfd(&refs.side[d->side], 0, 0, d->side ? "F/O" : "CAPT");
         glPopMatrix();
         glLineWidth(1.0f);
     }
+    glPopMatrix();
     d->presented_frame = rendered ? xpkit_uploaded[d->side] : 0;
     d->draws++; if (rendered) d->rendered_draws++;
     glColor4f(1, 1, 1, 1);
@@ -160,8 +165,8 @@ static void xpkit_pfd_init(void) {
             XPLMCreateAvionics_t p;
             memset(&p, 0, sizeof(p));
             p.structSize = sizeof(p);
-            p.screenWidth = p.bezelWidth = 768;
-            p.screenHeight = p.bezelHeight = 1024;
+            p.screenWidth = p.bezelWidth = A380X_PFD_PX(768);
+            p.screenHeight = p.bezelHeight = A380X_PFD_PX(1024);
             p.drawOnDemand = 1;
             p.drawCallback = xpkit_pfd_draw_device;
             p.screenTouchCallback = xpkit_pfd_touch;
