@@ -259,13 +259,9 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
     """Wrap the static draws of every applicable target; returns (text, report rows)."""
     applicable = [t for t in targets if filename.endswith(t["material"] + ".obj")
                   and (not t["motion"]["control"].files or filename in t["motion"]["control"].files)]
+    # A control already wrapped by an earlier run is left alone (later contract rows patch on top).
+    applicable = [t for t in applicable if f"{MARKER} {t['motion']['control'].id} " not in text]
     if not applicable:
-        return text, []
-    if MARKER in text:
-        missing = sorted({t["motion"]["control"].id for t in applicable
-                          if f"{MARKER} {t['motion']['control'].id} " not in text})
-        if missing:
-            raise ValueError(f"{filename}: incomplete earlier feedback patch, missing {missing[:5]}")
         return text, []
     lines = text.splitlines(keepends=True)
     vertices = [tuple(map(float, line.split()[1:4])) for line in lines if line.startswith("VT")]
@@ -420,19 +416,23 @@ def lamp_geometry(source: Source, lamp, cell: int):
 
 
 def append_controls(text: str, source: Source, motions: list[dict]):
-    if MARKER in text:
-        return text, []
+    """Append one block with the click targets and lamp quads not present yet (re-runs add nothing)."""
     clicks, lamps, report = [], [], []
     for motion in motions:
         control = motion["control"]
         manip = click_manipulator(control)
+        if manip and f"{MARKER} CLICK {control.id}\n" in text:
+            manip = None
         if manip:
             vertices, indices = oriented_box(local_points(source, motion["index"]), source.world(motion["index"]))
             clicks.append((control, manip, vertices, indices, motion))
         for lamp in control.lamps:
-            if lamp.cell is not None:
+            if lamp.cell is not None and f"{MARKER} LAMP {control.id} {lamp.face}\n" not in text:
                 vertices, indices = lamp_geometry(source, lamp, lamp.cell)
                 lamps.append((control, lamp, vertices, indices, motion))
+    if not clicks and not lamps:
+        return text, []
+    batch = text.count(MARKER + " CONTROLS") + 1
     lines = text.splitlines()
     row = next(i for i, line in enumerate(lines) if line.startswith("POINT_COUNTS"))
     counts = list(map(int, lines[row].split()[1:]))
@@ -464,7 +464,8 @@ def append_controls(text: str, source: Source, motions: list[dict]):
     lines[at:at] = ["IDX\t" + str(i) for i in all_indices]
     lines[row] = "POINT_COUNTS\t" + "\t".join(map(str, (counts[0] + len(all_vertices), counts[1], counts[2],
                                                           counts[3] + len(all_indices))))
-    return "\n".join([*lines, "", MARKER + " CONTROLS", *commands, ""]), report
+    header = MARKER + " CONTROLS" + ("" if batch == 1 else f" {batch}")
+    return "\n".join([*lines, "", header, *commands, ""]), report
 
 
 def sha(text: str) -> str:
@@ -510,8 +511,12 @@ def run(aircraft: Path, source_path: Path, dry_run: bool, controls=CONTROLS) -> 
         document = json.loads(manifest_path.read_text())
         section = {"commands": list(COMMANDS), "datarefs": list(DATAREFS),
                    "hooked_commands": list(hooked_commands()), "runtime_tested": False}
-        if document.get("cockpit_feedback") != section:
+        from avionics_provider import AVIONICS_COMMANDS, AVIONICS_DATAREFS
+        # the overhead pushbutton positions extend the lamp contract, part of the main provider lists
+        if (document.get("cockpit_feedback") != section or document.get("commands") != list(AVIONICS_COMMANDS)
+                or document.get("datarefs") != list(AVIONICS_DATAREFS)):
             document["cockpit_feedback"] = section
+            document["commands"], document["datarefs"] = list(AVIONICS_COMMANDS), list(AVIONICS_DATAREFS)
             report["files"].append(dict(path=str(PROVIDER_MANIFEST)))
             if not dry_run and not problems:
                 manifest_path.write_text(json.dumps(document, indent=2) + "\n")

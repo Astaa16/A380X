@@ -37,7 +37,8 @@ class Contract(unittest.TestCase):
 
     def test_hooked_commands_belong_to_other_modules(self):
         from avionics_provider import KCCU_COMMANDS, SD_COMMANDS
-        self.assertTrue(set(contract.hooked_commands()) <= set(KCCU_COMMANDS) | set(SD_COMMANDS))
+        from ovhd_lamps_contract import COMMANDS as OVHD_COMMANDS
+        self.assertTrue(set(contract.hooked_commands()) <= set(KCCU_COMMANDS) | set(SD_COMMANDS) | set(OVHD_COMMANDS))
         self.assertNotIn('a380x/xp12/ecam/sd/engine', contract.hooked_commands())  # ENG keeps its own motion
 
 

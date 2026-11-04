@@ -12,6 +12,7 @@ native module (`native/avionics/a380x_cockpit_feedback.inc`, table generated int
 | SURV panel | XPDR/TCAS SYS 1/2, WXR/TAWS SYS 1/2, ABV, BLW, TA ONLY, G/S MODE | FBW press clip | yes, `a380x/xp12/surv/<key>` | write the shared SURV datarefs (also used by the MFD SURV page); green bars follow them, TA ONLY "ON", G/S MODE "OFF" |
 | KCCU | 63 key caps per side | FBW clip, follows the existing `kccu/<side>/<key>` commands | existing targets | key travel only |
 | ENG MASTER 1-4 | number decal, FIRE / FAULT faces | follow the lever (`mixture_ratio[n]`) | existing toggle | the decals no longer float at the OFF pose |
+| Overhead | 103 pushbuttons with a latched position (docs/OVERHEAD_LAMPS.md) | FBW press clip on `ovhd/pb/<id>` | yes | legends follow the position (dark cockpit); EMER EXIT LT OFF has no FBW clip, command only |
 | Glareshield side | CONSOLE & FLOOR LT (OFF / DIM / BRT), OIT SIDE (FLT OPS / NSS AVNCS) | FBW clip | up/down switch | state datarefs only (`lighting/<side>_console_floor`, `oit/<side>_side`) |
 
 Datarefs: `<key>_pressed` / `press_ratio` 0..1 for key travel; selectors and switches are writable ints.

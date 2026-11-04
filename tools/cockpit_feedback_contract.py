@@ -166,7 +166,24 @@ def _glareshield_side():
     return rows
 
 
-CONTROLS: tuple[Control, ...] = (*_switching(), *_ecam(), *_surv(), *_kccu(), *_eng_master(), *_glareshield_side())
+def _overhead():
+    # Overhead pushbuttons with a latched position in the lamp module (tools/ovhd_lamps_contract.py
+    # pb_state_ids): the same-named command toggles it; here the cap travels and gets a click target.
+    from ovhd_lamps_contract import pb_state_ids, row
+    rows = []
+    for pid in pb_state_ids():
+        _pid, caption, node, *_rest = row(pid)
+        if node in OVERHEAD_WITHOUT_CLIP:
+            continue
+        rows.append(Control(f"ovhd_{pid}", "press", node, node, f"{PREFIX}ovhd/pb/{pid}_pressed",
+                            (f"{PREFIX}ovhd/pb/{pid}",), f"{caption} - pushbutton", group="overhead"))
+    return rows
+
+
+OVERHEAD_WITHOUT_CLIP = ("PUSH_OVHD_SIGNS",)   # EMER EXIT LT OFF: the FBW legend has no pushbutton clip
+
+CONTROLS: tuple[Control, ...] = (*_switching(), *_ecam(), *_surv(), *_kccu(), *_eng_master(), *_glareshield_side(),
+                                 *_overhead())
 
 
 def owned_commands() -> tuple[str, ...]:
