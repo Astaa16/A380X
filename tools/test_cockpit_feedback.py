@@ -27,7 +27,7 @@ class Contract(unittest.TestCase):
 
     def test_kinds(self):
         for c in contract.CONTROLS:
-            self.assertIn(c.kind, ('press', 'selector', 'switch', 'follow'))
+            self.assertIn(c.kind, ('press', 'selector', 'switch', 'follow', 'static'))
             if c.kind == 'press':
                 self.assertTrue(c.commands, c.id)
             if c.kind in ('selector', 'switch'):
@@ -38,7 +38,8 @@ class Contract(unittest.TestCase):
     def test_hooked_commands_belong_to_other_modules(self):
         from avionics_provider import KCCU_COMMANDS, SD_COMMANDS
         from ovhd_lamps_contract import COMMANDS as OVHD_COMMANDS
-        self.assertTrue(set(contract.hooked_commands()) <= set(KCCU_COMMANDS) | set(SD_COMMANDS) | set(OVHD_COMMANDS))
+        others = set(KCCU_COMMANDS) | set(SD_COMMANDS) | set(OVHD_COMMANDS) | set(contract.RMP_COMMANDS)
+        self.assertTrue(set(contract.hooked_commands()) <= others)
         self.assertNotIn('a380x/xp12/ecam/sd/engine', contract.hooked_commands())  # ENG keeps its own motion
 
 
@@ -86,10 +87,17 @@ class InstalledAircraft(unittest.TestCase):
                     self.assertIn(f'{cf.MARKER} LAMP {c.id} {lamp.face}\n', text)
 
     def test_every_control_moves_visible_geometry(self):
-        texts = [p.read_text(encoding='latin-1') for d in cf.PANEL_DIRS for p in (AIRCRAFT / d).glob('*.obj')
-                 if not p.name.startswith('._')]
+        files = {p.name: p.read_text(encoding='latin-1') for d in cf.PANEL_DIRS for p in (AIRCRAFT / d).glob('*.obj')
+                 if not p.name.startswith('._')}
+        source = cf.Source(cf.DEFAULT_SOURCE) if cf.DEFAULT_SOURCE.is_file() else None
         for c in contract.CONTROLS:
-            self.assertTrue(any(f'{cf.MARKER} {c.id} ' in t for t in texts), c.id)
+            if c.kind == 'static':
+                continue
+            if source is not None:   # a material with no exported OBJ (e.g. the RMP glass guard) has nothing to move
+                materials = {m for i in source.descendants(source.names[c.node]) for m, _t, _n in source.primitives(i)}
+                if not any(name.endswith(m + '.obj') for name in files for m in materials):
+                    continue
+            self.assertTrue(any(f'{cf.MARKER} {c.id} ' in t for t in files.values()), c.id)
 
     def test_rmp_screens(self):
         text = (AIRCRAFT / cf.SCREENS_OBJ).read_text(encoding='latin-1')
