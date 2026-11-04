@@ -42,6 +42,7 @@ LAMP_LIFT = 0.00006             # m in front of the authored face
 CLICK_MARGIN = 0.0005
 TOLERANCE = 0.000012            # vertex match, as patch_center_right_animations
 LEGEND_LIFT = 0.002             # the exported legend decals sit 2 mm out along their face normal
+SHELL_TOLERANCE = 0.00005       # a vertex exactly LEGEND_LIFT from a source point
 LIFT_TOLERANCE = 0.0003         # curved legend faces: per-vertex normals differ slightly from the face
 DEFAULT_SOURCE = Path.home() / "Developer/fbw-cockpit-source/a380-cockpit/A380_COCKPIT_LOD00.gltf"
 
@@ -118,14 +119,24 @@ class Source:
 
 
 def compile_motion(source: Source, control: Control) -> dict:
-    """The clip as OBJ stages keyed on the control's dataref values (outermost first)."""
+    """The clip(s) as OBJ stages keyed on the control's datarefs (outermost first)."""
     index = source.names[control.node]
-    clip = source.clips.get(control.clip)
+    if control.kind == "static":
+        return dict(control=control, index=index, pivot=transform_point(source.world(index), (0, 0, 0)), stages=[])
+    motion = compile_clip(source, control, control.clip, control.dataref, control.kind)
+    for clip, dataref in control.extra:
+        motion["stages"] += compile_clip(source, control, clip, dataref, "press")["stages"]
+    return motion
+
+
+def compile_clip(source: Source, control: Control, clip_name: str, dataref: str, kind: str) -> dict:
+    index = source.names[control.node]
+    clip = source.clips.get(clip_name)
     if clip is None:
-        raise ValueError(f"{control.id}: no FBW clip {control.clip}")
+        raise ValueError(f"{control.id}: no FBW clip {clip_name}")
     channels = [c for c in clip["channels"] if c["target"]["node"] == index]
     if not channels:
-        raise ValueError(f"{control.id}: clip {control.clip} does not animate {control.node}")
+        raise ValueError(f"{control.id}: clip {clip_name} does not animate {control.node}")
     samples = {}
     for channel in channels:
         sampler = clip["samplers"][channel["sampler"]]
@@ -141,25 +152,25 @@ def compile_motion(source: Source, control: Control) -> dict:
         ts, poses = samples["translation"]
         rest = node.get("translation", (0, 0, 0))
         deltas = [transform_vector(parent, _sub(p, rest)) for p in poses]
-        stages.append(dict(kind="translation", times=ts, poses=deltas))
+        stages.append(dict(kind="translation", times=ts, poses=deltas, dataref=dataref))
     if "rotation" in samples:
         ts, quats = samples["rotation"]
         axis, angles = rotation_keys(quats, node.get("rotation", (0, 0, 0, 1)), parent)
-        stages.append(dict(kind="rotation", times=ts, axis=axis, poses=angles, pivot=pivot))
+        stages.append(dict(kind="rotation", times=ts, axis=axis, poses=angles, pivot=pivot, dataref=dataref))
     if not stages:
         raise ValueError(f"{control.id}: clip {control.clip} has no translation or rotation")
     t0, t1 = times[0], times[-1]
     if t1 <= t0:
         raise ValueError(f"{control.id}: clip {control.clip} has no duration")
     key_value = {}
-    if control.kind in ("press", "follow"):
-        lo, hi = (0.0, 1.0) if control.kind == "press" else (control.minimum, control.maximum)
+    if kind in ("press", "follow"):
+        lo, hi = (0.0, 1.0) if kind == "press" else (control.minimum, control.maximum)
         key_value = {t: lo + (hi - lo) * (t - t0) / (t1 - t0) for t in times}
-    elif control.kind == "selector":
+    elif kind == "selector":
         if len(times) != control.positions:
             raise ValueError(f"{control.id}: {len(times)} keys for {control.positions} positions")
         key_value = {t: float(i) for i, t in enumerate(times)}
-    elif control.kind == "switch":
+    elif kind == "switch":
         # value 0 = the key whose lever tip is lowest (crew view), upward from there
         tip = max((p for _m, tris, _n in source.primitives(index) for tri in tris for p in tri),
                   key=lambda p: _dot(_sub(p, pivot), _sub(p, pivot)))
@@ -199,9 +210,9 @@ def apply_stage(stage, t, point):
 
 
 def stage_lines(motion: dict) -> list[str]:
-    ref = motion["control"].dataref
     lines = []
     for stage in motion["stages"]:
+        ref = stage["dataref"]
         if stage["kind"] == "translation":
             lines.append(f"ANIM_trans_begin\t{ref}")
             lines += [f"ANIM_trans_key\t{obj8_fmt(v)}\t{_vec(p)}" for v, p in zip(stage["values"], stage["poses"])]
@@ -218,6 +229,8 @@ def mesh_targets(source: Source, motion: dict) -> list[dict]:
     """Every visible primitive of the animated subtree. Children (legends, lamp faces) match either at
     their FBW position or lifted LEGEND_LIFT along their face normal, as the legend export placed them."""
     control = motion["control"]
+    if control.kind == "static":
+        return []
     emis_lamps = {lamp.face: lamp for lamp in control.lamps if lamp.cell is None}
     out = []
     for child in source.descendants(motion["index"]):
@@ -235,7 +248,7 @@ def mesh_targets(source: Source, motion: dict) -> list[dict]:
                     normal = tuple(-n for n in normal)
                 lifted = [tuple(p[a] + LEGEND_LIFT * normal[a] for a in range(3)) for p in points]
             every = points + lifted
-            margin = LIFT_TOLERANCE if lifted else TOLERANCE
+            margin = LEGEND_LIFT + LIFT_TOLERANCE if lifted else TOLERANCE
             low = [min(p[a] for p in every) - margin for a in range(3)]
             high = [max(p[a] for p in every) + margin for a in range(3)]
             out.append(dict(motion=motion, name=name, material=material, count=count, low=low, high=high,
@@ -277,6 +290,9 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
             if any(max(abs(a - b) for a, b in zip(p, q)) <= TOLERANCE for q in target["points"]) or \
                     any(max(abs(a - b) for a, b in zip(p, q)) <= LIFT_TOLERANCE for q in target["lifted"]):
                 picked.add(i)
+            elif target["lifted"] and any(abs(math.dist(p, q) - LEGEND_LIFT) <= SHELL_TOLERANCE
+                                          for q in target["points"]):
+                picked.add(i)     # curved decal (knob pointer): lifted along its own vertex normal
         chosen.append(picked)
     counts = [0] * len(applicable)
     skipped_animated = [0] * len(applicable)
@@ -365,6 +381,38 @@ def oriented_box(points, matrix, margin=CLICK_MARGIN):
     return vertices, indices
 
 
+def cap_box(source: Source, motion: dict, margin=CLICK_MARGIN):
+    """Push target over the front of a knob cap: the central half of the knob seen along its rotation
+    axis, from 30 % of its depth to 0.6 mm in front of it (in front of the rotary target, so it wins)."""
+    index = motion["index"]
+    world = source.world(index)
+    rotation = next((s for s in motion["stages"] if s["kind"] == "rotation"), None)
+    points = local_points(source, index)
+    low = [min(p[a] for p in points) for a in range(3)]
+    high = [max(p[a] for p in points) for a in range(3)]
+    if rotation is None:
+        return oriented_box(points, world, margin)
+    inverse = _invert(world)
+    axis = _unit(tuple(sum(inverse[r][c] * rotation["axis"][c] for c in range(3)) for r in range(3)))
+    k = max(range(3), key=lambda a: abs(axis[a]))
+    centre = [(lo + hi) / 2 for lo, hi in zip(low, high)]
+    front_high = transform_point(world, [high[a] if a == k else centre[a] for a in range(3)])
+    front_low = transform_point(world, [low[a] if a == k else centre[a] for a in range(3)])
+    front_is_high = _dot(_sub(EYE, front_high), _sub(EYE, front_high)) < _dot(_sub(EYE, front_low), _sub(EYE, front_low))
+    depth = high[k] - low[k]
+    lo2, hi2 = list(low), list(high)
+    for a in range(3):
+        if a != k:
+            half = (high[a] - low[a]) / 4
+            lo2[a], hi2[a] = centre[a] - half, centre[a] + half
+    if front_is_high:
+        lo2[k], hi2[k] = high[k] - 0.3 * depth, high[k] + 0.0006
+    else:
+        lo2[k], hi2[k] = low[k] - 0.0006, low[k] + 0.3 * depth
+    corners = [tuple(lo2), tuple(hi2)]
+    return oriented_box(corners, world, 0.0)
+
+
 def local_points(source: Source, index: int):
     """Points of a node's subtree in that node's local frame."""
     inverse = _invert(source.world(index))
@@ -424,6 +472,10 @@ def append_controls(text: str, source: Source, motions: list[dict]):
         if manip and f"{MARKER} CLICK {control.id}\n" in text:
             manip = None
         if manip:
+            if control.push_cap:   # the push cap first: drawn and hit-tested in front of the body
+                vertices, indices = cap_box(source, motion)
+                clicks.append((control, f"ATTR_manip_command\tbutton\t{control.push_cap}\t{control.label}",
+                               vertices, indices, motion))
             vertices, indices = oriented_box(local_points(source, motion["index"]), source.world(motion["index"]))
             clicks.append((control, manip, vertices, indices, motion))
         for lamp in control.lamps:
@@ -454,7 +506,8 @@ def append_controls(text: str, source: Source, motions: list[dict]):
     commands += ["ATTR_blend", "ATTR_poly_os\t0", "ATTR_draw_disable"]
     for control, manip, vertices, indices, motion in clicks:
         start, count = add(vertices, indices)
-        commands += [f"{MARKER} CLICK {control.id}", "ANIM_begin", *stage_lines(motion), manip,
+        marker = f"{MARKER} CLICK {control.id}" + (" CAP" if manip.startswith("ATTR_manip_command\t") and control.push_cap else "")
+        commands += [marker, "ANIM_begin", *stage_lines(motion), manip,
                      f"TRIS\t{start}\t{count}", "ATTR_manip_none", "ANIM_end"]
         report.append(dict(click=control.id, manipulator=manip.split("\t")[0], triangles=count // 3))
     commands += ["ATTR_manip_none", "ATTR_draw_enable"]
@@ -466,6 +519,83 @@ def append_controls(text: str, source: Source, motions: list[dict]):
                                                           counts[3] + len(all_indices))))
     header = MARKER + " CONTROLS" + ("" if batch == 1 else f" {batch}")
     return "\n".join([*lines, "", header, *commands, ""]), report
+
+
+SCREENS_OBJ = "objects/interior/cockpit-panels/a380x_mfd_screens.obj"
+SCREEN_LIFT = 0.0005             # m in front of the authored (black) screen face
+RMP_MARKER = "# A380X RMP DEVICES V1"
+
+
+def screen_quad(source: Source, node: str, lift=SCREEN_LIFT):
+    """Rectangle over a screen mesh, lifted toward the crew: (BL, TL, TR, BR) corners seen from the seat,
+    up = toward the windshield (+z), right = crew right (-x), and its facing normal."""
+    points = sorted({p for _m, tris, _n in source.primitives(source.names[node]) for tri in tris for p in tri})
+    centre = tuple(sum(p[a] for p in points) / len(points) for a in range(3))
+    normal = (0.0, 0.0, 0.0)
+    for _m, tris, _n in source.primitives(source.names[node]):
+        for tri in tris:
+            normal = tuple(a + b for a, b in zip(normal, _cross(_sub(tri[1], tri[0]), _sub(tri[2], tri[0]))))
+    normal = _unit(normal)
+    if _dot(normal, _sub(EYE, centre)) < 0:
+        normal = tuple(-n for n in normal)
+    def project(v):
+        d = _dot(v, normal)
+        return _unit(tuple(a - d * n for a, n in zip(v, normal)))
+    up0 = project((0.0, 0.0, 1.0))
+    side0 = _unit(_cross(up0, normal))
+    # principal in-plane axes of the screen outline (the overhead RMP is turned in its plane)
+    xs = [_dot(_sub(p, centre), side0) for p in points]
+    ys = [_dot(_sub(p, centre), up0) for p in points]
+    sxx = sum(x * x for x in xs); syy = sum(y * y for y in ys); sxy = sum(x * y for x, y in zip(xs, ys))
+    angle = 0.5 * math.atan2(2 * sxy, sxx - syy)             # long axis
+    long_axis = tuple(math.cos(angle) * a + math.sin(angle) * b for a, b in zip(side0, up0))
+    right = long_axis if _dot(long_axis, (-1.0, 0.0, 0.0)) >= 0 else tuple(-a for a in long_axis)   # crew right is -x
+    up = _unit(_cross(normal, right))
+    if _dot(up, up0) < 0:
+        up = tuple(-a for a in up)
+    us = [_dot(_sub(p, centre), right) for p in points]
+    vs = [_dot(_sub(p, centre), up) for p in points]
+    u0, u1, v0, v1 = min(us), max(us), min(vs), max(vs)
+    def corner(u, v):
+        return tuple(centre[a] + u * right[a] + v * up[a] + lift * normal[a] for a in range(3))
+    return [corner(u0, v0), corner(u0, v1), corner(u1, v1), corner(u1, v0)], normal, right, up
+
+
+def append_screens(text: str, source: Source):
+    """One full-UV device quad per RMP in the visible screen object (no manipulators there)."""
+    from cockpit_feedback_contract import RMP_CHANNELS, RMP_DEVICES, RMP_SCREEN_NODES
+    if RMP_MARKER in text:
+        return text, []
+    lines = text.splitlines()
+    row = next(i for i, line in enumerate(lines) if line.startswith("POINT_COUNTS"))
+    counts = list(map(int, lines[row].split()[1:]))
+    vertices, indices, commands, report = [], [], [RMP_MARKER, "ATTR_no_cockpit", "ATTR_poly_os\t2", "ATTR_draw_enable"], []
+    for n, (device, channel, node) in enumerate(zip(RMP_DEVICES, RMP_CHANNELS, RMP_SCREEN_NODES), 1):
+        corners, normal, right, up = screen_quad(source, node)
+        base = counts[0] + len(vertices)
+        start = counts[3] + len(indices)
+        # OBJ8 fronts are clockwise seen from the crew: BL, TL, TR / BL, TR, BR
+        for corner, uv in zip(corners, ((0, 0), (0, 1), (1, 1), (1, 0))):
+            vertices.append("VT\t" + _vec((*corner, *normal, *uv)))
+        tri = [0, 1, 2, 0, 2, 3]
+        a, b, c = (corners[k] for k in tri[:3])
+        if _dot(_cross(_sub(b, a), _sub(c, a)), normal) > 0:   # cross points away from the viewer for fronts
+            tri = [0, 2, 1, 0, 3, 2]
+        indices.extend(base + k for k in tri)
+        commands += ["ANIM_begin", f"ANIM_hide\t-0.5\t0.5\ta380x/xp12/rmp/{n}/device_active",
+                     f"ATTR_cockpit_device\t{device}\t1\t{channel}\t1", f"TRIS\t{start}\t6", "ATTR_no_cockpit",
+                     "ANIM_end"]
+        width = math.dist(corners[0], corners[3])
+        height = math.dist(corners[0], corners[1])
+        report.append(dict(device=device, width_mm=round(width * 1000, 1), height_mm=round(height * 1000, 1)))
+    commands += ["ATTR_poly_os\t0"]
+    at = max(i for i, line in enumerate(lines) if line.startswith("VT")) + 1
+    lines[at:at] = vertices
+    at = max(i for i, line in enumerate(lines) if line.startswith(("IDX\t", "IDX10\t", "IDX ", "IDX10 "))) + 1
+    lines[at:at] = ["IDX\t" + str(i) for i in indices]
+    lines[row] = "POINT_COUNTS\t" + "\t".join(map(str, (counts[0] + len(vertices), counts[1], counts[2],
+                                                          counts[3] + len(indices))))
+    return "\n".join([*lines, "", *commands, ""]), report
 
 
 def sha(text: str) -> str:
@@ -499,6 +629,11 @@ def run(aircraft: Path, source_path: Path, dry_run: bool, controls=CONTROLS) -> 
     if patched != original:
         staged[controls_path] = (original, patched)
     report["controls"] = rows
+    screens_path = aircraft / SCREENS_OBJ
+    original = screens_path.read_bytes().decode("latin-1")
+    patched, report["screens"] = append_screens(original, source)
+    if patched != original:
+        staged[screens_path] = (original, patched)
     report["problems"] = problems
     report["files"] = [dict(path=str(p.relative_to(aircraft)), before=sha(o), after=sha(n)) for p, (o, n) in staged.items()]
     if not dry_run and not problems:
@@ -509,8 +644,10 @@ def run(aircraft: Path, source_path: Path, dry_run: bool, controls=CONTROLS) -> 
     manifest_path = aircraft / PROVIDER_MANIFEST
     if manifest_path.is_file():
         document = json.loads(manifest_path.read_text())
+        from cockpit_feedback_contract import RMP_COMMANDS, RMP_DATAREFS, RMP_DEVICES
         section = {"commands": list(COMMANDS), "datarefs": list(DATAREFS),
-                   "hooked_commands": list(hooked_commands()), "runtime_tested": False}
+                   "hooked_commands": list(hooked_commands()), "rmp_commands": list(RMP_COMMANDS),
+                   "rmp_datarefs": list(RMP_DATAREFS), "cockpit_devices": list(RMP_DEVICES), "runtime_tested": False}
         from avionics_provider import AVIONICS_COMMANDS, AVIONICS_DATAREFS
         # the overhead pushbutton positions extend the lamp contract, part of the main provider lists
         if (document.get("cockpit_feedback") != section or document.get("commands") != list(AVIONICS_COMMANDS)

@@ -17,7 +17,12 @@ Kinds:
             commands already exist (KCCU, ECAM) or are created by the native module (SURV).
   selector  rotary selector with N detents: int <dataref> 0..N-1, commands <dataref>_left / _right.
   switch    toggle with N positions, 0 = bottom: int <dataref>, commands <dataref>_up / _down.
-  follow    animation only, driven by an existing dataref (no click, no command).
+  follow    animation only, driven by an existing dataref; a knob (commands up / down) may add a click.
+  static    lamps only (a fixed light face, no motion).
+
+Extra motions (`extra`, e.g. the RMP volume knobs: push in / pull out, then rotation) are applied inside
+the main one, each keyed 0..1 on its own dataref. `knob` gives the body a rotary click target, `push_cap`
+a push target over the front of the cap.
 """
 from __future__ import annotations
 
@@ -54,6 +59,9 @@ class Control:
     maximum: float = 1.0  # follow: dataref value at the last clip key
     files: tuple[str, ...] = ()      # restrict the panel patch to these OBJ names (default: all)
     group: str = ""
+    extra: tuple[tuple[str, str], ...] = ()   # (clip, dataref) applied inside the main motion, keyed 0..1
+    knob: tuple[str, str] | None = None       # (increase, decrease) commands: rotary click target
+    push_cap: str | None = None               # command of a push target over the cap
 
 
 def _ecam():
@@ -180,10 +188,88 @@ def _overhead():
     return rows
 
 
-OVERHEAD_WITHOUT_CLIP = ("PUSH_OVHD_SIGNS",)   # EMER EXIT LT OFF: the FBW legend has no pushbutton clip
+OVERHEAD_WITHOUT_CLIP = ("PUSH_OVHD_SIGNS",)
+
+# RMP keys: FBW node suffix -> command key (a380x_rmp_adapter.inc rmp_key_names, same order there).
+RMP_KEYS = (("0", "0"), ("1", "1"), ("2", "2"), ("3", "3"), ("4", "4"), ("5", "5"), ("6", "6"), ("7", "7"),
+            ("8", "8"), ("9", "9"), ("DOT", "dot"), ("CLR", "clr"), ("UP", "up"), ("DOWN", "down"),
+            ("ADK1", "adk1"), ("ADK2", "adk2"), ("ADK3", "adk3"), ("LSK1", "lsk1"), ("LSK2", "lsk2"),
+            ("LSK3", "lsk3"), ("VHF", "vhf"), ("HF", "hf"), ("TEL", "tel"), ("SQWK", "sqwk"), ("MENU", "menu"),
+            ("NAV", "nav"), ("MSG_CLR", "msg_clr"), ("RST", "rst"), ("VHF1", "vhf1_call"), ("VHF2", "vhf2_call"),
+            ("VHF3", "vhf3_call"), ("HF1", "hf1_call"), ("HF2", "hf2_call"), ("TEL1", "tel1_call"),
+            ("TEL2", "tel2_call"), ("INT", "int_call"), ("CAB", "cab_call"), ("PA", "pa_call"),
+            ("VOICE", "voice_call"), ("STBY_NAV", "stby_nav"), ("BLANK", "blank"), ("BLANK2", "blank2"),
+            ("DUMMY2", "dummy2"))
+RMP_KEY_LABELS = {"adk1": "ADK 1 - select row / swap", "adk2": "ADK 2 - select row / swap",
+                  "adk3": "ADK 3 - select row / swap (SQWK: IDENT)", "lsk1": "LSK 1 - select row / enter STBY",
+                  "lsk2": "LSK 2 - select row / enter STBY", "lsk3": "LSK 3 - select row / enter STBY",
+                  "clr": "CLR (hold: clear entry)", "msg_clr": "MSG CLR", "up": "UP - STBY mode",
+                  "down": "DOWN - STBY mode", "vhf1_call": "VHF 1 transmit", "vhf2_call": "VHF 2 transmit",
+                  "vhf3_call": "VHF 3 transmit"}
+# Reception knobs: FBW knob suffix -> channel (push: receive on / off, turn: volume)
+RMP_KNOBS = (("VHF1", "vhf1"), ("VHF2", "vhf2"), ("VHF3", "vhf3"), ("HF1", "hf1"), ("HF2", "hf2"), ("TEL1", "tel1"),
+             ("TEL2", "tel2"), ("INT", "int"), ("CAB", "cab"), ("PA", "pa"), ("VOICE", "voice"), ("DUMMY", "dummy"))
+RMP_CALL_LAMPS = ("vhf1_call", "vhf2_call", "vhf3_call")
+
+
+def rmp_commands(n: int) -> tuple[str, ...]:
+    p = f"{PREFIX}rmp/{n}/"
+    return (*(p + key for _node, key in RMP_KEYS),
+            *(p + f"{ch}_knob_{act}" for _node, ch in RMP_KNOBS for act in ("push", "up", "down")),
+            p + "brightness_up", p + "brightness_down")
+
+
+def rmp_datarefs(n: int) -> tuple[str, ...]:
+    p = f"{PREFIX}rmp/{n}/"
+    return (*(p + f"{ch}_{what}" for _node, ch in RMP_KNOBS for what in ("rx", "volume")),
+            p + "brightness", p + "state", p + "page", p + "standby_led", p + "device_active",
+            *(p + f"lamp/{key}" for key in RMP_CALL_LAMPS))
+
+
+def _rmp():
+    rows = []
+    for n in (1, 2, 3):
+        p = f"{PREFIX}rmp/{n}/"
+        for suffix, key in RMP_KEYS:
+            lamps = ()
+            if key in RMP_CALL_LAMPS:
+                lamps = (Lamp(f"PUSH_RMP_{n}_{suffix}_SEQ2", f"{p}lamp/{key}", GREEN_CELL),)
+            label = RMP_KEY_LABELS.get(key, key.replace("_", " ").upper())
+            rows.append(Control(f"rmp{n}_{key}", "press", f"PUSH_RMP_{n}_{suffix}", f"PUSH_RMP_{n}_{suffix}",
+                                f"{p}{key}_pressed", (p + key,), f"RMP {n} {label}", lamps=lamps, group="rmp"))
+        for suffix, ch in RMP_KNOBS:
+            node = f"KNOB_RMP_{n}_{suffix}"
+            rows.append(Control(f"rmp{n}_{ch}_knob", "follow", node, f"{node}_PUSH_ANIM", f"{p}{ch}_rx",
+                                label=f"RMP {n} {ch.upper()} - push: reception on / off, turn: volume",
+                                extra=((f"{node}_ROTATE_ANIM", f"{p}{ch}_volume"),),
+                                knob=(f"{p}{ch}_knob_up", f"{p}{ch}_knob_down"), push_cap=f"{p}{ch}_knob_push",
+                                group="rmp"))
+        rows.append(Control(f"rmp{n}_brightness", "follow", f"KNOB_RMP_{n}_OFFBRT", f"KNOB_RMP_{n}_OFFBRT",
+                            f"{p}brightness", label=f"RMP {n} OFF / BRT",
+                            knob=(f"{p}brightness_up", f"{p}brightness_down"), group="rmp"))
+        rows.append(Control(f"rmp{n}_nav_sel", "selector", f"KNOB_RMP_{n}_NAV_SEL", f"KNOB_RMP_{n}_NAV_SEL",
+                            f"{p}nav_sel", label=f"RMP {n} NAV audio - ADF 1 / ADF 2 / LS / VOR 1 / VOR 2 / MKR",
+                            positions=6, default=0, group="rmp"))
+        rows.append(Control(f"rmp{n}_int_rad", "switch", f"SWITCH_RMP_{n}_INTRAD", f"SWITCH_RMP_{n}_INTRAD",
+                            f"{p}int_rad", label=f"RMP {n} INT / RAD", positions=2, default=0, group="rmp"))
+        rows.append(Control(f"rmp{n}_stby_nav_cover", "switch", f"COVER_RMP_{n}_STBY_NAV", f"COVER_RMP_{n}_STBY_NAV",
+                            f"{p}stby_nav_cover", label=f"RMP {n} STBY RAD NAV guard - open / close",
+                            positions=2, default=0, group="rmp"))
+        rows.append(Control(f"rmp{n}_standby_led", "static", f"LIGHT_RMP_{n}_LED_GREEN", "", f"{p}standby_led",
+                            lamps=(Lamp(f"LIGHT_RMP_{n}_LED_GREEN", f"{p}standby_led", GREEN_CELL),), click=False,
+                            group="rmp"))
+    return rows
+
+
+RMP_DEVICES = ("a380x.xp12.rmp.1", "a380x.xp12.rmp.2", "a380x.xp12.rmp.3")
+RMP_CHANNELS = (23, 24, 25)       # instrument brightness slots (MFD 14/15, ND 16/17, SD 18, PFD 19/20, ISIS 21/22)
+RMP_SCREEN_NODES = ("SCREEN_RMP_1", "SCREEN_RMP_2", "SCREEN_RMP_3")
+RMP_W, RMP_H = 768, 466           # device texels (95.1 x 57.7 mm screen)
+RMP_COMMANDS = tuple(c for n in (1, 2, 3) for c in rmp_commands(n))
+RMP_DATAREFS = tuple(d for n in (1, 2, 3) for d in rmp_datarefs(n))   # EMER EXIT LT OFF: the FBW legend has no pushbutton clip
 
 CONTROLS: tuple[Control, ...] = (*_switching(), *_ecam(), *_surv(), *_kccu(), *_eng_master(), *_glareshield_side(),
-                                 *_overhead())
+                                 *_overhead(), *_rmp())
 
 
 def owned_commands() -> tuple[str, ...]:
@@ -202,13 +288,19 @@ def hooked_commands() -> tuple[str, ...]:
     return tuple(cmd for c in CONTROLS if c.kind == "press" for cmd in c.commands if cmd not in owned)
 
 
+def module_datarefs() -> set[str]:
+    """Datarefs another native module publishes (the feedback module only binds geometry to them)."""
+    return set(RMP_DATAREFS)
+
+
 def published_datarefs() -> tuple[str, ...]:
     out = []
+    others = module_datarefs()
     for c in CONTROLS:
-        if c.kind != "follow":
+        if c.kind not in ("follow", "static"):
             out.append(c.dataref)
         out += [lamp.dataref for lamp in c.lamps]
-    return tuple(dict.fromkeys(out))
+    return tuple(d for d in dict.fromkeys(out) if d not in others)
 
 
 COMMANDS = owned_commands()
@@ -216,7 +308,9 @@ DATAREFS = published_datarefs()
 
 
 def click_manipulator(c: Control) -> str | None:
-    if not c.click or c.kind == "follow":
+    if c.knob:
+        return f"ATTR_manip_command_knob\trotate_small\t{c.knob[0]}\t{c.knob[1]}\t{c.label}"
+    if not c.click or c.kind in ("follow", "static"):
         return None
     if c.kind == "press":
         return f"ATTR_manip_command\tbutton\t{c.commands[0]}\t{c.label}"

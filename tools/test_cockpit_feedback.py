@@ -91,11 +91,19 @@ class InstalledAircraft(unittest.TestCase):
         for c in contract.CONTROLS:
             self.assertTrue(any(f'{cf.MARKER} {c.id} ' in t for t in texts), c.id)
 
+    def test_rmp_screens(self):
+        text = (AIRCRAFT / cf.SCREENS_OBJ).read_text(encoding='latin-1')
+        self.assertEqual(text.count(cf.RMP_MARKER), 1)
+        for device in contract.RMP_DEVICES:
+            self.assertEqual(text.count(f'ATTR_cockpit_device\t{device}\t'), 1)
+
     def test_manifest_section(self):
         import json
         doc = json.loads((AIRCRAFT / cf.PROVIDER_MANIFEST).read_text())
         self.assertEqual(doc['cockpit_feedback']['commands'], list(contract.COMMANDS))
         self.assertEqual(doc['cockpit_feedback']['datarefs'], list(contract.DATAREFS))
+        self.assertEqual(doc['cockpit_feedback']['rmp_commands'], list(contract.RMP_COMMANDS))
+        self.assertEqual(doc['cockpit_feedback']['cockpit_devices'], list(contract.RMP_DEVICES))
 
 
 if __name__ == '__main__':
