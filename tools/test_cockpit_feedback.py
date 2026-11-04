@@ -99,6 +99,15 @@ class InstalledAircraft(unittest.TestCase):
                     continue
             self.assertTrue(any(f'{cf.MARKER} {c.id} ' in t for t in files.values()), c.id)
 
+    def test_range_knobs_spin_on_one_axis(self):
+        from fix_euler_knobs import MARKER as EULER
+        knob = (AIRCRAFT / 'objects/interior/cockpit-panels/panel_a380_cockpit_mip_knob01_4k.obj').read_text(encoding='latin-1')
+        self.assertEqual(knob.count(EULER), 2)
+        for side in ('captain', 'first_officer'):
+            self.assertEqual(knob.count(f'ANIM_rotate_begin\t') and
+                             sum(1 for line in knob.splitlines()
+                                 if line.strip().startswith('ANIM_rotate_begin') and line.endswith(f'{side}/range_index')), 1)
+
     def test_rmp_screens(self):
         text = (AIRCRAFT / cf.SCREENS_OBJ).read_text(encoding='latin-1')
         self.assertEqual(text.count(cf.RMP_MARKER), 1)

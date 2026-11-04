@@ -421,6 +421,7 @@ static const CfbPositionRow cfb_position_rows[] = {
     {"a380x/xp12/rmp/3/nav_sel", 6, 0, 0},
     {"a380x/xp12/rmp/3/int_rad", 2, 0, 1},
     {"a380x/xp12/rmp/3/stby_nav_cover", 2, 0, 1},
+    {"a380x/xp12/eng_start/selector", 3, 1, 0},
 };
 
 static const CfbEcamLampRow cfb_ecam_lamps[] = {

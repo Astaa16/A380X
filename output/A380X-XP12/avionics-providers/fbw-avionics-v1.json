@@ -2223,7 +2223,9 @@
       "a380x/xp12/rmp/3/int_rad_up",
       "a380x/xp12/rmp/3/int_rad_down",
       "a380x/xp12/rmp/3/stby_nav_cover_up",
-      "a380x/xp12/rmp/3/stby_nav_cover_down"
+      "a380x/xp12/rmp/3/stby_nav_cover_down",
+      "a380x/xp12/eng_start/selector_left",
+      "a380x/xp12/eng_start/selector_right"
     ],
     "datarefs": [
       "a380x/xp12/switching/att_hdg",
@@ -2659,7 +2661,8 @@
       "a380x/xp12/rmp/3/dummy2_pressed",
       "a380x/xp12/rmp/3/nav_sel",
       "a380x/xp12/rmp/3/int_rad",
-      "a380x/xp12/rmp/3/stby_nav_cover"
+      "a380x/xp12/rmp/3/stby_nav_cover",
+      "a380x/xp12/eng_start/selector"
     ],
     "hooked_commands": [
       "a380x/xp12/ecam/sd/apu",

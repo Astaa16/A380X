@@ -140,6 +140,12 @@ KCCU_NODE_KEYS = (*"ABCDEFGHIJKLMNOPQRSTUVWXYZ", *"0123456789", "DOT", "PLUSMINU
                   "FORWARD")
 
 
+def _eng_start():
+    # ENG START selector: 0 CRANK (FBW rest pose), 1 NORM, 2 IGN START; the start logic is a380x_eng_start.inc
+    return [Control("eng_start_selector", "selector", "ENG_START", "KNOB_ENGINES_MODE", f"{PREFIX}eng_start/selector",
+                    label="ENG START - CRANK / NORM / IGN START", positions=3, default=1, group="eng_start")]
+
+
 def _kccu():
     rows = []
     for letter, side in (("L", "captain"), ("R", "first_officer")):
@@ -269,7 +275,7 @@ RMP_COMMANDS = tuple(c for n in (1, 2, 3) for c in rmp_commands(n))
 RMP_DATAREFS = tuple(d for n in (1, 2, 3) for d in rmp_datarefs(n))   # EMER EXIT LT OFF: the FBW legend has no pushbutton clip
 
 CONTROLS: tuple[Control, ...] = (*_switching(), *_ecam(), *_surv(), *_kccu(), *_eng_master(), *_glareshield_side(),
-                                 *_overhead(), *_rmp())
+                                 *_overhead(), *_rmp(), *_eng_start())
 
 
 def owned_commands() -> tuple[str, ...]:
