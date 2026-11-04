@@ -17,8 +17,18 @@ Kinds:
             commands already exist (KCCU, ECAM) or are created by the native module (SURV).
   selector  rotary selector with N detents: int <dataref> 0..N-1, commands <dataref>_left / _right.
   switch    toggle with N positions, 0 = bottom: int <dataref>, commands <dataref>_up / _down.
-  follow    animation only, driven by an existing dataref; a knob (commands up / down) may add a click.
+  follow    animation only, driven by an existing dataref; a knob (commands up / down) may add a click,
+            `commands` a button click.
   static    lamps only (a fixed light face, no motion).
+  toggle    two-position part (guards, circuit breakers, laptop switch, fire pushbuttons, furniture): float
+            <dataref> 0..1 eased over `travel` seconds, command <dataref>_toggle; the whole clip is 0 -> 1.
+  rotary    knob without detent logic of its own: float <dataref> 0..1 over the whole clip, commands
+            <dataref>_up / _down (or hooked `commands` (up, down)) move it by `step`, eased at 1/`travel`
+            per second (0: at once); `wrap` turns it endlessly (KCCU wheel).
+
+Press commands are hooked (another module owns them) unless `own`, then this module creates them.
+A clip that animates several nodes (`also`, or `all_nodes` for every node it targets) moves each one; a
+node below another animated node (seat cushion on the seat, keys on the keyboard tray) composes both.
 
 Extra motions (`extra`, e.g. the RMP volume knobs: push in / pull out, then rotation) are applied inside
 the main one, each keyed 0..1 on its own dataref. `knob` gives the body a rotary click target, `push_cap`
@@ -59,9 +69,19 @@ class Control:
     maximum: float = 1.0  # follow: dataref value at the last clip key
     files: tuple[str, ...] = ()      # restrict the panel patch to these OBJ names (default: all)
     group: str = ""
-    extra: tuple[tuple[str, str], ...] = ()   # (clip, dataref) applied inside the main motion, keyed 0..1
+    extra: tuple[tuple, ...] = ()             # (clip, dataref[, min, max]) inside the main motion, keyed 0..1
+                                              # (or min..max)
     knob: tuple[str, str] | None = None       # (increase, decrease) commands: rotary click target
     push_cap: str | None = None               # command of a push target over the cap
+    also: tuple[str, ...] = ()                # more nodes moved by the same clip(s)
+    all_nodes: bool = False                   # every node the clip(s) animate
+    own: bool = False                         # press: the module creates the commands
+    travel: float = 0.0                       # toggle: seconds end to end; rotary: easing (0 = at once)
+    step: float = 0.1                         # rotary step per command
+    initial: float = 0.0                      # toggle / rotary start value
+    wrap: bool = False                        # rotary turns endlessly
+    click_node: str | None = None             # node whose subtree is the click box (default: node)
+    manip: str = ""                           # rotary click: "" knob, "up_down" switch up / down
 
 
 def _ecam():
@@ -249,7 +269,7 @@ def _rmp():
                                 label=f"RMP {n} {ch.upper()} - push: reception on / off, turn: volume",
                                 extra=((f"{node}_ROTATE_ANIM", f"{p}{ch}_volume"),),
                                 knob=(f"{p}{ch}_knob_up", f"{p}{ch}_knob_down"), push_cap=f"{p}{ch}_knob_push",
-                                group="rmp"))
+                                also=(f"{node}_SEQ1",), group="rmp"))
         rows.append(Control(f"rmp{n}_brightness", "follow", f"KNOB_RMP_{n}_OFFBRT", f"KNOB_RMP_{n}_OFFBRT",
                             f"{p}brightness", label=f"RMP {n} OFF / BRT",
                             knob=(f"{p}brightness_up", f"{p}brightness_down"), group="rmp"))
@@ -267,6 +287,335 @@ def _rmp():
     return rows
 
 
+def _glareshield():
+    """Glareshield and sidestick keys of the glareshield module (its commands, hooked; the click targets
+    are in config/cockpit_controls.json) and the AUTOLAND lights (test press only)."""
+    g = PREFIX + "glareshield/"
+    rows = []
+    for short, side, caption in (("CS", "left", "CAPT"), ("FO", "right", "F/O")):
+        for key, command in (("CHRONO", "chrono"), ("SIDESTICK", "takeover"), ("MASTERCAUT", "master_caution"),
+                             ("MASTERWARN", "master_warning"), ("ATCMSG", "atc_ack"), ("PTT", "ptt")):
+            node = f"PUSH_GLARESHIELD_{short}_{key}"
+            rows.append(Control(f"glareshield_{command}_{side}", "press", node, node, f"{g}{command}_{side}_pressed",
+                                (f"{g}{command}_{side}",), click=False, group="glareshield"))
+        clip = "PUSH_GLARESHIELD_CS_AUTOLAND" if short == "CS" else "PUSH_AUTOPILOT_MASTERCAUT_R"
+        rows.append(Control(f"glareshield_autoland_{side}", "press", f"PUSH_GLARESHIELD_{short}_AUTOLAND", clip,
+                            f"{g}autoland_{side}_pressed", (f"{g}autoland_{side}",), f"{caption} AUTOLAND light",
+                            own=True, group="glareshield"))
+        stick = "LEFT" if short == "CS" else "RIGHT"
+        rows.append(Control(f"sidestick_takeover_{side}", "press", f"PUSH_YOKE_{stick}", f"PUSH_YOKE_{stick}",
+                            f"{g}stick_takeover_{side}_pressed", (f"{g}takeover_{side}",),
+                            f"{caption} SIDESTICK takeover pushbutton", group="glareshield"))
+        rows.append(Control(f"{side}_loudspeaker", "follow", f"KNOB_GLARESHIELD_{short}_SPEAKER",
+                            f"KNOB_GLARESHIELD_{short}_SPEAKER", f"{g}volume_{side}", click=False, minimum=0,
+                            maximum=100, group="glareshield"))
+    return rows
+
+
+def _sidesticks():
+    # roll 0 = full left, pitch 0 = full forward (FBW keys 0..20, centre 10); the F/O stick follows the
+    # copilot axes, so it stays centred unless a second set of hardware is bound.
+    rows = []
+    for stick, side, suffix in (("LEFT", "captain", ""), ("RIGHT", "first_officer", "_copilot")):
+        rows.append(Control(f"sidestick_{side}", "follow", f"YOKE_{stick}_DUMMY1", "yoke_lever_stick1_l_r",
+                            f"sim/joystick/yoke_roll_ratio{suffix}", click=False, minimum=-1, maximum=1,
+                            extra=(("yoke_lever_stick_fore1_aft", f"sim/joystick/yoke_pitch_ratio{suffix}", -1, 1),),
+                            group="sidestick"))
+        rows.append(Control(f"tiller_handle_{side}", "toggle", f"HANDLE_{stick}_YOKE", f"HANDLE_{stick}_YOKE",
+                            f"{PREFIX}cockpit/{side}_side_handle", label="Side handle - fold / unfold",
+                            travel=0.6, group="sidestick"))
+    return rows
+
+
+EFIS_KEYS = ("PFD", "RECONF", "BLANK")
+
+
+def _efis():
+    rows = []
+    for short, side, caption in (("CS", "captain", "CAPT"), ("FO", "first_officer", "F/O")):
+        for key in EFIS_KEYS:
+            node = f"PUSH_EFIS_{short}_{key}"
+            rows.append(Control(f"efis_{side}_{key.lower()}", "press", node, node,
+                                f"{PREFIX}efis/{side}/{key.lower()}_pb_pressed", (f"{PREFIX}efis/{side}/{key.lower()}_pb",),
+                                f"{caption} EFIS {key}", own=True, group="efis"))
+        rows.append(Control(f"efis_{side}_oit_brightness", "rotary", f"KNOB_EFIS_{short}_OIT", f"KNOB_EFIS_{short}_OIT",
+                            f"{PREFIX}oit/{side}_brightness", label=f"{caption} OIT brightness", step=0.05,
+                            initial=0.75, group="efis"))
+    return rows
+
+
+def _kccu_extra():
+    rows = []
+    for letter, side, caption in (("L", "captain", "CAPT"), ("R", "first_officer", "F/O")):
+        p = f"{PREFIX}kccu/{side}/"
+        for n in range(1, 7):
+            node = f"PUSH_KCCU{letter}_BLANK{n}"
+            rows.append(Control(f"kccu_{side}_blank{n}", "press", node, node if n == 1 else node + "_ANIM",
+                                f"{p}blank{n}_pressed", (f"{p}blank{n}",), f"{caption} KCCU (blank key)", own=True,
+                                group="kccu"))
+        for what in ("kbd", "ccd"):
+            node = f"PUSH_KCCU{letter}_{what.upper()}_ON_OFF"
+            rows.append(Control(f"kccu_{side}_{what}_switch", "follow", node, node + "_ANIM", f"{p}{what}_on",
+                                click=False, group="kccu"))
+    rows.append(Control("kccu_captain_wheel", "rotary", "PUSH_KCCUL_WHEEL", "PUSH_KCCUL_WHEEL_ANIM",
+                        f"{PREFIX}kccu/captain/wheel_angle", (f"{PREFIX}kccu/captain/wheel_up",
+                                                              f"{PREFIX}kccu/captain/wheel_down"),
+                        click=False, step=0.1, wrap=True, group="kccu"))
+    return rows
+
+
+OIT_KEYS = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "ALT_LH", "ALT_RH", "ARROW_DOWN", "ARROW_LEFT",
+            "ARROW_RIGHT", "ARROW_UP", "B", "BACKSLASH", "BACKSPACE", "BLANK1", "BLANK2", "BLANK3", "BRACE_CLOSE",
+            "BRACE_OPEN", "C", "CAPS", "CAPSLOCK", "COMMA", "CTRL_LH", "CTRL_RH", "D", "DEL", "E", "ELLIPSIS",
+            "ENTER", "ESC", "F", "F1", "F10", "F11", "F12", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9",
+            "FULLSTOP", "G", "H", "I", "INS", "J", "K", "L", "LH_MOUSE", "M", "MINUS", "N", "O", "OIS_MENU",
+            "OIS_XFR", "P", "PLUS", "Q", "R", "RH_MOUSE", "S", "SEMICOLON", "SHIFT_LH", "SHIFT_RH", "SKIP_DOWN",
+            "SKIP_UP", "SLASH", "SPACE_LH", "SPACE_RH", "SWUNG_DASH", "T", "TAB", "U", "V", "W", "X", "Y", "Z")
+ACD_KEYS = ("OIS_XFR", "OIS_MENU", "ENTER", "ESC", "UP", "DOWN", "LEFT", "RIGHT")
+
+
+def _oit():
+    # OIT keyboard on the captain's tray (FBW models only that one) and the two ACD keypads: key travel.
+    p = PREFIX + "oit/"
+    rows = [Control(f"oit_kbd_{key.lower()}", "press", f"PUSH_KBD_CPT_{key}", f"PUSH_KBD_CPT_ANIM_{key}",
+                    f"{p}captain/kbd/{key.lower()}_pressed", (f"{p}captain/kbd/{key.lower()}",),
+                    f"CAPT OIT keyboard {key.replace('_', ' ')}", own=True, all_nodes=True, group="oit")
+            for key in OIT_KEYS]
+    for short, side, caption in (("CPT", "captain", "CAPT"), ("FO", "first_officer", "F/O")):
+        rows += [Control(f"oit_acd_{side}_{key.lower()}", "press", f"PUSH_ACD_{short}_{key}", f"PUSH_ACD_{short}_{key}",
+                         f"{p}{side}/acd/{key.lower()}_pressed", (f"{p}{side}/acd/{key.lower()}",),
+                         f"{caption} OIT cursor control {key.replace('_', ' ')}", own=True, group="oit")
+                 for key in ACD_KEYS]
+    return rows
+
+
+# momentary pushbuttons without a system here yet: (FBW node, clip, key, hover label); a hooked command
+# replaces the key's own one
+PANEL_KEYS = (
+    ("PUSH_OVHD_VENTILATION_SMOKE", "PUSH_OVHD_VENTILATION_SMOKE", "ventilation_smoke", "VENTILATION SMOKE"),
+    ("PUSH_OVHD_AP.035", "PUSH_OVHD_AP.035", "ovhd_pb_035", "pushbutton"),
+    ("PUSH_OVHD_AP.037", "PUSH_OVHD_AP.037", "ovhd_pb_037", "pushbutton"),
+    ("PUSH_OXYGEN_TWRRESET", "PUSH_OXYGEN_TWRRESET", "oxygen_tmr_reset", "OXYGEN TMR RESET"),
+    ("PUSH_DOOR_LCKG_SYS", "PUSH_DOOR_LCKG_SYS", "door_locking_sys", "COCKPIT DOOR LOCKING SYS"),
+    ("PUSH_OVHD_EMERELECPWR_RAT", "PUSH_OVHD_EMERELECPWR_RAT", "emer_elec_rat", "EMER ELEC PWR"),
+    ("PUSH_OVHD_PA.001", "PUSH_OVHD_PA", "ovhd_pa", "PA"),
+    ("PUSH_OVHD_OXYGEN_RATMANON", "PUSH_OVHD_OXYGEN_RATMANON", "oxygen_mask_man_on", "MASK MAN ON"),
+    ("PUSH_OVHD_CALLS_MECH", "PUSH_OVHD_CALLS_MECH", "calls_mech", "CALLS MECH"),
+    ("PUSH_OVHD_CALLS_DECK_UPPER", "PUSH_OVHD_CALLS_DECK_UPPER", "calls_upper_deck", "CALLS UPPER DECK"),
+    ("PUSH_OVHD_CALLS_DECK_MAIN", "PUSH_OVHD_CALLS_DECK_MAIN", "calls_main_deck", "CALLS MAIN DECK"),
+    ("PUSH_OVHD_CALLS_PURS", "PUSH_OVHD_CALLS_PURS", "calls_purs", "CALLS PURS"),
+    ("PUSH_OVHD_CALLS_REST_FWD", "PUSH_OVHD_CALLS_REST_FWD", "calls_rest_fwd", "CALLS REST FWD"),
+    ("PUSH_OVHD_CALLS_REST_MAIN", "PUSH_OVHD_CALLS_REST_MAIN", "calls_rest_main", "CALLS REST MAIN"),
+    ("PUSH_OVHD_CALLS_ALL", "PUSH_OVHD_CALLS_ALL", "calls_all", "CALLS ALL"),
+    ("PUSH_OVHD_EVAC_HORN_OFF", "PUSH_OVHD_EVAC_HORN_OFF", "evac_horn_off", "EVAC HORN SHUT OFF"),
+    ("PUSH_GND_HF_DATA_LINK", "PUSH_GND_HF_DATA_LINK", "gnd_hf_datalink", "GND HF DATALINK"),
+    ("PUSH_OVHD_MAINT_GND_CONNECTION", "PUSH_OVHD_MAINT_GND_CONNECTION", "maint_gnd_connection", "MAINT GND CONNECTION"),
+    ("PUSH_OVHD_CARGOSMOKE_TEST", "PUSH_OVHD_CARGOSMOKE_TEST", "cargo_smoke_test", "CARGO SMOKE TEST"),
+    ("PUSH_DFDR_EVENT", "ANIM_PUSH_DFDR_EVENT", "dfdr_event", "DFDR EVENT"),
+    ("PUSH_ACMS_TRIGGER", "ANIM_PUSH_ACMS_TRIGGER", "acms_trigger", "ACMS TRIGGER"),
+    ("PUSH_KNOB_CPT_WXR_VD_AZIM", "PUSH_KNOB_CPT_WXR_VD_AZIM", "captain_wxr_vd_azim_push", "CAPT WXR VD AZIM - push"),
+    ("PUSH_KNOB_FO_WXR_VD_AZIM", "PUSH_KNOB_FO_WXR_VD_AZIM", "first_officer_wxr_vd_azim_push", "F/O WXR VD AZIM - push"),
+)
+HOOKED_KEYS = {"oxygen_crew": ("PUSH_OVHD_OXYGEN_CREW", "sim/oxy/crew_valve_toggle")}
+
+
+def _panel_keys():
+    p = PREFIX + "cockpit/"
+    rows = [Control(f"key_{key}", "press", node, clip, f"{p}{key}_pressed", (f"{p}{key}",), f"{label} - pushbutton",
+                    own=True, group="panel_keys") for node, clip, key, label in PANEL_KEYS]
+    for key, (node, command) in HOOKED_KEYS.items():   # the CREW OXY SUPPLY click target exists already
+        rows.append(Control(f"key_{key}", "press", node, node, f"{p}{key}_pressed", (command,), click=False,
+                            group="panel_keys"))
+    return rows
+
+
+FIRE_PUSHBUTTONS = ("ENG1", "ENG2", "ENG3", "ENG4", "APU")
+
+
+def _fire():
+    # ENG / APU FIRE pushbuttons (released = 1, a380x/xp12/engine/fire_pushbutton[0..3] for the ECAM) under
+    # their guards.
+    rows = []
+    for unit in FIRE_PUSHBUTTONS:
+        key = unit.lower()
+        rows.append(Control(f"fire_{key}_guard", "toggle", f"A380X_OVHD_{unit}_FIRE_GUARD",
+                            f"A380X_OVHD_{unit}_FIRE_GUARD", f"{PREFIX}fire/{key}_guard",
+                            label=f"{unit} FIRE pushbutton guard - open / close", all_nodes=True, travel=0.3,
+                            group="fire"))
+        rows.append(Control(f"fire_{key}_pb", "toggle", f"PUSH_OVHD_FIRE_{unit}", f"PUSH_OVHD_FIRE_{unit}",
+                            f"{PREFIX}fire/{key}_pb", label=f"{unit} FIRE pushbutton - release / reset",
+                            all_nodes=True, travel=0.15, group="fire"))
+    return rows
+
+
+GUARDS = ("LOCK_OVHD_CALLS_EMER", "LOCK_OVHD_CABINPRESS_DITCHING", "LOCK_OVHD_AIRCOND_RAMAIR", "LOCK_OVHD_CARGOSMOKE_FWD",
+          "LOCK_OVHD_ENGMANSTART_1", "LOCK_OVHD_ENGMANSTART_2", "LOCK_OVHD_ENGMANSTART_3", "LOCK_OVHD_ENGMANSTART_4",
+          "LOCK_OVHD_ENGMANSTARTALTN", "LOCK_OVHD_CARGOSMOKE_AFT", "LOCK_OVHD_FLTCTL_SEC1", "LOCK_OVHD_FLTCTL_SEC2",
+          "LOCK_OVHD_FLTCTL_SEC3", "LOCK_OVHD_FLTCTL_PRIM1", "LOCK_OVHD_FLTCTL_PRIM2", "LOCK_OVHD_FLTCTL_PRIM3",
+          "LOCK_OVHD_HYD_ENG1_AB", "LOCK_OVHD_HYD_ENG2_AB", "LOCK_OVHD_HYD_ENG3_AB", "LOCK_OVHD_HYD_ENG4_AB",
+          "LOCK_OVHD_FUEL_OUTRTK_XFR", "LOCK_OVHD_FUEL_MIDTK_XFR", "LOCK_OVHD_FUEL_INRTK_XFR",
+          "LOCK_OVHD_FUEL_TRIMTK_XFR", "LOCK_OVHD_ENG_FADEC1", "LOCK_OVHD_ENG_FADEC2", "LOCK_OVHD_ENG_FADEC3",
+          "LOCK_OVHD_ENG_FADEC4", "LOCK_OVHD_HYD_GPUMPA", "LOCK_OVHD_HYD_GPUMPB", "LOCK_OVHD_HYD_YPUMPA",
+          "LOCK_OVHD_HYD_YPUMPB", "LOCK_DOOR_LCKG_SYS", "LOCK_OVHD_NSSMASTER", "LOCK_OVHD_EVAC_COMMAND",
+          "LOCK_OVHD_OXYGEN_RATMANON", "LOCK_OVHD_CABAIR_EXTRACT", "LOCK_OVHD_JETTISON_ACTIVE", "LOCK_OVHD_JETTISON_ARM",
+          "LOCK_OVHD_EMER_OUTR_XFR", "LOCK_GND_HF_DATA_LINK", "LOCK_OVHD_MAINT_CONNECTION")
+CIRCUIT_BREAKERS = ("AESU1", "AESU2", "AICU1", "AICU2", "ARPT_NAV", "ATC", "AVS1", "AVS2", "BSCS1", "BSCS2", "CIDS1",
+                    "CIDS2", "CIDS3", "CPCS1", "CPCS2", "DSMS", "DTLNKROUTER", "EMPTY1", "EMPTY2", "EMPTY3", "EMPTY4",
+                    "EMPTY5", "EMPTY6", "EMPTY7", "EMPTY8", "ENG1_EIPM2", "ENG2_EIPM1", "ENG3_EIPM2", "ENG4_EIPM1",
+                    "ESS_TR", "FLAPS1", "FLAPS2", "FMC_A", "FMC_B", "FMC_C", "FQMS1", "FQMS2", "FWS1", "FWS2", "GCU",
+                    "LGCIS1", "LGCIS2", "NSS_AVNCS", "NSS_FLT_OPS", "PACK1_CTL", "PACK2_CTL", "PAX_BBAND", "SCS1",
+                    "SCS2", "SDF1", "SDF2", "SDF3", "SLAT2", "SLATS1", "TCS1", "TCS2", "TR1", "TR_2A", "VCS1", "VCS2")
+
+
+def _guards_and_breakers():
+    rows = []
+    for node in GUARDS:
+        key = node.replace("LOCK_OVHD_", "").replace("LOCK_", "").lower()
+        rows.append(Control(f"guard_{key}", "toggle", node, node, f"{PREFIX}guard/{key}",
+                            label=f"{key.replace('_', ' ').upper()} guard - open / close", travel=0.3, group="guard"))
+    for name in CIRCUIT_BREAKERS:
+        node = f"CB_{name}"
+        rows.append(Control(f"cb_{name.lower()}", "toggle", node, node, f"{PREFIX}cb/{name.lower()}",
+                            label=f"C/B {name.replace('_', ' ')} - pull / push", travel=0.1, group="cb"))
+    for short, side, caption in (("CS", "captain", "CAPT"), ("FO", "first_officer", "F/O")):
+        node = f"SWITCH_LAPTOP_{short}_POWER"
+        rows.append(Control(f"laptop_{side}_power", "toggle", node, node, f"{PREFIX}cockpit/{side}_laptop_power",
+                            label=f"{caption} laptop POWER", travel=0.1, group="cb"))
+    return rows
+
+
+# overhead knobs and switches without a system behind them here (state and motion only):
+# (FBW node / clip, key, kind, label, positions or step, start)
+OVERHEAD_KNOBS = (
+    ("KNOB_OVHD_AIRCOND_PACKFLOW", "pack_flow", "rotary", "PACK FLOW - LO / NORM / HI", 1 / 3, 1 / 3),
+    ("KNOB_OVHD_AIRCOND_COCKPIT", "cockpit_temp", "rotary", "CKPT temperature", 0.05, 0.5),
+    ("KNOB_OVHD_AIRCOND_FWDCABIN", "fwd_cabin_temp", "rotary", "FWD CABIN temperature", 0.05, 0.5),
+    ("KNOB_OVHD_AIRCOND_BULK", "bulk_temp", "rotary", "BULK CARGO temperature", 0.05, 0.5),
+    ("KNOB_OVHD_AIRCOND_FWDCARGO", "fwd_cargo_temp", "rotary", "FWD CARGO temperature", 0.05, 0.5),
+    ("KNOB_OVHD_CABINPRESS_LDGELEV", "ldg_elev", "rotary", "LDG ELEV - AUTO / manual", 0.05, 0.0),
+    ("SWITCH_OVHD_CABINPRESS_MANVSCTL", "man_vs_ctl", "rotary", "MAN V/S CTL", 1 / 3, 0.0),
+    ("KNOB_OVHD_READINGLTL", "reading_light_left", "rotary", "CAPT READING LT", 0.1, 0.0),
+    ("KNOB_OVHD_READINGLTR", "reading_light_right", "rotary", "F/O READING LT", 0.1, 0.0),
+    ("KNOB_OVHD_AIRCOND_XBLEED", "xbleed", "selector", "X BLEED - SHUT / AUTO / OPEN", 3, 1),
+    ("SWITCH_OVHD_EXTLT_RWY", "rwy_turn_off", "switch", "RWY TURN OFF", 2, 0),
+    ("SWITCH_OVHD_EXTLT_WING", "wing_lt", "switch", "WING", 2, 0),
+    ("SWITCH_OVHD_EXTLT_LOGO", "logo_lt", "switch", "LOGO", 3, 0),
+    ("SWITCH_OVHD_INTLT_STORM", "storm_lt", "switch", "STORM", 2, 0),
+    ("SWITCH_OVHD_INTLT_EMEREXIT", "emer_exit_lt", "switch", "EMER EXIT LT - OFF / ARM / ON", 3, 1),
+    ("SWITCH_OVHD_INTLT_STBYCOMPAS", "stby_compass_lt", "switch", "STBY COMPASS", 3, 0),
+    ("SWITCH_OVHD_EVAC_CAPT", "evac_capt", "switch", "EVAC CAPT / CAPT & PURS", 3, 0),
+    ("SWITCH_OVHD_ELT_SELECTOR", "elt", "switch", "ELT - TEST / ARM / ON", 3, 1),
+    ("LIGHTING_Knob_Panel", "pedestal_panel_lt", "rotary", "Panel lighting", 0.05, 0.5),
+    ("LIGHTING_Knob_Glareshield", "pedestal_glareshield_lt", "rotary", "Glareshield lighting", 0.05, 0.5),
+    ("LIGHTING_Knob_Pedestal", "pedestal_flood_lt", "rotary", "Pedestal lighting", 0.05, 0.5),
+    ("LIGHTING_Knob_Ambient", "pedestal_ambient_lt", "rotary", "Ambient lighting", 0.05, 0.5),
+    ("KNOB_CPT_WXR_VD_AZIM", "captain_wxr_vd_azim", "rotary", "CAPT WXR VD AZIM", 0.25, 0.0),
+    ("KNOB_FO_WXR_VD_AZIM", "first_officer_wxr_vd_azim", "rotary", "F/O WXR VD AZIM", 0.5, 0.0),
+)
+
+
+def _overhead_knobs():
+    p = PREFIX + "cockpit/"
+    rows = []
+    for node, key, kind, label, size, start in OVERHEAD_KNOBS:
+        if kind == "rotary":
+            rows.append(Control(f"knob_{key}", kind, node, node, p + key, label=label, step=size, initial=start,
+                                group="overhead_knobs"))
+        else:
+            rows.append(Control(f"knob_{key}", kind, node, node, p + key, label=label, positions=size, default=start,
+                                group="overhead_knobs"))
+    # the FWD CABIN clip of the FBW model also turns the READ LT knob next to it: its own state here
+    rows.append(Control("knob_read_lt", "rotary", "KNOB_OVHD_READ_LT", "KNOB_OVHD_AIRCOND_FWDCABIN", p + "read_lt",
+                        label="READ LT", step=0.05, group="overhead_knobs"))
+    rows.append(Control("bat_selector", "follow", "KNOB_OVHD_BAT", "KNOB_OVHD_BAT", f"{PREFIX}elec/bat/selector",
+                        label="BAT display - ESS / APU / OFF / BAT 1 / BAT 2", minimum=0, maximum=4,
+                        knob=(f"{PREFIX}elec/bat_selector_right", f"{PREFIX}elec/bat_selector_left"),
+                        group="overhead_knobs"))
+    rows.append(Control("parking_brake", "follow", "LEVER_PARKINGBRAKE", "lever_parking_brake",
+                        "sim/cockpit2/controls/parking_brake_ratio", ("sim/flight_controls/park_brake_toggle",),
+                        "PARK BRK - pull and turn to set / release", also=("LEVER_PARKINGBRAKE_WHITE_MIKE",),
+                        group="overhead_knobs"))
+    return rows
+
+
+WIPER_DATAREFS = (f"{PREFIX}wipers/captain_sweep", f"{PREFIX}wipers/first_officer_sweep")
+
+
+def _wipers():
+    # WIPER selector 0 OFF, 1 SLOW, 2 FAST; the blade sweep (0 parked .. 1) is a380x_cockpit_feedback.inc
+    rows = []
+    for lr, side, caption in (("left", "captain", "CAPT"), ("right", "first_officer", "F/O")):
+        rows.append(Control(f"wiper_{side}_selector", "selector", f"HANDLING_Switch_Wiper_{lr}",
+                            f"HANDLING_Switch_Wiper_{lr}", f"{PREFIX}wipers/{side}_selector",
+                            label=f"{caption} WIPER - OFF / SLOW / FAST", positions=3, default=0, group="wipers"))
+        rows.append(Control(f"wiper_{side}_blade", "follow", f"WIPER_BASE_{lr[0].upper()}", f"HANDLING_Wiper_{lr}",
+                            f"{PREFIX}wipers/{side}_sweep", click=False, group="wipers"))
+    return rows
+
+
+def _furniture():
+    """Seats, armrests, tables, keyboard trays, windows, shades and stowage doors (FBW cabin clips).
+    Two-position parts glide over `travel` seconds; seat height / fore-aft and armrest tilt are rotaries."""
+    p = PREFIX + "cockpit/"
+    rows = []
+    for short, side in (("CPT", "captain"), ("FO", "first_officer")):
+        rows += [
+            Control(f"seat_{side}_height", "rotary", f"SEAT_{short}_MOVE_UP_DOWN_SWITCH", f"SEAT_{short}_MOVE_UP_DOWN_ANIM",
+                    f"{p}{side}_seat_height", label=f"{short} SEAT - up / down", step=0.1, travel=0.25,
+                    all_nodes=True, manip="up_down", group="furniture"),
+            Control(f"seat_{side}_fwd_aft", "rotary", f"SEAT_{short}_MOVE_FWD_AFT_SWITCH", f"SEAT_{short}_MOVE_FWD_AFT_ANIM",
+                    f"{p}{side}_seat_fwd_aft", label=f"{short} SEAT - aft / forward", step=0.1, travel=0.25,
+                    all_nodes=True, manip="up_down", group="furniture"),
+            *([] if short == "FO" else [Control(f"armrest_{side}_stow", "toggle", f"BIGARMREST_{short}_STOW_CLICK", f"BIGARMREST_{short}_STOW_ANIM",
+                    f"{p}{side}_armrest_stow", label=f"{short} ARMREST - stow / deploy", travel=1.0, all_nodes=True,
+                    group="furniture")]),       # FBW has no F/O stow clip
+            Control(f"armrest_{side}_height", "rotary", f"BIGARMREST_{short}_UP_DOWN_CLICK",
+                    f"BIGARMREST_{short}_UP_DOWN_ANIM", f"{p}{side}_armrest_height", label=f"{short} ARMREST height",
+                    step=0.1, travel=0.25, all_nodes=True, manip="up_down", group="furniture"),
+            Control(f"armrest_{side}_tilt", "rotary", f"BIGARMREST_{short}_TILT_CLICK", f"BIGARMREST_{short}_TILT_ANIM",
+                    f"{p}{side}_armrest_tilt", label=f"{short} ARMREST tilt", step=0.1, travel=0.25, all_nodes=True,
+                    manip="up_down", group="furniture"),
+            Control(f"small_armrest_{side}_stow", "toggle", f"SMALLARMREST_{short}_STOW_CLICK",
+                    f"SMALLARMREST_{short}_STOW_ANIM", f"{p}{side}_small_armrest_stow",
+                    label=f"{short} inboard ARMREST - stow / deploy", travel=1.0, all_nodes=True, group="furniture"),
+            Control(f"small_armrest_{side}_fwd", "toggle", f"SMALLARMREST_{short}_FWD_CLICK",
+                    f"SMALLARMREST_{short}_FWD_ANIM", f"{p}{side}_small_armrest_fwd",
+                    label=f"{short} inboard ARMREST - slide", travel=0.8, all_nodes=True, group="furniture"),
+            Control(f"table_{side}", "toggle", f"A380_{short}_TABLE_CLICK", f"A380_{short}_TABLE", f"{p}{side}_table",
+                    label=f"{short} TABLE - stow / deploy", travel=2.5, all_nodes=True, group="furniture"),
+            Control(f"meal_table_{side}", "toggle", f"A380_{short}_KEYBOARD_CLICK", f"A380_{short}_MEALTABLE",
+                    f"{p}{side}_meal_table", label=f"{short} MEAL TABLE - stow / deploy", travel=1.5, all_nodes=True,
+                    group="furniture"),
+            Control(f"keyboard_{side}", "toggle", f"A380_{short}_MEALTABLE_CLICK", f"A380_{short}_KEYBOARD",
+                    f"{p}{side}_keyboard", label=f"{short} KEYBOARD tray - stow / deploy", travel=1.0, all_nodes=True,
+                    group="furniture"),
+            Control(f"footrest_{side}", "toggle", f"A380_{short}_FOOTREST_CLICK", f"A380_{short}_FOOTREST",
+                    f"{p}{side}_footrest", label=f"{short} FOOTREST - stow / deploy", travel=1.5, all_nodes=True,
+                    group="furniture"),
+            Control(f"sliding_window_{side}", "toggle", f"{short}_SLIDING_WINDOW_CLICK", f"{short}_SLIDING_WINDOW_ANIM",
+                    f"{p}{side}_sliding_window", label=f"{short} SLIDING WINDOW - open / close", travel=3.0,
+                    all_nodes=True, group="furniture"),
+            Control(f"small_shade_{side}", "toggle", "Plane.075" if short == "CPT" else "Plane.154",
+                    f"{short}_SMALL_SHADE_ANIM", f"{p}{side}_small_shade", label=f"{short} side SUNSHADE",
+                    travel=1.0, all_nodes=True, group="furniture"),
+        ]
+    for key, clip, node, label in (("fwd_lh", "SUNSHADE_FWD_LH_ANIM", "SUNSHADE_FWD_LH", "FWD LH SUNSHADE"),
+                                   ("fwd_rh", "SUNSHADE_FWD_RH_ANIM", "SUNSHADE_FWD_RH", "FWD RH SUNSHADE"),
+                                   ("fwd_ctr", "SUNSHADE_FWD_CTR_ANIM", "SUNSHADE_FWD_CTR_BALL", "FWD CTR SUNSHADE")):
+        rows.append(Control(f"sunshade_{key}", "toggle", node, clip, f"{p}sunshade_{key}", label=f"{label} - up / down",
+                            travel=1.5, all_nodes=True, group="furniture"))
+    for key, clip, node, click, label in (
+            ("aft_oxy", "AFT_OXY_ANIM", "Cube.082", "AFT_OXY_CLICK", "AFT OXYGEN stowage"),
+            ("aft_oit", "AFT_OIT_ANIM", "Cube.444", "AFT_OIT_CLICK", "AFT OIT stowage"),
+            ("cas_lh", "CAS_LH_OPEN_ANIM", "Cube.128", None, "LH stowage"),
+            ("cas_rh", "CAS_RH_OPEN_ANIM", "Cube.426", None, "RH stowage"),
+            ("cpt_oxy_fwd", "CPT_OXY_FWD_ANIM", "Cube.604", None, "CAPT OXYGEN stowage"),
+            ("lg_pin_door", "A380_LGPIN_DOOR", "LG_DOOR_HINGE", None, "Gear pin stowage")):
+        rows.append(Control(f"stowage_{key}", "toggle", node, clip, f"{p}{key}_door", label=f"{label} - open / close",
+                            travel=0.8, all_nodes=True, click_node=click, group="furniture"))
+    return rows
+
+
 RMP_DEVICES = ("a380x.xp12.rmp.1", "a380x.xp12.rmp.2", "a380x.xp12.rmp.3")
 RMP_CHANNELS = (23, 24, 25)       # instrument brightness slots (MFD 14/15, ND 16/17, SD 18, PFD 19/20, ISIS 21/22)
 RMP_SCREEN_NODES = ("SCREEN_RMP_1", "SCREEN_RMP_2", "SCREEN_RMP_3")
@@ -275,7 +624,9 @@ RMP_COMMANDS = tuple(c for n in (1, 2, 3) for c in rmp_commands(n))
 RMP_DATAREFS = tuple(d for n in (1, 2, 3) for d in rmp_datarefs(n))   # EMER EXIT LT OFF: the FBW legend has no pushbutton clip
 
 CONTROLS: tuple[Control, ...] = (*_switching(), *_ecam(), *_surv(), *_kccu(), *_eng_master(), *_glareshield_side(),
-                                 *_overhead(), *_rmp(), *_eng_start())
+                                 *_overhead(), *_rmp(), *_eng_start(), *_glareshield(), *_sidesticks(), *_efis(),
+                                 *_kccu_extra(), *_oit(), *_panel_keys(), *_fire(), *_guards_and_breakers(),
+                                 *_overhead_knobs(), *_wipers(), *_furniture())
 
 
 def owned_commands() -> tuple[str, ...]:
@@ -286,17 +637,27 @@ def owned_commands() -> tuple[str, ...]:
             out += [c.dataref + "_left", c.dataref + "_right"]
         elif c.kind == "switch":
             out += [c.dataref + "_up", c.dataref + "_down"]
-    return tuple(out)
+        elif c.kind == "press" and c.own:
+            out += list(c.commands)
+        elif c.kind == "toggle":
+            out.append(c.dataref + "_toggle")
+        elif c.kind == "rotary" and not c.commands:
+            out += [c.dataref + "_up", c.dataref + "_down"]
+    return tuple(dict.fromkeys(out))
 
 
 def hooked_commands() -> tuple[str, ...]:
     owned = set(owned_commands())
-    return tuple(cmd for c in CONTROLS if c.kind == "press" for cmd in c.commands if cmd not in owned)
+    out = [cmd for c in CONTROLS if c.kind in ("press", "rotary") for cmd in c.commands if cmd not in owned]
+    return tuple(dict.fromkeys(out))
 
 
 def module_datarefs() -> set[str]:
     """Datarefs another native module publishes (the feedback module only binds geometry to them)."""
     return set(RMP_DATAREFS)
+
+
+FIRE_PUSHBUTTON_DATAREF = PREFIX + "engine/fire_pushbutton"   # int[4], ENG 1..4 released
 
 
 def published_datarefs() -> tuple[str, ...]:
@@ -306,6 +667,7 @@ def published_datarefs() -> tuple[str, ...]:
         if c.kind not in ("follow", "static"):
             out.append(c.dataref)
         out += [lamp.dataref for lamp in c.lamps]
+    out += [*WIPER_DATAREFS, FIRE_PUSHBUTTON_DATAREF]
     return tuple(d for d in dict.fromkeys(out) if d not in others)
 
 
@@ -313,16 +675,32 @@ COMMANDS = owned_commands()
 DATAREFS = published_datarefs()
 
 
+def rotary_commands(c: Control) -> tuple[str, str]:
+    return tuple(c.commands[:2]) if c.commands else (c.dataref + "_up", c.dataref + "_down")
+
+
 def click_manipulator(c: Control) -> str | None:
     if c.knob:
         return f"ATTR_manip_command_knob\trotate_small\t{c.knob[0]}\t{c.knob[1]}\t{c.label}"
-    if not c.click or c.kind in ("follow", "static"):
+    if not c.click or c.kind == "static" or (c.kind == "follow" and not c.commands):
         return None
-    if c.kind == "press":
+    if c.kind in ("press", "follow"):
         return f"ATTR_manip_command\tbutton\t{c.commands[0]}\t{c.label}"
+    if c.kind == "toggle":
+        return f"ATTR_manip_command\thand\t{c.dataref}_toggle\t{c.label}"
+    if c.kind == "rotary":
+        up, down = rotary_commands(c)
+        if c.manip == "up_down":
+            return f"ATTR_manip_command_switch_up_down\tup_down\t{up}\t{down}\t{c.label}"
+        return f"ATTR_manip_command_knob\trotate_small\t{up}\t{down}\t{c.label}"
     if c.kind == "selector":
         return f"ATTR_manip_command_knob\trotate_medium\t{c.dataref}_right\t{c.dataref}_left\t{c.label}"
     return f"ATTR_manip_command_switch_up_down\tup_down\t{c.dataref}_up\t{c.dataref}_down\t{c.label}"
+
+
+def _cf(value: float) -> str:
+    """C float literal."""
+    return f"{round(float(value), 6)!r}f"
 
 
 def emit_c_table() -> str:
@@ -332,7 +710,10 @@ def emit_c_table() -> str:
            "#ifndef A380X_COCKPIT_FEEDBACK_TABLE_H", "#define A380X_COCKPIT_FEEDBACK_TABLE_H", "",
            "typedef struct { const char *dataref; const char *command; } CfbPressRow;",
            "typedef struct { const char *dataref; int positions, initial, switch_kind; } CfbPositionRow;",
-           "typedef struct { const char *dataref; int page; } CfbEcamLampRow;", "",
+           "typedef struct { const char *dataref; int page; } CfbEcamLampRow;",
+           "typedef struct { const char *dataref; float travel, initial; } CfbToggleRow;",
+           "typedef struct { const char *dataref, *up, *down; float step, initial, travel; int wrap, hooked; } CfbRotaryRow;",
+           "",
            "static const CfbPressRow cfb_press_rows[] = {"]
     for c in CONTROLS:
         if c.kind == "press":
@@ -344,6 +725,20 @@ def emit_c_table() -> str:
             out.append(f'    {{"{c.dataref}", {c.positions}, {c.default}, {1 if c.kind == "switch" else 0}}},')
     out += ["};", "", "static const CfbEcamLampRow cfb_ecam_lamps[] = {"]
     out += [f'    {{"{ref}", {page}}},' for ref, page in ECAM_PAGE_LAMPS.items()]
+    out += ["};", "", "static const CfbToggleRow cfb_toggle_rows[] = {"]
+    out += [f'    {{"{c.dataref}", {_cf(c.travel)}, {_cf(c.initial)}}},' for c in CONTROLS if c.kind == "toggle"]
+    out += ["};", "", "static const CfbRotaryRow cfb_rotary_rows[] = {"]
+    for c in CONTROLS:
+        if c.kind == "rotary":
+            up, down = rotary_commands(c)
+            out.append(f'    {{"{c.dataref}", "{up}", "{down}", {_cf(c.step)}, {_cf(c.initial)}, {_cf(c.travel)}, '
+                       f'{1 if c.wrap else 0}, {1 if c.commands else 0}}},')
+    out += ["};", "", "static const char *const cfb_wiper_selectors[] = {"]
+    out += [f'    "{c.dataref}",' for c in CONTROLS if c.group == "wipers" and c.kind == "selector"]
+    out += ["};", "", "static const char *const cfb_wiper_sweeps[] = {"]
+    out += [f'    "{ref}",' for ref in WIPER_DATAREFS]
+    out += ["};", "", "static const char *const cfb_fire_pushbuttons[] = {   /* ENG 1..4 */"]
+    out += [f'    "{PREFIX}fire/{unit.lower()}_pb",' for unit in FIRE_PUSHBUTTONS[:4]]
     out += ["};", "", "static const char *const cfb_surv_buttons[] = {"]
     out += [f'    "{key}",' for key in SURV_BUTTONS]
     out += ["};", "", "#endif", ""]

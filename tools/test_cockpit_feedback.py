@@ -27,7 +27,11 @@ class Contract(unittest.TestCase):
 
     def test_kinds(self):
         for c in contract.CONTROLS:
-            self.assertIn(c.kind, ('press', 'selector', 'switch', 'follow', 'static'))
+            self.assertIn(c.kind, ('press', 'selector', 'switch', 'follow', 'static', 'toggle', 'rotary'))
+            if c.kind in ('toggle', 'rotary'):
+                self.assertTrue(0.0 <= c.initial <= 1.0 and c.travel >= 0.0, c.id)
+            if c.kind == 'rotary':
+                self.assertTrue(0.0 < c.step <= 1.0 and len(c.commands) in (0, 2), c.id)
             if c.kind == 'press':
                 self.assertTrue(c.commands, c.id)
             if c.kind in ('selector', 'switch'):
@@ -38,7 +42,9 @@ class Contract(unittest.TestCase):
     def test_hooked_commands_belong_to_other_modules(self):
         from avionics_provider import KCCU_COMMANDS, SD_COMMANDS
         from ovhd_lamps_contract import COMMANDS as OVHD_COMMANDS
-        others = set(KCCU_COMMANDS) | set(SD_COMMANDS) | set(OVHD_COMMANDS) | set(contract.RMP_COMMANDS)
+        from avionics_provider import GLARESHIELD_COMMANDS
+        others = (set(KCCU_COMMANDS) | set(SD_COMMANDS) | set(OVHD_COMMANDS) | set(contract.RMP_COMMANDS)
+                  | set(GLARESHIELD_COMMANDS) | {'sim/oxy/crew_valve_toggle'})
         self.assertTrue(set(contract.hooked_commands()) <= others)
         self.assertNotIn('a380x/xp12/ecam/sd/engine', contract.hooked_commands())  # ENG keeps its own motion
 
@@ -90,12 +96,18 @@ class InstalledAircraft(unittest.TestCase):
         files = {p.name: p.read_text(encoding='latin-1') for d in cf.PANEL_DIRS for p in (AIRCRAFT / d).glob('*.obj')
                  if not p.name.startswith('._')}
         source = cf.Source(cf.DEFAULT_SOURCE) if cf.DEFAULT_SOURCE.is_file() else None
+        if source is not None:
+            motions = cf.link_motions(source, [cf.compile_motion(source, c) for c in contract.CONTROLS])
+            owned = {m['control'].id for m in motions if cf.mesh_targets(source, m)}
+            owns_mesh = owned.__contains__
         for c in contract.CONTROLS:
             if c.kind == 'static':
                 continue
             if source is not None:   # a material with no exported OBJ (e.g. the RMP glass guard) has nothing to move
                 materials = {m for i in source.descendants(source.names[c.node]) for m, _t, _n in source.primitives(i)}
                 if not any(name.endswith(m + '.obj') for name in files for m in materials):
+                    continue
+                if not owns_mesh(c.id):   # moves only nodes below it that another control owns
                     continue
             self.assertTrue(any(f'{cf.MARKER} {c.id} ' in t for t in files.values()), c.id)
 

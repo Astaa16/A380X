@@ -15,6 +15,17 @@ native module (`native/avionics/a380x_cockpit_feedback.inc`, table generated int
 | Overhead | 103 pushbuttons with a latched position (docs/OVERHEAD_LAMPS.md) | FBW press clip on `ovhd/pb/<id>` | yes | legends follow the position (dark cockpit); EMER EXIT LT OFF has no FBW clip, command only |
 | RMP 1-3 | 43 keys, 12 reception knobs, OFF/BRT, NAV selector, INT/RAD, STBY NAV guard, standby LED | FBW clips (keys press; knobs push in/out with reception, turn with volume) | yes (knobs: turn on the body, push on the cap) | screens on cockpit devices `a380x.xp12.rmp.<n>`; VHF and SQWK pages (native/avionics/a380x_rmp.h, FBW logic); green bars on the transmitting CALL key |
 | Glareshield side | CONSOLE & FLOOR LT (OFF / DIM / BRT), OIT SIDE (FLT OPS / NSS AVNCS) | FBW clip | up/down switch | state datarefs only (`lighting/<side>_console_floor`, `oit/<side>_side`) |
+| Glareshield / sidestick keys | CHRONO, SIDESTICK, MASTER WARN / CAUT, ATC MSG, PTT (both sides), sidestick takeover, AUTOLAND lights, loudspeaker knobs | FBW clips on the glareshield module's commands (hooked) / `volume_<side>` 0..100 | existing targets; stick takeover and AUTOLAND new | takeover = `glareshield/takeover_<side>`; AUTOLAND is a press only |
+| Sidesticks | captain / F/O stick | roll and pitch clips follow `sim/joystick/yoke_roll_ratio`, `yoke_pitch_ratio` (F/O: `_copilot`) | - | the F/O stick stays centred unless copilot axes are bound |
+| EFIS / KCCU / OIT | EFIS PFD, RECONF, blank keys; OIT brightness knobs; KCCU blank keys, KBD / CCD switches (follow `kccu/<side>/kbd_on`, `ccd_on`), captain scroll wheel; OIT keyboard (88 keys, moves with the tray), ACD keypads | FBW clips | yes (switches and wheel: existing targets) | key travel; no OIT application behind the keys yet |
+| Panel keys | VENTILATION SMOKE, CALLS (MECH, decks, PURS, rests, ALL), EVAC HORN OFF, MASK MAN ON, TMR RESET, door LOCKING SYS, GND HF DATALINK, MAINT GND CONNECTION, CARGO SMOKE TEST, PA, DFDR EVENT, ACMS TRIGGER, WXR VD AZIM push, two unlabelled overhead keys; CREW OXY SUPPLY (hooked `sim/oxy/crew_valve_toggle`) | FBW press clips, `a380x/xp12/cockpit/<key>` | yes | press only |
+| Fire | ENG 1-4 / APU FIRE pushbuttons and guards | FBW clips, eased toggles `fire/<unit>_pb`, `fire/<unit>_guard` | yes | ENG pushbuttons released publish `a380x/xp12/engine/fire_pushbutton[0..3]` (EWD / SD / FWS inputs); no extinguishing or isolation yet |
+| Guards, breakers | 42 overhead guards (`guard/<name>`), 60 circuit breakers (`cb/<name>`), laptop POWER switches | FBW clips, eased toggles | yes; a closed guard is in front of its pushbutton, open it first | state only |
+| Overhead knobs / switches | PACK FLOW, CKPT / FWD CABIN / BULK / FWD CARGO temperature, LDG ELEV, MAN V/S CTL, READ / READING LT, X BLEED, RWY TURN OFF, WING, LOGO, STORM, EMER EXIT LT, STBY COMPASS, EVAC CAPT, ELT, pedestal lighting knobs, WXR VD AZIM | FBW clips; rotaries 0..1 (`cockpit/<key>`, `_up` / `_down`), selectors / switches as above | yes | state only (no system behind them yet) |
+| BAT selector | KNOB_OVHD_BAT | follows `elec/bat/selector` 0..4 | rotary on `elec/bat_selector_right` / `_left` | the ELEC panel BAT display source |
+| Parking brake | lever | follows `sim/cockpit2/controls/parking_brake_ratio` | `sim/flight_controls/park_brake_toggle` | X-Plane brake |
+| Wipers | CAPT / F/O WIPER selector (OFF / SLOW / FAST), blades | selector clip; blades follow `wipers/<side>_sweep` | rotary | native sweep (1.2 / 2 strokes per s, needs AC), parks at OFF |
+| Furniture | seats (height, fore-aft), armrests (stow, height, tilt), inboard armrests, tables, meal tables, keyboard trays, footrests, sliding windows, sun shades (forward, side), stowage doors (AFT OXY, AFT OIT, LH / RH, CAPT OXY, gear pin) | FBW clips (nested parts compose, e.g. the keyboard keys ride on the tray) | on FBW's click spots; seats / armrests: click up or down | state only |
 
 Datarefs: `<key>_pressed` / `press_ratio` 0..1 for key travel; selectors and switches are writable ints.
 Press handlers are registered in front of the owning module's handler and return 1, so the original
@@ -28,8 +39,15 @@ Geometry notes
 * Lamp faces in the emissive decal (SURV bars) get their own `ATTR_light_level` and are hidden while dark.
   Lamp faces in decals without a LIT texture (ECAM bars, TA ONLY, G/S MODE) get lit quads in the controls
   object (fcu_labels atlas cells), drawn alpha-tested so they write depth.
-* The KCCU KBD / CCD switches and the WXR VD AZIM knobs are not animated yet: their FBW position mapping
-  needs the behaviour XML to confirm.
+* A clip that moves several nodes moves each of them; a node below another animated node gets both
+  motions (outer first). Rotations that change axis during the clip (sliding window cover, table hinge)
+  are written as world Z / Y / X tables, exact at every FBW key.
+* Not done: the captain / F/O main sun shades and the aft shades are skinned (bones, no mesh nodes) and
+  cannot be moved by OBJ animation; the F/O big armrest has no FBW stow clip; the seat adjuster switch
+  rocking motion and the KCCU KBD / CCD switch ON direction need the behaviour XML to confirm (the switch
+  shows ON at the clip's last key).
+* `tools/audit_fbw_animations.py --aircraft <aircraft>` lists every FBW clip as animated / static /
+  partial / not exported in the X-Plane objects.
 
 Run (X-Plane closed): `python3 tools/cockpit_feedback.py --aircraft "<X-Plane>/Aircraft/A380X-XP12"`.
 Re-running is a no-op. Not yet tested in the simulator.

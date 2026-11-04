@@ -118,32 +118,105 @@ class Source:
         return out
 
 
+def _extras(control: Control):
+    """(clip, dataref, kind, low, high) of the main clip and every extra motion."""
+    lo, hi = (control.minimum, control.maximum) if control.kind == "follow" else (0.0, 1.0)
+    out = [(control.clip, control.dataref, control.kind, lo, hi)]
+    for extra in control.extra:
+        clip, dataref, *span = extra
+        out.append((clip, dataref, "follow" if span else "press", *(span or (0.0, 1.0))))
+    return out
+
+
+def clip_span(source: Source, clip: dict):
+    times = [row[0] for channel in clip["channels"]
+             for row in accessor_values(source.doc, source.buffers, clip["samplers"][channel["sampler"]]["input"])]
+    return min(times), max(times)
+
+
 def compile_motion(source: Source, control: Control) -> dict:
-    """The clip(s) as OBJ stages keyed on the control's datarefs (outermost first)."""
+    """The clip(s) as OBJ stages keyed on the control's datarefs, per animated node (outermost first).
+    `stages` (the main node's chain, ancestors included) is completed by link_motions()."""
     index = source.names[control.node]
+    motion = dict(control=control, index=index, pivot=transform_point(source.world(index), (0, 0, 0)),
+                  stages=[], nodes={})
     if control.kind == "static":
-        return dict(control=control, index=index, pivot=transform_point(source.world(index), (0, 0, 0)), stages=[])
-    motion = compile_clip(source, control, control.clip, control.dataref, control.kind)
-    for clip, dataref in control.extra:
-        motion["stages"] += compile_clip(source, control, clip, dataref, "press")["stages"]
+        return motion
+    for clip_name, dataref, kind, lo, hi in _extras(control):
+        clip = source.clips.get(clip_name)
+        if clip is None:
+            raise ValueError(f"{control.id}: no FBW clip {clip_name}")
+        if control.all_nodes:
+            nodes = sorted({c["target"]["node"] for c in clip["channels"]})
+        else:
+            nodes = [index, *(source.names[n] for n in control.also)]
+        span = clip_span(source, clip) if control.all_nodes or control.also else None
+        for node in nodes:
+            stages = compile_clip(source, control, clip_name, dataref, kind, node, span, lo, hi,
+                                  required=not control.all_nodes)["stages"]
+            if stages:
+                motion["nodes"].setdefault(node, []).extend(stages)
+    if not motion["nodes"]:
+        raise ValueError(f"{control.id}: clip {control.clip} moves nothing")
+    if index in motion["nodes"]:
+        motion["stages"] = list(motion["nodes"][index])
     return motion
 
 
-def compile_clip(source: Source, control: Control, clip_name: str, dataref: str, kind: str) -> dict:
-    index = source.names[control.node]
+def _quat_matrix(q):
+    x, y, z, w = q
+    return [[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+            [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+            [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]]
+
+
+def _unwrap(angles):
+    out = []
+    for a in angles:
+        if out:
+            while a - out[-1] > 180:
+                a -= 360
+            while a - out[-1] < -180:
+                a += 360
+        out.append(a)
+    return out
+
+
+def euler_stages(quats, rest, parent, pivot):
+    """A rotation that changes axis during the clip: world Z, Y, X tables (exact at every key)."""
+    from patch_efis_animations import quaternion_multiply
+    columns = [_unit([parent[r][c] for r in range(3)]) for c in range(3)]
+    p = [[columns[c][r] for c in range(3)] for r in range(3)]            # parent rotation, scale removed
+    inverse = tuple(-v if i < 3 else v for i, v in enumerate(rest))
+    zs, ys, xs = [], [], []
+    for q in quats:
+        m = _quat_matrix(quaternion_multiply(q, inverse))
+        d = [[sum(p[r][i] * m[i][j] * p[c][j] for i in range(3) for j in range(3)) for c in range(3)] for r in range(3)]
+        ys.append(math.degrees(math.asin(max(-1.0, min(1.0, -d[2][0])))))
+        xs.append(math.degrees(math.atan2(d[2][1], d[2][2])))
+        zs.append(math.degrees(math.atan2(d[1][0], d[0][0])))
+    return [(axis, _unwrap(angles)) for axis, angles in (((0.0, 0.0, 1.0), zs), ((0.0, 1.0, 0.0), ys),
+                                                          ((1.0, 0.0, 0.0), xs)) if max(map(abs, angles)) > 1e-4]
+
+
+def compile_clip(source: Source, control: Control, clip_name: str, dataref: str, kind: str, index=None,
+                 span=None, lo=None, hi=None, required=True) -> dict:
+    """One node's channels of a clip as stages. `span` (the whole clip's time range) keys a node whose own
+    channels cover only part of it; no-op channels (constant keys, scale) give no stage."""
+    if index is None:
+        index = source.names[control.node]
     clip = source.clips.get(clip_name)
     if clip is None:
         raise ValueError(f"{control.id}: no FBW clip {clip_name}")
     channels = [c for c in clip["channels"] if c["target"]["node"] == index]
-    if not channels:
-        raise ValueError(f"{control.id}: clip {clip_name} does not animate {control.node}")
+    if not channels and required:
+        raise ValueError(f"{control.id}: clip {clip_name} does not animate {source.nodes[index].get('name')}")
     samples = {}
     for channel in channels:
         sampler = clip["samplers"][channel["sampler"]]
         times = [row[0] for row in accessor_values(source.doc, source.buffers, sampler["input"])]
         values = accessor_values(source.doc, source.buffers, sampler["output"])
         samples[channel["target"]["path"]] = (times, values)
-    times = sorted({t for ts, _ in samples.values() for t in ts})
     node = source.nodes[index]
     parent = source.parent_world(index)
     pivot = transform_point(source.world(index), (0, 0, 0))
@@ -152,19 +225,30 @@ def compile_clip(source: Source, control: Control, clip_name: str, dataref: str,
         ts, poses = samples["translation"]
         rest = node.get("translation", (0, 0, 0))
         deltas = [transform_vector(parent, _sub(p, rest)) for p in poses]
-        stages.append(dict(kind="translation", times=ts, poses=deltas, dataref=dataref))
+        if max(abs(v) for d in deltas for v in d) > 1e-6:
+            stages.append(dict(kind="translation", times=ts, poses=deltas, dataref=dataref))
     if "rotation" in samples:
         ts, quats = samples["rotation"]
-        axis, angles = rotation_keys(quats, node.get("rotation", (0, 0, 0, 1)), parent)
-        stages.append(dict(kind="rotation", times=ts, axis=axis, poses=angles, pivot=pivot, dataref=dataref))
+        rest = node.get("rotation", (0, 0, 0, 1))
+        try:
+            parts = [rotation_keys(quats, rest, parent)]
+        except ValueError:
+            parts = euler_stages(quats, rest, parent, pivot)
+        for axis, angles in parts:
+            if max(map(abs, angles)) > 1e-4:
+                stages.append(dict(kind="rotation", times=ts, axis=axis, poses=angles, pivot=pivot, dataref=dataref))
     if not stages:
-        raise ValueError(f"{control.id}: clip {control.clip} has no translation or rotation")
-    t0, t1 = times[0], times[-1]
+        if required and not channels:
+            raise ValueError(f"{control.id}: clip {clip_name} has no translation or rotation")
+        return dict(control=control, index=index, pivot=pivot, stages=[])
+    times = sorted({t for s in stages for t in s["times"]})
+    t0, t1 = span if span else (times[0], times[-1])
     if t1 <= t0:
-        raise ValueError(f"{control.id}: clip {control.clip} has no duration")
+        raise ValueError(f"{control.id}: clip {clip_name} has no duration")
     key_value = {}
-    if kind in ("press", "follow"):
-        lo, hi = (0.0, 1.0) if kind == "press" else (control.minimum, control.maximum)
+    if kind in ("press", "follow", "toggle", "rotary"):
+        if lo is None:
+            lo, hi = (control.minimum, control.maximum) if kind == "follow" else (0.0, 1.0)
         key_value = {t: lo + (hi - lo) * (t - t0) / (t1 - t0) for t in times}
     elif kind == "selector":
         if len(times) != control.positions:
@@ -194,6 +278,34 @@ def compile_clip(source: Source, control: Control, clip_name: str, dataref: str,
     return dict(control=control, index=index, pivot=pivot, stages=stages)
 
 
+def link_motions(source: Source, motions: list[dict]):
+    """Compose the motion of nested animated nodes: every node's chain is the stages of all its animated
+    ancestors (outermost first) and its own. Sets motion["stages"] (main node) and motion["click_stages"]."""
+    node_stages, owner = {}, {}
+    for motion in motions:
+        for node, stages in motion["nodes"].items():
+            node_stages.setdefault(node, []).extend(stages)
+            owner.setdefault(node, motion)
+
+    def chain(index):
+        path = [index]
+        while path[-1] in source.parents:
+            path.append(source.parents[path[-1]])
+        return [s for node in reversed(path) for s in node_stages.get(node, [])]
+
+    for motion in motions:
+        control = motion["control"]
+        motion["chain"] = chain
+        motion["animated"] = node_stages
+        motion["owner"] = owner
+        if control.kind != "static":
+            motion["stages"] = chain(motion["index"])
+        click = source.names[control.click_node] if control.click_node else motion["index"]
+        motion["click_index"] = click
+        motion["click_stages"] = chain(click) if control.kind != "static" else []
+    return motions
+
+
 def apply_stage(stage, t, point):
     i = stage["times"].index(t) if t in stage["times"] else min(range(len(stage["times"])),
                                                                  key=lambda k: abs(stage["times"][k] - t))
@@ -209,9 +321,9 @@ def apply_stage(stage, t, point):
     return tuple(a + b for a, b in zip(stage["pivot"], rotated))
 
 
-def stage_lines(motion: dict) -> list[str]:
+def stage_lines(motion) -> list[str]:
     lines = []
-    for stage in motion["stages"]:
+    for stage in (motion["stages"] if isinstance(motion, dict) else motion):
         ref = stage["dataref"]
         if stage["kind"] == "translation":
             lines.append(f"ANIM_trans_begin\t{ref}")
@@ -226,33 +338,41 @@ def stage_lines(motion: dict) -> list[str]:
 
 
 def mesh_targets(source: Source, motion: dict) -> list[dict]:
-    """Every visible primitive of the animated subtree. Children (legends, lamp faces) match either at
-    their FBW position or lifted LEGEND_LIFT along their face normal, as the legend export placed them."""
+    """Every visible primitive below the control's animated nodes (down to the next animated node, which
+    gets its own chain). Children (legends, lamp faces) match either at their FBW position or lifted
+    LEGEND_LIFT along their face normal, as the legend export placed them."""
     control = motion["control"]
     if control.kind == "static":
         return []
     emis_lamps = {lamp.face: lamp for lamp in control.lamps if lamp.cell is None}
+    animated, owner, chain = motion["animated"], motion["owner"], motion["chain"]
     out = []
-    for child in source.descendants(motion["index"]):
-        name = source.nodes[child].get("name", "")
-        for material, triangles, count in source.primitives(child):
-            points = sorted({p for tri in triangles for p in tri})
-            lifted = []
-            if child != motion["index"]:
-                normal = (0.0, 0.0, 0.0)
-                for tri in triangles:
-                    normal = tuple(a + b for a, b in zip(normal, _cross(_sub(tri[1], tri[0]), _sub(tri[2], tri[0]))))
-                normal = _unit(normal)
-                centre = tuple(sum(p[a] for p in points) / len(points) for a in range(3))
-                if _dot(normal, _sub(EYE, centre)) < 0:
-                    normal = tuple(-n for n in normal)
-                lifted = [tuple(p[a] + LEGEND_LIFT * normal[a] for a in range(3)) for p in points]
-            every = points + lifted
-            margin = LEGEND_LIFT + LIFT_TOLERANCE if lifted else TOLERANCE
-            low = [min(p[a] for p in every) - margin for a in range(3)]
-            high = [max(p[a] for p in every) + margin for a in range(3)]
-            out.append(dict(motion=motion, name=name, material=material, count=count, low=low, high=high,
-                            points=points, lifted=lifted, lamp=emis_lamps.get(name)))
+    for root in motion["nodes"]:
+        if owner[root] is not motion:
+            continue
+        pending = [root]
+        while pending:
+            child = pending.pop()
+            pending.extend(c for c in source.nodes[child].get("children", []) if c not in animated)
+            name = source.nodes[child].get("name", "")
+            for material, triangles, count in source.primitives(child):
+                points = sorted({p for tri in triangles for p in tri})
+                lifted = []
+                if child != root:
+                    normal = (0.0, 0.0, 0.0)
+                    for tri in triangles:
+                        normal = tuple(a + b for a, b in zip(normal, _cross(_sub(tri[1], tri[0]), _sub(tri[2], tri[0]))))
+                    normal = _unit(normal)
+                    centre = tuple(sum(p[a] for p in points) / len(points) for a in range(3))
+                    if _dot(normal, _sub(EYE, centre)) < 0:
+                        normal = tuple(-n for n in normal)
+                    lifted = [tuple(p[a] + LEGEND_LIFT * normal[a] for a in range(3)) for p in points]
+                every = points + lifted
+                margin = LEGEND_LIFT + LIFT_TOLERANCE if lifted else TOLERANCE
+                low = [min(p[a] for p in every) - margin for a in range(3)]
+                high = [max(p[a] for p in every) + margin for a in range(3)]
+                out.append(dict(motion=motion, name=name, material=material, count=count, low=low, high=high,
+                                points=points, lifted=lifted, lamp=emis_lamps.get(name), stages=chain(child)))
     return out
 
 
@@ -268,12 +388,32 @@ def _depths(lines):
         yield depth
 
 
+class _Grid:
+    """Points bucketed in CELL cubes, for neighbourhood queries."""
+    CELL = 0.003
+
+    def __init__(self, points):
+        self.cells = {}
+        for q in points:
+            self.cells.setdefault(tuple(int(math.floor(v / self.CELL)) for v in q), []).append(q)
+
+    def near(self, p, radius):
+        if not self.cells:
+            return
+        key = [int(math.floor(v / self.CELL)) for v in p]
+        reach = int(math.ceil(radius / self.CELL))
+        for dx in range(-reach, reach + 1):
+            for dy in range(-reach, reach + 1):
+                for dz in range(-reach, reach + 1):
+                    yield from self.cells.get((key[0] + dx, key[1] + dy, key[2] + dz), ())
+
+
 def patch_panel(text: str, filename: str, targets: list[dict]):
     """Wrap the static draws of every applicable target; returns (text, report rows)."""
     applicable = [t for t in targets if filename.endswith(t["material"] + ".obj")
                   and (not t["motion"]["control"].files or filename in t["motion"]["control"].files)]
     # A control already wrapped by an earlier run is left alone (later contract rows patch on top).
-    applicable = [t for t in applicable if f"{MARKER} {t['motion']['control'].id} " not in text]
+    applicable = [t for t in applicable if f"{MARKER} {t['motion']['control'].id} {t['name']}\n" not in text]
     if not applicable:
         return text, []
     lines = text.splitlines(keepends=True)
@@ -284,17 +424,23 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
     for target in applicable:
         picked = set()
         low, high = target["low"], target["high"]
+        points, lifted = _Grid(target["points"]), _Grid(target["lifted"])
         for i, p in enumerate(vertices):
             if not all(low[a] <= p[a] <= high[a] for a in range(3)):
                 continue
-            if any(max(abs(a - b) for a, b in zip(p, q)) <= TOLERANCE for q in target["points"]) or \
-                    any(max(abs(a - b) for a, b in zip(p, q)) <= LIFT_TOLERANCE for q in target["lifted"]):
+            if any(max(abs(a - b) for a, b in zip(p, q)) <= TOLERANCE for q in points.near(p, TOLERANCE)) or \
+                    any(max(abs(a - b) for a, b in zip(p, q)) <= LIFT_TOLERANCE for q in lifted.near(p, LIFT_TOLERANCE)):
                 picked.add(i)
             elif target["lifted"] and any(abs(math.dist(p, q) - LEGEND_LIFT) <= SHELL_TOLERANCE
-                                          for q in target["points"]):
+                                          for q in points.near(p, LEGEND_LIFT + SHELL_TOLERANCE)):
                 picked.add(i)     # curved decal (knob pointer): lifted along its own vertex normal
         chosen.append(picked)
+    owners = {}
+    for k, picked in enumerate(chosen):
+        for v in picked:
+            owners.setdefault(v, []).append(k)
     counts = [0] * len(applicable)
+    shared = [0] * len(applicable)
     skipped_animated = [0] * len(applicable)
     light_state = "ATTR_light_level_reset"
     output = []
@@ -309,11 +455,15 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
         runs = []
         for position in range(start, start + count, 3):
             tri = indices[position:position + 3]
-            matches = [k for k, picked in enumerate(chosen) if all(v in picked for v in tri)]
+            matches = [k for k in owners.get(tri[0], ()) if tri[1] in chosen[k] and tri[2] in chosen[k]]
             if len(matches) > 1:
-                names = sorted({applicable[k]["name"] for k in matches})
-                if len(names) > 1:
-                    raise ValueError(f"{filename}: ambiguous geometry at index {position}: {names}")
+                # coincident meshes are fine when they move the same way
+                motions = {"\n".join(stage_lines(applicable[k]["stages"])) for k in matches}
+                if len(motions) > 1:
+                    # a part resting on another (key cap on the keyboard base) shares a few vertices with
+                    # it: the triangle goes to the smaller, more specific mesh
+                    matches = sorted(matches, key=lambda k: applicable[k]["count"])
+                    shared[matches[0]] += 3
                 matches = matches[:1]
             match = matches[0] if matches else -1
             if match >= 0 and depth > 0:
@@ -340,7 +490,7 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
             block.append("ANIM_begin")
             if lamp:
                 block.append(f"ANIM_hide\t-1\t0.001\t{lamp.dataref}")
-            block += stage_lines(target["motion"]) + [f"TRIS\t{run_start}\t{run_count}", "ANIM_end"]
+            block += stage_lines(target["stages"]) + [f"TRIS\t{run_start}\t{run_count}", "ANIM_end"]
             if lamp:
                 block.append(light_state)
             output.extend(indent + row + "\n" for row in block)
@@ -348,9 +498,9 @@ def patch_panel(text: str, filename: str, targets: list[dict]):
     if vertex_payload(text) != vertex_payload(patched):
         raise ValueError(f"{filename}: VT/IDX/texture payload changed")
     report = []
-    for target, count, animated in zip(applicable, counts, skipped_animated):
+    for target, count, animated, share in zip(applicable, counts, skipped_animated, shared):
         report.append(dict(control=target["motion"]["control"].id, mesh=target["name"], wrapped=count,
-                           source_indices=target["count"], already_animated=animated,
+                           source_indices=target["count"], already_animated=animated, shared=share,
                            lamp=target["lamp"].dataref if target["lamp"] else None))
     return patched, report
 
@@ -476,7 +626,8 @@ def append_controls(text: str, source: Source, motions: list[dict]):
                 vertices, indices = cap_box(source, motion)
                 clicks.append((control, f"ATTR_manip_command\tbutton\t{control.push_cap}\t{control.label}",
                                vertices, indices, motion))
-            vertices, indices = oriented_box(local_points(source, motion["index"]), source.world(motion["index"]))
+            click = motion.get("click_index", motion["index"])
+            vertices, indices = oriented_box(local_points(source, click), source.world(click))
             clicks.append((control, manip, vertices, indices, motion))
         for lamp in control.lamps:
             if lamp.cell is not None and f"{MARKER} LAMP {control.id} {lamp.face}\n" not in text:
@@ -507,7 +658,10 @@ def append_controls(text: str, source: Source, motions: list[dict]):
     for control, manip, vertices, indices, motion in clicks:
         start, count = add(vertices, indices)
         marker = f"{MARKER} CLICK {control.id}" + (" CAP" if manip.startswith("ATTR_manip_command\t") and control.push_cap else "")
-        commands += [marker, "ANIM_begin", *stage_lines(motion), manip,
+        stages = motion.get("click_stages", motion["stages"])
+        if manip.startswith("ATTR_manip_command\t") and control.push_cap:
+            stages = motion["stages"]
+        commands += [marker, "ANIM_begin", *stage_lines(stages), manip,
                      f"TRIS\t{start}\t{count}", "ATTR_manip_none", "ANIM_end"]
         report.append(dict(click=control.id, manipulator=manip.split("\t")[0], triangles=count // 3))
     commands += ["ATTR_manip_none", "ATTR_draw_enable"]
@@ -604,7 +758,7 @@ def sha(text: str) -> str:
 
 def run(aircraft: Path, source_path: Path, dry_run: bool, controls=CONTROLS) -> dict:
     source = Source(source_path)
-    motions = [compile_motion(source, c) for c in controls]
+    motions = link_motions(source, [compile_motion(source, c) for c in controls])
     targets = [t for m in motions for t in mesh_targets(source, m)]
     staged, report = {}, {"panels": [], "controls": []}
     for directory in PANEL_DIRS:
@@ -618,11 +772,20 @@ def run(aircraft: Path, source_path: Path, dry_run: bool, controls=CONTROLS) -> 
             report["panels"] += [dict(file=path.name, **r) for r in rows]
     # Every visible source mesh must be wrapped exactly, unless it already moved before this pass.
     # Legend children may differ by a few triangles from the FBW mesh (the export re-triangulated some
-    # legend art): at least 90 % wrapped is accepted, and reported as partial.
+    # legend art): at least 80 % wrapped is accepted, and reported as partial. More than the FBW count is
+    # fine up to double-sided duplicates (the export writes both faces of two-sided materials).
     for r in report["panels"]:
         r["partial"] = 0 < r["wrapped"] < r["source_indices"]
-    problems = [r for r in report["panels"] if (r["partial"] and r["wrapped"] < 0.9 * r["source_indices"])
-                or r["wrapped"] > r["source_indices"] or (r["wrapped"] == 0 and r["already_animated"] == 0)]
+    # Coincident meshes of one control count once (the triangle goes to the first): totals per control and file.
+    totals = {}
+    for r in report["panels"]:
+        total = totals.setdefault((r["file"], r["control"]), dict(file=r["file"], control=r["control"], wrapped=0,
+                                                                  source_indices=0, already_animated=0))
+        for key in ("wrapped", "source_indices", "already_animated"):
+            total[key] += r[key]
+    problems = [r for r in report["panels"] if r["wrapped"] == 0 and r["already_animated"] == 0]
+    problems += [r for r in totals.values() if 0 < r["wrapped"] < 0.8 * (r["source_indices"] - r["already_animated"])
+                 or r["wrapped"] > 2.2 * r["source_indices"] + 6]
     controls_path = aircraft / CONTROLS_OBJ
     original = controls_path.read_bytes().decode("latin-1")
     patched, rows = append_controls(original, source, motions)
