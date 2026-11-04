@@ -598,6 +598,9 @@ def validate(root: Path, datarefs: Path | None = None, commands: Path | None = N
             custom_refs.update(avionics_provider['xpkit_pfd']['datarefs'])
         if avionics_provider.get('ecam_sd'):
             packaged_devices.update(avionics_provider['ecam_sd']['cockpit_devices'])
+        if avionics_provider.get('cockpit_feedback'):
+            packaged_commands.update(avionics_provider['cockpit_feedback']['commands'])
+            custom_refs.update(avionics_provider['cockpit_feedback']['datarefs'])
         if avionics_provider.get('isis'):
             packaged_devices.update(avionics_provider['isis']['cockpit_devices'])
             packaged_commands.update(avionics_provider['isis']['commands'])

@@ -282,6 +282,7 @@ static int xpkit_draw_sd(void);
 #include "a380x_sd_adapter.inc"
 #include "a380x_fms_adapter.inc"
 #include "a380x_isis_adapter.inc"
+#include "a380x_cockpit_feedback.inc" /* key travel, SWITCHING / SURV / ECAM CP lamps (after SD, ADIRS, FMS) */
 #include "a380x_fws_adapter.inc"
 #define XPKIT_ND_OVERLAY(side) (plugin_enabled && cds_overlay((side) ? A380X_ELN_DU_FO_ND : A380X_ELN_DU_CAPT_ND, 0, 0, 768, 1024))
 #include "a380x_xpkit_adapter.inc"
@@ -382,6 +383,7 @@ static float flight_loop(float elapsed_since_last_call, float elapsed_since_last
      * Mechanical ENG motion uses our own callback's elapsed wall time. */
     sda_update(elapsed_since_last_call, a380x_power_du_on(A380X_ELN_DU_SD, powered), &ewd);
     isis_adapter_update(dt);
+    cfb_update();
     a380x_efb_update(dt);
     xpkit_update();
     return -1.0f;
@@ -624,6 +626,8 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
         XPLMDebugString(fws_line);
     }
     if (!sda_init()) XPLMDebugString("A380X ECAM SD: registration failed; existing avionics remain available\n");
+    /* Key-travel, selector and lamp datarefs before the aircraft OBJs bind them. */
+    if (!cfb_init()) XPLMDebugString("A380X cockpit feedback: registration failed; keys stay static\n");
     /* L/G GRVTY panel datarefs before the aircraft OBJs bind them (cover, guards, switch). */
     if (!lgg_init()) XPLMDebugString("A380X L/G GRVTY: registration failed; gravity extension unavailable, the lever drives the gear\n");
     /* Thrust-lever manipulator datarefs before the aircraft OBJs bind them; needs the FCU commands. */
@@ -638,6 +642,7 @@ PLUGIN_API int XPluginStart(char *name, char *signature, char *description)
         thrust_shutdown();
         lgg_shutdown();
         isis_adapter_shutdown();
+        cfb_shutdown();
         sda_shutdown();
         mfda_shutdown(); fmsa_shutdown();
         adirs_window_shutdown(); adirs_shutdown();
@@ -674,6 +679,7 @@ PLUGIN_API void XPluginStop(void)
     elec_shutdown();
     XPLMUnregisterDrawCallback(draw_panel, xplm_Phase_Gauges, 0, NULL);
     isis_adapter_shutdown();
+    cfb_shutdown();
     sda_shutdown();
     mfda_shutdown(); fmsa_shutdown();
     adirs_window_shutdown(); adirs_shutdown();
@@ -757,6 +763,7 @@ PLUGIN_API void XPluginReceiveMessage(XPLMPluginID from, int message, void *para
         flaps_plane_loaded();  /* lever, SFCC and surfaces re-read from X-Plane's flap handle */
         speedbrake_plane_loaded(); /* lever re-read from X-Plane's speedbrake handle (ARMED = ARM) */
     }
+    if (message == XPLM_MSG_PLANE_LOADED && (intptr_t)param == 0) cfb_reset();
     if (message == XPLM_MSG_PLANE_LOADED && (intptr_t)param == 0 && guidance.initialized) {
         adirs_reset();
         release_guidance_controls();

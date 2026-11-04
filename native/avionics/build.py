@@ -615,6 +615,9 @@ def main() -> None:
             or [line[2:] for line in ovhd_contracts if line.startswith("D ")] != list(OVHD_DATAREFS)
             or set(OVHD_DATAREFS) & (set(ELEC_DATAREFS) | set(ELEC_NETWORK_DATAREFS))):
         raise RuntimeError("Overhead lamp native registry disagrees with tools/ovhd_lamps_contract.py")
+    from cockpit_feedback_contract import emit_c_table as feedback_table
+    if (HERE / "a380x_cockpit_feedback_table.h").read_text() != feedback_table():
+        raise RuntimeError("a380x_cockpit_feedback_table.h is stale: python3 tools/cockpit_feedback_contract.py --emit-c")
     adapter = (HERE / "a380x_fcu_adapter.inc").read_text()
     command_names = {"a380x/xp12/fcu/" + name for name in re.findall(r'FCUC\("([^"\n]+)"', adapter)}
     dataref_names = {"a380x/xp12/fcu/" + name for name in re.findall(r'FCUR\("([^"\n]+)"', adapter)}
