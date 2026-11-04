@@ -8,8 +8,16 @@
  * reference .png names and ship only .dds). Rows are stored top-down like the PNG: Laminar's DDS
  * (Sikorsky S-76 panels, Cessna 172 audio panel) decode upright with text reading normally.
  *
- *   png2dds in.png out.dds            convert
- *   png2dds --verify in.png out.dds   decode out.dds level 0 and print the PSNR against in.png
+ *   png2dds [--alpha-test CUTOFF] in.png out.dds   convert
+ *   png2dds --verify in.png out.dds                decode out.dds level 0, print the PSNR against in.png
+ *
+ * Transparency: the colour of fully transparent texels is filled from the nearest visible texels
+ * (pull-push) and mip levels average colour weighted by alpha. The FBW decal exports store black
+ * under transparent texels; filtering and mipmapping mixed that black into every visible edge and
+ * drew a dark, smeared outline around white panel lettering. With --alpha-test (the OBJ's
+ * ATTR_no_blend cutoff), each mip level's alpha is scaled so the share of texels above the cutoff
+ * stays that of level 0: lettering keeps its weight at a distance instead of thinning or bloating.
+ * --verify weights the colour error by alpha (colour under transparent texels is never seen).
  *
  * Exit status: 0 ok, 2 usage, 3 unsupported or invalid PNG, 4 I/O error, 5 verification mismatch.
  * Only non-interlaced 8-bit grey, grey+alpha, RGB, RGBA and palette PNGs are supported (every
@@ -18,7 +26,7 @@
  * Encoder: per 4x4 block, endpoints on the principal axis of the colours (power iteration), inset,
  * then two least-squares refinements of the endpoints for the chosen indices, keeping the
  * lowest-error result. Alpha (DXT5) uses the 8-value mode between the block's min and max.
- * Mipmaps: 2x2 box filter of the 8-bit values, down to 1x1.
+ * Mipmaps: 2x2 box filter (colour weighted by alpha), down to 1x1.
  */
 #include <math.h>
 #include <stdint.h>
@@ -292,27 +300,156 @@ static void encode_level(const uint8_t *rgba, int w, int h, int dxt5, uint8_t *o
     for (int by = 0; by < (h + 3) / 4; ++by)
         for (int bx = 0; bx < (w + 3) / 4; ++bx) {
             load_block(rgba, w, h, bx, by, px);
-            if (dxt5) { encode_alpha(px, out); out += 8; }
+            if (dxt5) {
+                /* Endpoints for the visible texels only: a transparent texel in a mixed block takes
+                 * the mean of the block's visible colours (the fill keeps fully clear blocks smooth). */
+                int sum[3] = {0, 0, 0}, visible = 0, clear = 0;
+                for (int i = 0; i < 16; ++i) {
+                    if (px[i][3]) { for (int c = 0; c < 3; ++c) sum[c] += px[i][c]; ++visible; } else ++clear;
+                }
+                if (visible && clear)
+                    for (int i = 0; i < 16; ++i)
+                        if (!px[i][3]) for (int c = 0; c < 3; ++c) px[i][c] = (uint8_t)((sum[c] + visible / 2) / visible);
+                encode_alpha(px, out); out += 8;
+            }
             encode_color(px, out); out += 8;
         }
 }
 
-/* 2x2 box filter (POT sizes: each dimension halves, minimum 1). */
+/* 2x2 box filter (POT sizes: each dimension halves, minimum 1); colour weighted by alpha so a
+ * transparent texel's colour never darkens or tints its visible neighbours. */
 static uint8_t *downsample(const uint8_t *src, int w, int h, int *nw, int *nh)
 {
     int ww = w > 1 ? w / 2 : 1, hh = h > 1 ? h / 2 : 1;
     uint8_t *dst = malloc((size_t)ww * (size_t)hh * 4);
     if (!dst) return NULL;
     for (int y = 0; y < hh; ++y)
-        for (int x = 0; x < ww; ++x)
-            for (int c = 0; c < 4; ++c) {
-                int x0 = w > 1 ? 2 * x : 0, x1 = w > 1 ? 2 * x + 1 : 0, y0 = h > 1 ? 2 * y : 0, y1 = h > 1 ? 2 * y + 1 : 0;
-                int s = src[((size_t)y0 * w + x0) * 4 + c] + src[((size_t)y0 * w + x1) * 4 + c]
-                      + src[((size_t)y1 * w + x0) * 4 + c] + src[((size_t)y1 * w + x1) * 4 + c];
-                dst[((size_t)y * ww + x) * 4 + c] = (uint8_t)((s + 2) / 4);
+        for (int x = 0; x < ww; ++x) {
+            int x0 = w > 1 ? 2 * x : 0, x1 = w > 1 ? 2 * x + 1 : 0, y0 = h > 1 ? 2 * y : 0, y1 = h > 1 ? 2 * y + 1 : 0;
+            const uint8_t *q[4] = {src + ((size_t)y0 * w + x0) * 4, src + ((size_t)y0 * w + x1) * 4,
+                                   src + ((size_t)y1 * w + x0) * 4, src + ((size_t)y1 * w + x1) * 4};
+            uint8_t *o = dst + ((size_t)y * ww + x) * 4;
+            int sa = q[0][3] + q[1][3] + q[2][3] + q[3][3];
+            for (int c = 0; c < 3; ++c) {
+                int s = 0, sw = 0;
+                for (int k = 0; k < 4; ++k) { s += q[k][c] * q[k][3]; sw += q[k][c]; }
+                o[c] = (uint8_t)(sa ? (s + sa / 2) / sa : (sw + 2) / 4);
             }
+            o[3] = (uint8_t)((sa + 2) / 4);
+        }
     *nw = ww; *nh = hh;
     return dst;
+}
+
+/* Textures whose semi-transparent texels are mostly bright straight-alpha colour (>= 80%), like the
+ * FBW panel lettering: their darker edge texels (premultiplied or partly darkened by an earlier
+ * resample) are export artefacts that draw a dark rim around every glyph. The FCU label shadows and
+ * the dark MIP03 panel are dark by design and fail this test, so they keep their edge colours. */
+static int bright_straight_alpha(const Image *img)
+{
+    size_t n = (size_t)img->w * (size_t)img->h, semi = 0, bright = 0;
+    for (size_t i = 0; i < n; ++i) {
+        const uint8_t *p = img->rgba + i * 4;
+        if (p[3] == 0 || p[3] >= 250) continue;
+        ++semi;
+        if (p[0] > 200 || p[1] > 200 || p[2] > 200) ++bright;
+    }
+    return semi && bright * 5 >= semi * 4;
+}
+
+static float luma(const float c[3]) { return 0.299f * c[0] + 0.587f * c[1] + 0.114f * c[2]; }
+
+/* Pull-push fill: every texel gets the colour of the nearest source texels (alpha > 0; with the
+ * edge repair, the glyph cores at alpha >= 200). Fully transparent texels take that colour; with
+ * the repair, so do edge texels (alpha < 200) more than 15% darker than it. Alpha never changes.
+ * Returns 0, or 4 when out of memory. */
+static int bleed_transparent(Image *img)
+{
+    int w = img->w, h = img->h, levels = 1, any_clear = 0, any_source = 0;
+    size_t n = (size_t)w * (size_t)h;
+    int repair = bright_straight_alpha(img), core = repair ? 200 : 1;
+    for (size_t i = 0; i < n; ++i) {
+        int a = img->rgba[i * 4 + 3];
+        if (a >= core) any_source = 1;
+        if (a == 0 || (repair && a < core)) any_clear = 1;
+    }
+    if (!any_clear || !any_source) return 0;
+    while ((w >> (levels - 1)) > 1 || (h >> (levels - 1)) > 1) ++levels;
+    /* Level l >= 1: normalised colour (r, g, b) and coverage weight per texel. */
+    float **lv = calloc((size_t)levels, sizeof *lv);
+    int *lw = calloc((size_t)levels, sizeof *lw), *lh = calloc((size_t)levels, sizeof *lh), rc = 4;
+    if (!lv || !lw || !lh) goto done;
+    lw[0] = w; lh[0] = h;
+    for (int l = 1; l < levels; ++l) {
+        int pw = lw[l - 1], ph = lh[l - 1], cw = pw > 1 ? pw / 2 : 1, ch = ph > 1 ? ph / 2 : 1;
+        lw[l] = cw; lh[l] = ch;
+        lv[l] = malloc((size_t)cw * (size_t)ch * 4 * sizeof(float));
+        if (!lv[l]) goto done;
+        for (int y = 0; y < ch; ++y)
+            for (int x = 0; x < cw; ++x) {
+                float s[3] = {0, 0, 0}, sw = 0;
+                for (int k = 0; k < 4; ++k) {
+                    int sx = pw > 1 ? 2 * x + (k & 1) : 0, sy = ph > 1 ? 2 * y + (k >> 1) : 0;
+                    float wt, c[3];
+                    if (l == 1) {
+                        const uint8_t *p = img->rgba + ((size_t)sy * pw + sx) * 4;
+                        wt = p[3] >= core ? 1.0f : 0.0f; c[0] = p[0]; c[1] = p[1]; c[2] = p[2];
+                    } else {
+                        const float *p = lv[l - 1] + ((size_t)sy * pw + sx) * 4;
+                        wt = p[3]; c[0] = p[0]; c[1] = p[1]; c[2] = p[2];
+                    }
+                    for (int j = 0; j < 3; ++j) s[j] += c[j] * wt;
+                    sw += wt;
+                }
+                float *o = lv[l] + ((size_t)y * cw + x) * 4;
+                for (int j = 0; j < 3; ++j) o[j] = sw > 0 ? s[j] / sw : 0;
+                o[3] = sw;
+            }
+    }
+    /* Push: a texel with no coverage takes its parent's (already filled) colour. */
+    for (int l = levels - 2; l >= 1; --l)
+        for (int y = 0; y < lh[l]; ++y)
+            for (int x = 0; x < lw[l]; ++x) {
+                float *o = lv[l] + ((size_t)y * lw[l] + x) * 4;
+                if (o[3] > 0) continue;
+                const float *p = lv[l + 1] + ((size_t)(lh[l + 1] > 1 ? y / 2 : 0) * lw[l + 1] + (lw[l + 1] > 1 ? x / 2 : 0)) * 4;
+                o[0] = p[0]; o[1] = p[1]; o[2] = p[2];
+            }
+    for (int y = 0; y < h; ++y)
+        for (int x = 0; x < w; ++x) {
+            uint8_t *o = img->rgba + ((size_t)y * w + x) * 4;
+            if (o[3] >= core) continue;
+            const float *p = lv[1] + ((size_t)(lh[1] > 1 ? y / 2 : 0) * lw[1] + (lw[1] > 1 ? x / 2 : 0)) * 4;
+            if (o[3]) {                                   /* repair only: a darkened edge texel */
+                float c[3] = {o[0], o[1], o[2]};
+                if (luma(c) >= 0.85f * luma(p)) continue;
+            }
+            for (int j = 0; j < 3; ++j) { float v = p[j] + 0.5f; o[j] = (uint8_t)(v < 0 ? 0 : v > 255 ? 255 : v); }
+        }
+    rc = 0;
+done:
+    if (lv) for (int l = 0; l < levels; ++l) free(lv[l]);
+    free(lv); free(lw); free(lh);
+    return rc;
+}
+
+/* Share of texels whose alpha exceeds the cutoff (0..255 scale). */
+static double coverage(const uint8_t *rgba, size_t n, double cutoff, double scale)
+{
+    size_t above = 0;
+    for (size_t i = 0; i < n; ++i) if (rgba[i * 4 + 3] * scale > cutoff) ++above;
+    return n ? (double)above / (double)n : 0.0;
+}
+
+/* Alpha scale for a mip level that restores the level-0 coverage at the alpha-test cutoff. */
+static double coverage_scale(const uint8_t *rgba, size_t n, double cutoff, double target)
+{
+    double lo = 0.0, hi = 8.0;
+    for (int i = 0; i < 24; ++i) {
+        double mid = 0.5 * (lo + hi);
+        if (coverage(rgba, n, cutoff, mid) < target) lo = mid; else hi = mid;
+    }
+    return 0.5 * (lo + hi);
 }
 
 /* ------------------------------------------------------------------ DDS */
@@ -320,14 +457,16 @@ static uint8_t *downsample(const uint8_t *src, int w, int h, int *nw, int *nh)
 static void put32(uint8_t *p, uint32_t v) { p[0] = (uint8_t)v; p[1] = (uint8_t)(v >> 8); p[2] = (uint8_t)(v >> 16); p[3] = (uint8_t)(v >> 24); }
 static uint32_t get32(const uint8_t *p) { return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24; }
 
-static int write_dds(const char *path, const Image *img, int dxt5, int *levels_out)
+static int write_dds(const char *path, const Image *img, int dxt5, double alpha_test, int *levels_out)
 {
     int block = dxt5 ? 16 : 8, levels = 1, w = img->w, h = img->h;
     uint8_t header[128];
     const uint8_t *level = img->rgba;
-    uint8_t *owned = NULL;
+    uint8_t *owned = NULL, *scaled = NULL;
+    double cutoff = alpha_test * 255.0, target = 0.0;
     char tmp[4096];
     FILE *f;
+    if (dxt5 && alpha_test > 0.0) target = coverage(img->rgba, (size_t)img->w * (size_t)img->h, cutoff, 1.0);
     while ((w >> (levels - 1)) > 1 || (h >> (levels - 1)) > 1) ++levels;
     memset(header, 0, sizeof(header));
     memcpy(header, "DDS ", 4);
@@ -349,18 +488,27 @@ static int write_dds(const char *path, const Image *img, int dxt5, int *levels_o
         size_t bytes = level_bytes(w, h, block);
         uint8_t *blocks = malloc(bytes);
         if (!blocks) { fclose(f); remove(tmp); free(owned); return 4; }
-        encode_level(level, w, h, dxt5, blocks);
-        if (fwrite(blocks, 1, bytes, f) != bytes) { free(blocks); fclose(f); remove(tmp); free(owned); return 4; }
+        if (l > 0 && dxt5 && alpha_test > 0.0 && target > 0.0) {
+            size_t n = (size_t)w * (size_t)h;
+            double s = coverage_scale(level, n, cutoff, target);
+            free(scaled);
+            scaled = malloc(n * 4);
+            if (!scaled) { free(blocks); fclose(f); remove(tmp); free(owned); return 4; }
+            memcpy(scaled, level, n * 4);
+            for (size_t i = 0; i < n; ++i) { double a = scaled[i * 4 + 3] * s + 0.5; scaled[i * 4 + 3] = (uint8_t)(a > 255 ? 255 : a); }
+            encode_level(scaled, w, h, dxt5, blocks);
+        } else encode_level(level, w, h, dxt5, blocks);
+        if (fwrite(blocks, 1, bytes, f) != bytes) { free(blocks); fclose(f); remove(tmp); free(owned); free(scaled); return 4; }
         free(blocks);
         if (l + 1 < levels) {
             int nw, nh;
             uint8_t *next = downsample(level, w, h, &nw, &nh);
             free(owned);
-            if (!next) { fclose(f); remove(tmp); return 4; }
+            if (!next) { fclose(f); remove(tmp); free(scaled); return 4; }
             owned = next; level = next; w = nw; h = nh;
         }
     }
-    free(owned);
+    free(owned); free(scaled);
     if (fclose(f) || rename(tmp, path)) { remove(tmp); return 4; }
     *levels_out = levels;
     return 0;
@@ -421,14 +569,25 @@ static double psnr(double mse) { return mse <= 0.0 ? 99.0 : 10.0 * log10(255.0 *
 
 int main(int argc, char **argv)
 {
-    int verify = argc == 4 && !strcmp(argv[1], "--verify");
-    const char *in = argv[argc - 2], *out = argv[argc - 1], *why = "";
+    int verify = 0, arg = 1;
+    double alpha_test = 0.0;
+    const char *why = "";
     Image img = {0, 0, NULL};
     int rc, dxt5 = 0, levels = 0;
-    if (!(argc == 3 || verify)) {
-        fprintf(stderr, "usage: png2dds [--verify] in.png out.dds\n");
+    while (arg < argc && argv[arg][0] == '-' && argv[arg][1] == '-') {
+        if (!strcmp(argv[arg], "--verify")) { verify = 1; ++arg; }
+        else if (!strcmp(argv[arg], "--alpha-test") && arg + 1 < argc) {
+            char *end = NULL;
+            alpha_test = strtod(argv[arg + 1], &end);
+            if (!end || *end || !(alpha_test >= 0.0 && alpha_test < 1.0)) { fprintf(stderr, "png2dds: --alpha-test wants 0..1\n"); return 2; }
+            arg += 2;
+        } else break;
+    }
+    if (argc - arg != 2) {
+        fprintf(stderr, "usage: png2dds [--alpha-test CUTOFF] in.png out.dds | png2dds --verify in.png out.dds\n");
         return 2;
     }
+    const char *in = argv[arg], *out = argv[arg + 1];
     rc = png_decode(in, &img, &why);
     if (rc) { fprintf(stderr, "png2dds: %s: %s\n", in, why); return rc; }
     if ((img.w & (img.w - 1)) || (img.h & (img.h - 1))) {
@@ -439,7 +598,7 @@ int main(int argc, char **argv)
     for (size_t i = 0; i < (size_t)img.w * (size_t)img.h; ++i) if (img.rgba[i * 4 + 3] != 255) { dxt5 = 1; break; }
     if (verify) {
         Image d = {0, 0, NULL};
-        double se_c = 0.0, se_a = 0.0;
+        double se_c = 0.0, se_a = 0.0, wsum = 0.0;
         size_t n = (size_t)img.w * (size_t)img.h;
         if (dds_decode_top(out, &d) || d.w != img.w || d.h != img.h) {
             fprintf(stderr, "png2dds: %s: unreadable or mismatched DDS\n", out);
@@ -447,14 +606,18 @@ int main(int argc, char **argv)
             return 5;
         }
         for (size_t i = 0; i < n; ++i) {
-            for (int c = 0; c < 3; ++c) { double e = (double)img.rgba[i*4+c] - d.rgba[i*4+c]; se_c += e * e; }
+            double wt = img.rgba[i*4+3] / 255.0;   /* colour under transparent texels is never seen */
+            for (int c = 0; c < 3; ++c) { double e = (double)img.rgba[i*4+c] - d.rgba[i*4+c]; se_c += wt * e * e; }
+            wsum += wt;
             { double e = (double)img.rgba[i*4+3] - d.rgba[i*4+3]; se_a += e * e; }
         }
-        printf("%dx%d psnr_rgb=%.2f psnr_alpha=%.2f\n", img.w, img.h, psnr(se_c / (3.0 * n)), psnr(se_a / n));
+        printf("%dx%d psnr_rgb=%.2f psnr_alpha=%.2f\n", img.w, img.h,
+               psnr(wsum > 0 ? se_c / (3.0 * wsum) : 0.0), psnr(se_a / n));
         free(img.rgba); free(d.rgba);
         return 0;
     }
-    rc = write_dds(out, &img, dxt5, &levels);
+    if (dxt5 && bleed_transparent(&img)) { fprintf(stderr, "png2dds: %s: out of memory\n", in); free(img.rgba); return 4; }
+    rc = write_dds(out, &img, dxt5, alpha_test, &levels);
     if (rc) fprintf(stderr, "png2dds: %s: write failed\n", out);
     else printf("%dx%d %s %d levels\n", img.w, img.h, dxt5 ? "DXT5" : "DXT1", levels);
     free(img.rgba);
